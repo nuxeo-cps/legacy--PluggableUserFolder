@@ -350,7 +350,7 @@ class SimpleGroupRolesPlugin(Folder):
                 if groupid == 'role:Anonymous':
                     return 1
                 if groupid == 'role:Authenticated' and \
-                    user and user != 'Anonymous':
+                    user and user != 'Anonymous User':
                     return 1
                 groupob = self.getGroup(groupid)
                 if user in groupob.getComputedUsers():
