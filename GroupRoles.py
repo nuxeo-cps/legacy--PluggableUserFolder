@@ -27,7 +27,7 @@ from AccessControl import ClassSecurityInfo
 from OFS.SimpleItem import SimpleItem
 from OFS.Folder import Folder
 from OFS.ObjectManager import checkValidId
-from ZODB.PersistentMapping import PersistentMapping
+from Globals import PersistentMapping
 
 from PluginInterfaces import IRolePlugin, IGroupPlugin
 
