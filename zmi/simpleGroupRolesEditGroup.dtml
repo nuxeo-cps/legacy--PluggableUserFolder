@@ -30,7 +30,7 @@
   <td>&nbsp;</td>
   <td class="form-label">userid</td>
 </tr>
-<dtml-in getMembers prefix="user">
+<dtml-in getUsers prefix="user">
   <tr <dtml-if sequence-odd>bgcolor="#CCCCCC"</dtml-if>>
     <td>
        <input type="checkbox" name="selectedusers:list" value="&dtml-user_item;">
@@ -57,7 +57,7 @@
   <td class="form-element">
     <select multiple name="userids:list">
       <dtml-in "acl_users.getUserNames()" prefix="user">
-        <dtml-if "user_item not in getMembers()">
+        <dtml-if "user_item not in getUsers()">
           <option value="&dtml-user_item;"><dtml-var user_item></option>
         </dtml-if>
       </dtml-in>
