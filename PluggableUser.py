@@ -64,10 +64,6 @@ class PluggableUserMixin:
            including local roles assigned in context of
            the passed in object."""
 
-        LOG('PluggableUser', DEBUG, 'getRolesInContext',
-            'User: %s\nObject: %s\n' % \
-            (self.getId(), str(object)))
-
         userid = self.getId()
         roles = self.getRoles()
         local = {}
@@ -103,10 +99,6 @@ class PluggableUserMixin:
     def allowed(self, object, object_roles=None):
         """Check whether the user has access to object. The user must
            have one of the roles in object_roles to allow access."""
-        LOG('PluggableUser', DEBUG, 'allowed',
-            'Roles: %s\nUser: %s\nObject: %s\n' % \
-            (object_roles, self.getId(), str(object)))
-
         if object_roles is _what_not_even_god_should_do: return 0
 
         # Short-circuit the common case of anonymous access.
