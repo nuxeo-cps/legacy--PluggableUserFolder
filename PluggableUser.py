@@ -30,7 +30,7 @@ from AccessControl.PermissionRole import _what_not_even_god_should_do
 
 from PluginInterfaces import IRolePlugin
 
-class PluggableUserMixin(Base):
+class PluggableUserMixin:
     """A mixin for user that overrides the methods for getting roles"""
     security = ClassSecurityInfo()
 
@@ -57,39 +57,39 @@ class PluggableUserMixin(Base):
            the passed in object."""
 
         LOG('PluggableUser', DEBUG, 'getRolesInContext',
-            'Roles: %s\nUser: %s\nObject: %s\n' % \
-            (object_roles, self.getId(), str(object)))
+            'User: %s\nObject: %s\n' % \
+            (self.getId(), str(object)))
 
         userid = self.getId()
         roles = self.getRoles()
         local = {}
-        object = getattr(object, 'aq_inner', object)
+        inner_object = getattr(object, 'aq_inner', object)
         while 1:
-            local_roles = getattr(object, '__ac_local_roles__', None)
+            local_roles = getattr(inner_object, '__ac_local_roles__', None)
             if local_roles:
                 if callable(local_roles):
                     local_roles = local_roles()
                 dict = local_roles or {}
                 for r in dict.get(userid, []):
                     local[r] = 1
-            inner = getattr(object, 'aq_inner', object)
+            inner = getattr(inner_object, 'aq_inner', inner_object)
             parent = getattr(inner, 'aq_parent', None)
             if parent is not None:
-                object = parent
+                inner_object = parent
                 continue
-            if hasattr(object, 'im_self'):
-                object = object.im_self
-                object = getattr(object, 'aq_inner', object)
+            if hasattr(inner_object, 'im_self'):
+                inner_object = object.im_self
+                object = getattr(inner_object, 'aq_inner', inner_object)
                 continue
             break
         roles = list(roles) + local.keys()
 
         plugins = self._v_acl_users._get_plugins(IRolePlugin)
-        LOG('PluggableUser', DEBUG, 'allowed',
-            'Roles: %s\nUser: %s\nPlugins: %s\n' % \
-            (object_roles, userid, str(plugins)))
+        LOG('PluggableUser', DEBUG, 'getRolesInContext',
+            'User: %s\nPlugins: %s\n' % \
+            (userid, str(plugins)))
         for plugin in plugins:
-            roles = plugin.modifyLocalRoles(userid, inner_obj, roles)
+            roles = plugin.modifyLocalRoles(userid, object, roles)
 
         return roles
 
