@@ -38,7 +38,7 @@ except:
 from PluginInterfaces import IAuthenticationPlugin
 from PluggableUser import PluggableUserMixin
 
-class PluggableLDAPUser(PluggableUserMixin, LDAPUser):
+class PluggableLDAPUser(LDAPUser, PluggableUserMixin):
     pass
 
 class LDAPAuthenticationPlugin(LDAPUserFolder):
@@ -96,16 +96,29 @@ class LDAPAuthenticationPlugin(LDAPUserFolder):
         if self._login_attr != 'dn':
             login_name = login_name[0]
 
-        user_obj = PluggableLDAPUser( login_name
-                           , pwd or 'undef'
-                           , user_roles or []
-                           , user_groups or []
-                           , []
-                           , user_dn
-                           , user_attrs
-                           , self.getMappedUserAttrs()
-                           , self.getMultivaluedUserAttrs()
-                           )
+        if _ldap_user_groups:
+            user_obj = PluggableLDAPUser( login_name
+                            , pwd or 'undef'
+                            , user_roles or []
+                            , user_groups or []
+                            , []
+                            , []
+                            , user_dn
+                            , user_attrs
+                            , self.getMappedUserAttrs()
+                            , self.getMultivaluedUserAttrs()
+                            )
+        else:
+            user_obj = PluggableLDAPUser( login_name
+                            , pwd or 'undef'
+                            , user_roles or []
+                            , user_groups or []
+                            , []
+                            , user_dn
+                            , user_attrs
+                            , self.getMappedUserAttrs()
+                            , self.getMultivaluedUserAttrs()
+                            )
 
         if pwd is not None:
             self._authenticated_cache.set(name, user_obj)
