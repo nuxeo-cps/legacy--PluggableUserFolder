@@ -108,6 +108,15 @@ class SimpleGroup(SimpleItem):
                 index = self.members.index(userid)
                 del self.members[index]
 
+    def setUsers(self, userids):
+        for userid in userids:
+            if not userid in self.members:
+                self.members.append(userid)
+        for userid in self.members:
+            if not userid in userids:
+                index = self.members.index(userid)
+                del self.members[index]
+
 
 class SimpleGroupRolesPlugin(Folder):
     """This plugin stores the user definitions in the ZODB"""

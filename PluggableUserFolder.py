@@ -241,7 +241,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
     def setUsersOfGroup(self, users, group):
         LOG('PluggableUserFolder', DEBUG, 'setUsersOfGroup')
         group = self.getGroupById(group)
-        group.addUsers(users)
+        group.setUsers(users)
 
     security.declareProtected(Permissions.manage_users, 'userFolderAddGroup')
     def userFolderAddGroup(self, groupname, title='', **kw):
