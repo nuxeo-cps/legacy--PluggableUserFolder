@@ -40,7 +40,7 @@ class PluggableUserMixin:
         """Return the list of roles assigned to a user."""
         LOG('PluggableUser', DEBUG, 'getRoles',
             'User: %s\n' % self.getId())
-        plugins = self._v_acl_users._get_plugins(IRolePlugin)
+        plugins = self.acl_users._get_plugins(IRolePlugin)
         # plugins = self._sort_plugins(plugins, self.role_order)
         roles = self.roles[:] # Make sure it's a copy, and not the original
         for plugin in plugins:
@@ -82,7 +82,7 @@ class PluggableUserMixin:
             break
         roles = list(roles) + local.keys()
 
-        plugins = self._v_acl_users._get_plugins(IRolePlugin)
+        plugins = self.acl_users._get_plugins(IRolePlugin)
         LOG('PluggableUser', DEBUG, 'getRolesInContext',
             'User: %s\nPlugins: %s\n' % \
             (userid, str(plugins)))
@@ -133,7 +133,7 @@ class PluggableUserMixin:
         # we can incur only the overhead required to find a match.
         inner_obj = getattr(object, 'aq_inner', object)
         userid = self.getId()
-        plugins = self._v_acl_users._get_plugins(IRolePlugin)
+        plugins = self.acl_users._get_plugins(IRolePlugin)
         LOG('PluggableUser', DEBUG, 'allowed',
             'Roles: %s\nUser: %s\nPlugins: %s\n' % \
             (object_roles, userid, str(plugins)))
@@ -177,7 +177,7 @@ class PluggableUserMixin:
 
     def getGroups(self):
         LOG('PluggableUser', DEBUG, 'getGroups()')
-        return self._v_acl_users.getGroupsForUser(self.getId())
+        return self.acl_users.getGroupsForUser(self.getId())
 
 
 class PluggableUser(PluggableUserMixin, User):
