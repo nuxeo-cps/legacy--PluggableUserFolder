@@ -57,6 +57,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
     maxlistusers = DEFAULTMAXLISTUSERS
     identification_order = 'basic_identification'
     authentication_order = 'internal_authentication'
+    group_role_order = ''
 
     encrypt_passwords = 0
 
@@ -128,6 +129,31 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         sorted_list.extend(plugin_list)
         return sorted_list
 
+    def _get_first_plugin(self, interface, include_readonly=0):
+        if interface == IAuthenticationPlugin:
+            order = self.authentication_order
+        if interface == IIdentificationPlugin:
+            order = self.identificatio_order
+        if interface == IRolePlugin:
+            order = self.group_role_order
+        if interface == IGroupPlugin:
+            order = self.group_role_order
+
+        plugin = None
+        for id in order.split(','):
+            if hasattr(self, id):
+                plugin = getattr(self, id)
+                if not include_readonly and hasattr(plugin, 'isReadOnly') \
+                   and plugin.isReadonly():
+                    continue
+                break
+        if plugin is None:
+            plugins = self._get_plugins(interface, include_readonly)
+            if not plugins:
+                # TODO: make into a more specific object
+                raise Exception("There are no %s plugins" % str(interface))
+            pligin = plugins[0]
+        return plugin
 
     # ----------------------------------
     # ZMI interfaces
@@ -136,46 +162,53 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
     security.declareProtected(Permissions.manage_users, 'manage_userFolderProperties')
     manage_userFolderProperties = DTMLFile('zmi/userFolderProps', globals())
 
+    def _munge_order(self, order, interface):
+        """Internal support method for ZMI interface"""
+        message = ''
+        error = 0
+        existing_plugs = [p.id for p in self._get_plugins(interface)]
+        plugs = order.split(',')
+        plugs = [p.strip() for p in plugs if p.strip()]
+        for plug in plugs:
+            if plug in existing_plugs:
+                existing_plugs.remove(plug)
+            else:
+                message = message + 'Error: Plugin %s not found\n' % plug
+                error = 1
+        if not error:
+            for plug in existing_plugs:
+                message = message + \
+                'Plugin %s not included in list, appending.\n' % plug
+                plugs.append(plug)
+        return plugs, message, error
+
     def manage_setUserFolderProperties(self, maxlistusers=DEFAULTMAXLISTUSERS,
-                                       identification_order=None,
-                                       authentication_order=None,
+                                       identification_order='',
+                                       authentication_order='',
+                                       group_role_order='',
                                        REQUEST=None):
         """
         Sets the properties of the user folder.
         """
         message = ''
         error = 0
-        if identification_order:
-            existing_plugs = [p.id for p in self._get_plugins(IIdentificationPlugin)]
-            iplugs = identification_order.split(',')
-            iplugs = [p.strip() for p in iplugs if p.strip()]
-            for plug in iplugs:
-                if plug in existing_plugs:
-                    existing_plugs.remove(plug)
-                else:
-                    message = message + 'Error: Plugin %s not found\n' % plug
-                    error = 1
-            if not error:
-                for plug in existing_plugs:
-                    message = message + \
-                    'Plugin %s not included in list, appending.\n' % plug
-                    iplugs.append(plug)
+        iplugs, msg, err = self._munge_order(identification_order, \
+                                             IIdentificationPlugin)
+        message = message + msg
+        if err:
+            error = 1
 
-        if authentication_order:
-            existing_plugs = [p.id for p in self._get_plugins(IAuthenticationPlugin)]
-            aplugs = authentication_order.split(',')
-            aplugs = [p.strip() for p in aplugs if p.strip()]
-            for plug in aplugs:
-                if plug in existing_plugs:
-                    existing_plugs.remove(plug)
-                else:
-                    message = message + 'Error: Plugin %s not found\n' % plug
-                    error = 1
-            if not error:
-                for plug in existing_plugs:
-                    message = message + \
-                    'Plugin %s not included in list, appending.\n' % plug
-                    aplugs.append(plug)
+        aplugs, msg, err = self._munge_order(authentication_order, \
+                                             IAuthenticationPlugin)
+        message = message + msg
+        if err:
+            error = 1
+
+        gplugs, msg, err = self._munge_order(group_role_order, \
+                                             IGroupPlugin)
+        message = message + msg
+        if err:
+            error = 1
 
         try:
             maxlistusers = int(maxlistusers)
@@ -188,6 +221,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         else:
             self.identification_order = ', '.join(iplugs)
             self.authentication_order = ', '.join(aplugs)
+            self.group_role_order = ', '.join(gplugs)
             self.maxlistusers = maxlistusers
             message= message + 'Saved Changes.\n'
 
@@ -205,12 +239,16 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
     # change to get GroupIds and set up alias.
     security.declareProtected(Permissions.manage_users, 'setUsersOfGroup')
     def setUsersOfGroup(self, users, group):
-        pass
+        LOG('PluggableUserFolder', DEBUG, 'setUsersOfGroup')
+        group = self.getGroupById(group)
+        group.addUsers(users)
 
     security.declareProtected(Permissions.manage_users, 'userFolderAddGroup')
     def userFolderAddGroup(self, groupname, title='', **kw):
         """Creates a group"""
-        pass
+        LOG('PluggableUserFolder', DEBUG, 'userFolderAddGroup')
+        plugin = self._get_first_plugin(IGroupPlugin)
+        plugin.addGroup(groupname, title)
 
     security.declareProtected(Permissions.manage_users, 'userFolderDelGroups')
     def userFolderDelGroups(self, groupnames):
@@ -221,24 +259,26 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
     def getGroupNames(self):
         LOG('PluggableUserFolder', DEBUG, 'getGroupNames called')
         groups = []
-        for plugin in self._get_plugins(IRolePlugin):
+        for plugin in self._get_plugins(IGroupPlugin):
             groups.extend(plugin.getGroupIds())
         return groups
 
     security.declareProtected(Permissions.manage_users, 'getGroupById')
     def getGroupById(self, groupname, default=_marker):
         """Returns the given group"""
+        LOG('PluggableUserFolder', DEBUG, 'getGroupById: ' + groupname)
         if groupname.startswith('role:'):
             from GroupRoles import Group
             return Group(groupname, title=groupname)
 
-        groups = {}
-        try:
-            group = groups[groupname]
-        except KeyError:
-            if default is _marker: raise
-            return default
-        return group
+        for plugin in self._get_plugins(IGroupPlugin):
+            group = plugin.getGroup(groupname)
+            if group is not None:
+                return group
+        # Group not found
+        if default is _marker:
+            raise Exception('Group %s not found' % groupname)
+        return default
 
     security.declareProtected(Permissions.manage_users, 'getUserNames')
     def getUserNames(self):
@@ -288,6 +328,8 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
                 o = option.copy()
                 o['plugin_action'] = 'manage_' + plugin.plugin_id + option['id']
                 options.append(o)
+        LOG('PluggableUserFolder', DEBUG, 'Role Management Options',
+            str(options) + '\n')
         return options
 
     # ----------------------------------

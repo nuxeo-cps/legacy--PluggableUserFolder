@@ -36,6 +36,15 @@
  </td>
 </tr>
 
+<tr>
+ <td align="left" valign="center" class="form-label">
+  Call order of Group and Role Plugins
+ </td>
+ <td align="left" valign="center" class="form-element" >
+ <input type=text name="group_role_order" value="&dtml.missing-group_role_order;" size=100>
+ </td>
+</tr>
+
 </table>
 
 <p>

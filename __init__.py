@@ -34,6 +34,13 @@ try:
 except ImportError:
     LdapSupport = 0
 
+try:
+    from Products.CMFCore.DirectoryView import registerDirectory
+    registerDirectory('skins', globals())
+    CMFSupport = 1
+except ImportError:
+    CMFSupport = 0
+
 from AccessControl.Permissions import add_user_folders
 
 def initialize(context):
@@ -71,15 +78,14 @@ def initialize(context):
         icon='zmi/UserFolder_icon.gif',
         visibility=None,
     )
-    # Group support not yet finished, diabled in this release
-    #context.registerClass(
-    #    instance_class=GroupRoles.GroupRolesPlugin,
-    #    permission=add_user_folders,
-    #    constructors=(GroupRoles.manage_addGroupRolesPlugin,),
-    #    icon='zmi/UserFolder_icon.gif',
-    #    visibility=None,
-    #)
-    #registerRolePlugin(GroupRoles.GroupRolesPlugin)
+    context.registerClass(
+        instance_class=GroupRoles.GroupRolesPlugin,
+        permission=add_user_folders,
+        constructors=(GroupRoles.manage_addGroupRolesPlugin,),
+        icon='zmi/UserFolder_icon.gif',
+        visibility=None,
+    )
+    registerRolePlugin(GroupRoles.GroupRolesPlugin)
 
     if LdapSupport:
         context.registerClass(

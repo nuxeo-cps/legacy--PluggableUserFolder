@@ -61,8 +61,8 @@ class Group(SimpleItem):
     def getMembers(self):
         return self.members.keys()
 
-    # XXX: Temporary CPS hacks
     getUsers = getMembers
+
     def Title(self):
         return self.title
 
@@ -115,9 +115,7 @@ class Group(SimpleItem):
     def manage_addUser(self, userids, REQUEST=None):
         """Add a user to the members of the group"""
         # XXX check that user exists
-        for userid in userids:
-            if not userid in self.members.keys():
-                self.members[userid] = []
+        self.addUsers(userids)
         if REQUEST is not None:
             return self.manage_groupForm(manage_tabs_message='Users added')
 
@@ -129,12 +127,16 @@ class Group(SimpleItem):
         if REQUEST is not None:
             return self.manage_groupForm(manage_tabs_message='Users deleted')
 
+    def addUsers(self, userids):
+        for userid in userids:
+            if not userid in self.members.keys():
+                self.members[userid] = []
 
 
 class GroupRolesPlugin(Folder):
     """This plugin stores the user definitions in the ZODB"""
     security = ClassSecurityInfo()
-    __implements__ = (IGroupPlugin,)
+    __implements__ = (IGroupPlugin,IRolePlugin)
 
     meta_type = 'Group Roles Plugin'
     id = 'group_roles'
@@ -180,7 +182,7 @@ class GroupRolesPlugin(Folder):
 
     def manage_addGroup(self, id, title, REQUEST=None):
         """Adds a new group to the list of groups"""
-        self._setObject(id,Group(id, title))
+        self.addgroup(id, title)
         if REQUEST is not None:
             REQUEST['RESPONSE'].redirect(
                 self.absolute_url() + '/manage_workspace')
@@ -247,7 +249,9 @@ class GroupRolesPlugin(Folder):
     #
     # API
     #
-    
+    def addGroup(self, id, title):
+        self._setObject(id,Group(id, title))
+
     def getGroupIds(self):
         return self.objectIds('Group')
 
