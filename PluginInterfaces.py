@@ -16,15 +16,15 @@
 #
 # $Id$
 
-__doc__='''User Folder Plugin Interfaces'''
-__version__='$Revision$'[11:-2]
+__doc__ = '''User Folder Plugin Interfaces'''
+__version__ = '$Revision$'[11:-2]
 
 import Interface
 
 class IAuthenticationPlugin(Interface.Base):
 
     def isReadOnly(self):
-        """Returns 1 if you can not add, change or delete users"""
+        """Return 1 if you can not add, change or delete users"""
 
     def getUserNames(self):
         """Return a list of usernames"""
@@ -44,20 +44,26 @@ class IAuthenticationPlugin(Interface.Base):
         done from within UserFolder.authenticate()."""
 
     def _doAddUser(self, name, password, roles, domains, **kw):
-        """Create a new user. This should be implemented by subclasses to
-           do the actual adding of a user. The 'password' will be the
-           original input password, unencrypted. The implementation of this
-           method is responsible for performing any needed encryption."""
+        """Create a new user
+        
+        This should be implemented by subclasses to do the actual adding of a
+        user. The 'password' will be the original input password, unencrypted.
+        The implementation of this method is responsible for performing any
+        needed encryption."""
 
     def _doChangeUser(self, name, password, roles, domains, **kw):
-        """Modify an existing user. This should be implemented by subclasses
-           to make the actual changes to a user. The 'password' will be the
-           original input password, unencrypted. The implementation of this
-           method is responsible for performing any needed encryption."""
+        """Modify an existing user
+        
+        This should be implemented by subclasses to make the actual changes to
+        a user. The 'password' will be the original input password,
+        unencrypted. The implementation of this method is responsible for
+        performing any needed encryption."""
 
     def _doDelUsers(self, names):
-        """Delete one or more users. This should be implemented by subclasses
-           to do the actual deleting of users."""
+        """Delete one or more users
+        
+        This should be implemented by subclasses to do the actual deleting of
+        users."""
 
 class IIdentificationPlugin(Interface.Base):
 
@@ -83,7 +89,7 @@ class IIdentificationPlugin(Interface.Base):
     # def identify(self, auth, request):
 
     def makeAuthenticationString(self, request, auth):
-        """Returns an autentication string
+        """Return an authentication string
 
         This string starts with the authentication type and then a space.
         The rest of the string contains the authentication data. Ex:
@@ -94,10 +100,10 @@ class IIdentificationPlugin(Interface.Base):
         """
 
     def canIdentify(self, auth):
-        """Returns true if the plugin knows how to identify this string"""
+        """Return true if the plugin knows how to identify this string"""
 
     def identify(self, auth):
-        """Returns a username and a password from the authentication string"""
+        """Return a username and a password from the authentication string"""
 
 
 class IRolePlugin(Interface.Base):
@@ -110,16 +116,16 @@ class IRolePlugin(Interface.Base):
     # independently of each other.
 
     def modifyGlobalRoles(self, user, roles):
-        """Returns a updated list of roles"""
+        """Return a updated list of roles"""
 
     def modifyLocalRoles(self, user, object, roles):
-        """Modifies a list of local roles
+        """Modify a list of local roles
 
-        This is 
+        This is  XXX
         """
 
     def isUserAllowed(self, user, object, object_roles, previous):
-        """Checks local roles for just one role
+        """Check local roles for just one role
 
         This method is called from User.allowed(), and allows for several
         shortcuts for the plugin. Firstly, it only cares about one role,

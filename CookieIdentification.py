@@ -62,19 +62,22 @@ class CookieIdentificationPlugin(PropertyManager, SimpleItem):
     #
 
     def makeAuthenticationString(self, request, auth):
-        if request.__class__ is not HTTPRequest:
+        if not isinstance(request, HTTPRequest):
             LOG('CookieIdentification', DEBUG, 'Not an HTTP Request')
             return None
 
-        if not request[ 'REQUEST_METHOD' ] in ( 'GET', 'PUT', 'POST' ):
+        # XXX: what if it is a HEAD ?
+        if not request['REQUEST_METHOD'] in ('GET', 'PUT', 'POST'):
             LOG('CookieIdentification', DEBUG, 'Not a GET, PUT or POST')
             return None
 
-        if request.environ.has_key( 'WEBDAV_SOURCE_PORT' ):
+        # XXX: why isn't WebDAV supported ?
+        if request.environ.has_key('WEBDAV_SOURCE_PORT'):
             LOG('CookieIdentification', DEBUG, 'WebDAV not supported')
             return None
 
-        if request.has_key(self.pw_cookie) and request.has_key(self.name_cookie):
+        if request.has_key(self.pw_cookie) \
+          and request.has_key(self.name_cookie):
             # Attempt to log in and set cookies.
             name = request[self.name_cookie]
             pw = request[self.pw_cookie]
@@ -102,8 +105,9 @@ class CookieIdentificationPlugin(PropertyManager, SimpleItem):
         return 0
 
     def identify(self, auth):
-        try: name, password=tuple(decodestring(
-                                auth.split(' ')[-1]).split(':', 1))
+        try: 
+            name, password = tuple(decodestring(
+                                   auth.split(' ')[-1]).split(':', 1))
         except:
             raise 'Bad Request', 'Invalid authentication token'
         LOG('CookieIdentification', DEBUG, 'Identify',
@@ -112,9 +116,7 @@ class CookieIdentificationPlugin(PropertyManager, SimpleItem):
 
     security.declarePublic('logout')
     def logout(self):
-        '''
-        Logs out the user and redirects to the logout page.
-        '''
+        '''Log out the user and redirect to the logout page.'''
         req = self.REQUEST
         resp = req['RESPONSE']
         resp.expireCookie( self.auth_cookie, path='/')
@@ -125,8 +127,7 @@ class CookieIdentificationPlugin(PropertyManager, SimpleItem):
     #
     security.declarePublic('propertyLabel')
     def propertyLabel(self, id):
-        """Return a label for the given property id
-        """
+        """Return a label for the given property id."""
         for p in self._properties:
             if p['id'] == id:
                 return p.get('label', id)
@@ -148,14 +149,14 @@ class CookieIdentificationPlugin(PropertyManager, SimpleItem):
 
 def manage_addCookieIdentificationPlugin(self, REQUEST=None):
     """ """
-    ob=CookieIdentificationPlugin()
-    self=self.this()
+    ob = CookieIdentificationPlugin()
+    self = self.this()
     if hasattr(aq_base(self), ob.id):
         return MessageDialog(
-            title  ='Item Exists',
-            message='This object already contains an %s' % id.title ,
-            action ='%s/manage_main' % REQUEST['URL1'])
+            title='Item Exists',
+            message='This object already contains an %s' % id.title,
+            action='%s/manage_main' % REQUEST['URL1'])
     self._setObject(ob.id, ob)
     if REQUEST is not None:
-        REQUEST['RESPONSE'].redirect(self.absolute_url()+'/manage_main')
+        REQUEST['RESPONSE'].redirect(self.absolute_url() + '/manage_main')
 
