@@ -3,7 +3,11 @@ ZODB Requires:
 -
 New features:
 ~~~~~~~~~~~~~
--
+- Full group plugins support.
+- A SimpleGroups plugin that works as most Zope groups.
+- CPS support for Simple Groups, giving PluggableUserFolder equal CPS
+  functionality as UserFolderWithGroups
+
 Bug fixes:
 ~~~~~~~~~~
 -
