@@ -16,7 +16,7 @@ from AccessControl import Unauthorized
 
 
 from Products.PluggableUserFolder.PluggableUserFolder import \
-    PluggableUserFolder
+    PluggableUserFolder, manage_addPluggableUserFolder
 from Products.PluggableUserFolder.InternalAuthentication import \
     InternalAuthenticationPlugin
 from Products.PluggableUserFolder.PluginInterfaces import \
@@ -37,13 +37,19 @@ class ReadonlyAuthenticationPlugin(InternalAuthenticationPlugin):
     def isReadOnly(self):
         return 1
 
+ZopeTestCase.installProduct('PluggableUserFolder')
+# Install some more products, just to make sure that there are
+#products that should NOT be listed in all_meta_types.
+ZopeTestCase.installProduct('ZCatalog')
+ZopeTestCase.installProduct('PageTemplates')
+
 class TestBase(ZopeTestCase.ZopeTestCase):
 
     _setup_fixture = 0
 
     def afterSetUp(self):
         self._setupFolder()
-        self.folder._setObject('acl_users', PluggableUserFolder())
+        manage_addPluggableUserFolder(self.folder)
         self.uf = self.folder.acl_users
         ob = ReadonlyAuthenticationPlugin()
         self.uf._setObject(ob.id, ob)
@@ -51,8 +57,18 @@ class TestBase(ZopeTestCase.ZopeTestCase):
         self._user = self.uf.getUserById(_user_name).__of__(self.uf)
         self._setPermissions(_standard_permissions)
 
-    def afterClear(self):
+    def beforeClose(self, call_close_hook=1):
+        '''Clears out the fixture.'''
+        self._logout()
         try: del self.uf
+        except AttributeError: pass
+        try: del self.folder.acl_users
+        except AttributeError: pass
+        try: self.app._delObject(_folder_name)
+        except (AttributeError, RuntimeError): pass
+        try: del self.folder
+        except AttributeError: pass
+        try: del self._user
         except AttributeError: pass
 
     def _setupPublishedMethod(self):
@@ -243,9 +259,6 @@ class TestPluginFolder(TestBase):
 
 class TestInstallFolder(TestBase):
 
-    def afterSetUp(self):
-        TestBase.afterSetUp(self)
-
     def testAllMetaTypes(self):
         # Install some other products, so there is stuff to show
         products = self.uf.all_meta_types()
@@ -266,8 +279,8 @@ else:
         suite = unittest.TestSuite()
         suite.addTest(unittest.makeSuite(TestUserFolder))
         suite.addTest(unittest.makeSuite(TestAccess))
-        suite.addTest(unittest.makeSuite(TestValidate))
         suite.addTest(unittest.makeSuite(TestPluginFolder))
         suite.addTest(unittest.makeSuite(TestInstallFolder))
+        suite.addTest(unittest.makeSuite(TestValidate))
         return suite
 
