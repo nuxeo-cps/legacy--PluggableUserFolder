@@ -2,76 +2,121 @@ Apache SSL Identification
 
   Apache SSL identification is an Identification plugin that uses Apaches
   SSL functionality to identify and authorize the user via SSL certificates.
-  It lets Apache identify and Authenticate the user.
+  It lets Apache identify and authenticate the user.
 
-  The Authentication method of today requires a cleartext password, that is
-  then send to the User object (which is retrieved from an Authentication
-  plugin). Today this is solved by getting the celartext password from the
-  User object, but that means that the Authentication plugin must store the
-  password in cleartext. This will surely not work together with LDAP, so
-  it will need to be fixed.
+  Setting up Zope + Apache through CGI
 
-  Setting it up
+    Setting up Zope + CGI is described in detail in DOCS/WEBSERVER.txt. Here is
+    a brief overview of the process:
 
-    Basically you first need an Apache that works anonymously with Zope via
-    PCGI. To do this you need to compile Apache with CGI and Rewrite.
-    You don't actually need to use Zopes PCGI2, since that is a hack of PCGI
-    to allow authentication headers. In this case standard Apache CGI works
-    fine, since we don't need Apache to pass basic authentication headers
-    anyway. If you want both Certificates AND Basic HTTP Authentication to
-    work, you will need PCGI2, but then you can defeat the Certificates by
-    knowing the password...
+    - You need to compile Apache with the CGI and Rewrite modules. It doesn't
+      matter if you compile them statically or load the dynamically, but
+      Apache needs to have both these modules. Make sure you compile in the SSL
+      module while you are at it, because you will need it later.
 
-    Setting up Zope + CGI is described in DOCS/WEBSERVER.txt.
-    You probably need to add something like this to httpd.conf:
+      You can use either Apache 2 or Apache 1.3, both works fine. If you
+      don't have downloaded any of them, I recommend you go for Apache 2. In any
+      case, make sure you use the latest version of either Apache 1.3 or Apache 2.
 
-    RewriteEngine on
-    ProxyVia on
-    RewriteRule ^(.*) \
-    /usr/local/apache2/cgi-bin/Zope.cgi/VirtualHostBase/\
-    http/bird.in.nuxeo.com:80/dicod/VirtualHostRoot/$1 \
-    [L,t=application/x-httpd-cgi]
+    - You need to install Zope with  "python w_pcgi.py". This creates a Zope.cgi
+      file, that you need to copy to your Apache cgi-bin directory (typically
+      /usr/local/apache2/cgi-bin/ ).
 
-    Of course, '/usr/local/apache2/cgi-bin/Zope.cgi' need to be changed to
-    where ever the Zope.cgi script is located. Also 'bird.in.nuxeo.com'
-    should be changed to the name of the server.
+    - In DOCS/WEBSERVER.txt PCGI2 is mentioned, and it's said you need to use it.
+      However, since PCGI2 is a hack of PCGI to allow HTTP authentication headers
+      to be passed through CGI, it is not needed in this case. If you want both
+      Certificates AND Basic HTTP Authentication to work, you will need PCGI2,
+      but then you can defeat the Certificates by  knowing the password...
 
-    Then you need to set up SSL. Standard Apache SSL setup work fine. The
-    default Apache 2.0 setup uses Virtual hosting to configure SSL and has
-    all SSL configuration in a VirtualHost part, like so:
+    - After making sure Zope and Apache works separately, you need to get to Zope
+      through Apache. This is done by setting up a Rewrite that rewrites the calls to
+      Apache through the Zope.cgi script. It can look something like this:
 
-    <VirtualHost _default_:443>
-    SSLLoadsOfSSLConfigurationOptions
-    </VirtualHost>
+        RewriteEngine on
+        ProxyVia on
+        RewriteRule ^(.*) \
+        /usr/local/apache2/cgi-bin/Zope.cgi/VirtualHostBase/\
+        http/bird.in.nuxeo.com:80/dicod/VirtualHostRoot/$1 \
+        [L,t=application/x-httpd-cgi]
 
-    Make sure this works with accessing Apache before making any Zope
-    specific changes. First make sure https://path to theserver.com/ gives
-    you a server certificate.
+      Of course, '/usr/local/apache2/cgi-bin/Zope.cgi' need to be changed to
+      where ever the Zope.cgi script is located. Also 'bird.in.nuxeo.com'
+      should be changed to the name of the server.
 
-    Add:
-    SSLVerifyClient require
-    SSLVerifyDepth  10
-
-    Inside the VirtualHost configuration to make sure Apache requests a
-    Certificate from the browser when you use https.
-
-    Then all you need to do is to get the rewrite to Zope into the SSL
-    virtual host config:
-
-    RewriteEngine on
-    ProxyVia on
-    RewriteCond %{HTTP:Authorization}  ^(.*) #Not sure this is needed
-    RewriteRule ^(.*) \
-    /usr/local/apache2/cgi-bin/Zope.cgi/VirtualHostBase/\
-    https/bird.in.nuxeo.com:443/dicod/VirtualHostRoot/$1 \
-    [L,t=application/x-httpd-cgi]
+      You will not be able to log into the Zope ZMI (unless you did use PCGI2 anyway)
+      but that doesn't matter. You should be able to access the Zope server
+      as an anonymous user.
 
 
-    Of course, '/usr/local/apache2/cgi-bin/Zope.cgi' need to be changed to
-    where ever the Zope.cgi script is located. Also 'bird.in.nuxeo.com'
-    should be changed to the name of the server.
+  Getting Apache to understand SSL.
 
-    Replace the standard CookieCrumbler with the DICOD Cookie Crumbler
-    (in the ZMI replace /dicod/cookie_authentication)
+    - You now need to make sure that Apach loads the SSL module. You also need
+      to set up a server certificate and a certificate authority, and you need
+      to set up your browser to use a client certificate created with that same
+      certificate authority. How to do all this is described in the Apache SSL
+      documentation.
 
+    - The Standard Apache SSL setup should work fine. The default Apache 2.0
+      setup uses Virtual hosting to configure SSL and has all SSL configuration
+      in a VirtualHost part, like so:
+
+        <VirtualHost _default_:443>
+        SSLLoadsOfSSLConfigurationOptions
+        </VirtualHost>
+
+      This is a good way to do it, since this allows you to separate the SSL testing
+      and the Zope testing, since all the Zope setup we have done so far is on
+      port 80, and the VirtualHost configuration above only works on port 443 (the
+      SSL port).
+
+      You can therefore make sure that Apache has SSL set up properly by connecting
+      to https://path to theserver.com/. Your browser should recieve a server
+      certificate, and you should see the Apache default screen.
+
+    - Then add:
+        SSLVerifyClient require
+        SSLVerifyDepth  10
+
+      Inside the VirtualHost configuration to make sure Apache requests a
+      Certificate from the browser when you use https, and test this.
+
+    - Then all you need to do is to get the rewrite to Zope into the SSL
+      virtual host config:
+
+        RewriteEngine on
+        ProxyVia on
+        RewriteCond %{HTTP:Authorization}  ^(.*)
+        RewriteRule ^(.*) \
+        /usr/local/apache2/cgi-bin/Zope.cgi/VirtualHostBase/\
+        https/bird.in.nuxeo.com:443/dicod/VirtualHostRoot/$1 \
+        [L,t=application/x-httpd-cgi]
+
+      Of course, '/usr/local/apache2/cgi-bin/Zope.cgi' need to be changed to
+      where ever the Zope.cgi script is located. Also 'bird.in.nuxeo.com'
+      should be changed to the name of the server, just as with the other Zope
+      rewrite above.
+
+      You should now be able to access the Zope server via https, but you will
+      not yet be able to log in, you will be anonymous to the Zope server.
+
+  Setting up the Pluggable User Folder
+    - Log into the Zope server (bypassing Apache completely) as administrator.
+
+    - In the Pluggable User Folder folder create an "Apache SSL Identification"
+      object. In its properties you can set which attribute of the certificate that
+      holds the unique data for the user. This data will then be used as a username.
+      By default it is SSL_CLIENT_I_DN_CN. The "SSL_CLIENT_I_" part means that it
+      is data picked up by Apache from an SSL client certificate, and the "DN_CN"
+      defines which data. In this case it is the Common Name that is used, that
+      is the firstname plus last name of the user. You can change this to any
+      information that is availiable in the certificate.
+
+    - Create a user with a username that matches the information in the field
+      selected above for the certificate that you are using. The password is not
+      significant, it will be ignored. Give the user Manager rights so you can
+      test it.
+
+      You should now be able to connect to the Zope server via Apache, and
+      automatically be logged in into the Zope server with the user defined in
+      your certificate.
 
