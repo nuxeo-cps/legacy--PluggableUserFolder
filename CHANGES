@@ -1,12 +1,4 @@
-ZODB Requires:
-~~~~~~~~~~~~~~
--
 New features:
 ~~~~~~~~~~~~~
-- Support for setting the call order of plugins
-Bug fixes:
-~~~~~~~~~~
--
-New internal features:
-~~~~~~~~~~~~~~~~~~~~~~
--
+- You can now set and ID when creating LDAP plugins, to have several separate
+  LDAP plugins.
