@@ -375,8 +375,10 @@ class SimpleGroupRolesPlugin(Folder):
         if object is None:
             object = self
         users = {}
-        groups = self.getGroupsOnObject(object) + \
-                 tuple(self.getAcquiredGroups(object))
+        groups = self.getGroupsOnObject(object)
+        for each in self.getAcquiredGroups(object):
+            for group in each['groups']:
+                groups += group
         for group in groups:
             for userid in group.getUsers():
                 users[userid] = 1
