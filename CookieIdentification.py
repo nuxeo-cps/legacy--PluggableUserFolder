@@ -86,14 +86,12 @@ class CookieIdentificationPlugin(PropertyManager, SimpleItem):
             response = request['RESPONSE']
             LOG('CookieIdentification', DEBUG, 'New cookie login', ac+'\n')
             response.setCookie(self.auth_cookie, quote(ac) , path='/')
-            #self.delRequestVar(request, self.name_cookie)
-            #self.delRequestVar(request, self.pw_cookie)
-            #request._auth = 'CookieAuth %s' % ac
-            #return request._auth
+            self.delRequestVar(request, self.name_cookie)
+            self.delRequestVar(request, self.pw_cookie)
             return 'CookieAuth %s' % ac
         if request.has_key(self.auth_cookie):
             ac = unquote(request[self.auth_cookie])
-            #self.delRequestVar(req, self.auth_cookie)
+            self.delRequestVar(req, self.auth_cookie)
             LOG('CookieIdentification', DEBUG, 'Found cookie login', ac+'\n')
             return 'CookieAuth %s' % ac
         return None
