@@ -12,6 +12,7 @@ Bug fixes:
 ~~~~~~~~~~
 - A bug that appeared with LDAPLogin when you log in with a non-LDAP user
   and has LDAPLogin first in the path fixed.
+- A bug in mergedLocalRoles() when there was no roles plugins solved.
 
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
