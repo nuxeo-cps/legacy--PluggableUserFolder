@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="here/main_template/macros/master">
+
+<metal:block fill-slot="header">
+  Group Management
+</metal:block>
+
+<metal:block fill-slot="main">
+<form action="localgroup_unapply" method="post">
+
+<table cellspacing="0" cellpadding="2" border="0">
+  <tr><td colspan=2><h3>Aqcuired groups</h3></td></tr>
+    <tr tal:repeat="group python:here.acl_users.group_roles.getAcquiredGroups(here)">
+      <td>&nbsp;</td>
+
+      <td valign="center" class="form-label"
+          tal:repeat="role group/groups"
+          tal:content="role">
+        Role
+      </td>
+      <td valign="center" class="form-item">
+        <a tal:attributes="href python:group['obj'].absolute_url() + '/localgroup_manage'"
+           tal:content="group/obj/title_or_id">
+          link
+        </a>
+
+      </td>
+    </tr>
+  <tr><td colspan=2><h3>Groups applied here</h3></td></tr>
+    <tr tal:repeat="group here/manage_groupRolesGetGroups">
+      <td><input type="checkbox" name="unapply_groups:list"
+           tal:attributes="value group"></td>
+      <td tal:content="group">Role</td>
+    </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td><input class="form-element" type="submit" name="submit"
+        value=" Delete " />
+    </td>
+  </tr>
+</table>
+</form>
+<form action="localgroup_apply" method="post">
+<table>
+  <tr>
+    <td>&nbsp;</td>
+    <td valign="center" class="form-element">
+      <select name="apply_groups:list" multiple="true">
+        <tal:block repeat="group here/acl_users/group_roles/getGroupIds"
+                   define="appliedgroups here/manage_groupRolesGetGroups">
+          <option tal:condition="python:group not in appliedgroups"
+                  tal:attributes="value group"
+                  tal:content="group">Group
+          </option>
+        </tal:block>
+       </select>
+    </td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td class="form-element">
+      <input class="form-element" type="submit" name="submit"
+        value=" Add " />
+    </td>
+  </tr>
+</table>
+
+
+</form>
+
+</metal:block>
+</html>
+
+
