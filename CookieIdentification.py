@@ -22,7 +22,7 @@ __version__ = '$Revision$'[11:-2]
 
 from urllib import quote, unquote
 
-from zLOG import LOG, DEBUG, ERROR
+from PluggableUserFolder import LOG, DEBUG, ERROR
 from Globals import MessageDialog
 from base64 import decodestring, encodestring
 from Acquisition import aq_base
