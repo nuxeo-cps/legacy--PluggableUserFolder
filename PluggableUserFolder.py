@@ -240,26 +240,13 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         if super and name == super.getUserName():
             user = super
         else:
+            # This is the only change from BasicUserFolder.authenticate():
+            # password is passed to getUser()
             user = self.getUser(name, password)
         if user is not None and user.authenticate(password, request):
             return user
         else:
             return None
-
-
-    def authorize(self, user, accessed, container, name, value, roles):
-        user = getattr(user, 'aq_base', user).__of__(self)
-        newSecurityManager(None, user)
-        security = getSecurityManager()
-        try:
-            try:
-                if security.validate(accessed, container, name, value, roles):
-                    return 1
-            except:
-                noSecurityManager()
-                raise
-        except Unauthorized: pass
-        return 0
 
 
 
