@@ -7,9 +7,12 @@ New features:
   support implementations. mergedLocalRoles() should now be imported from
   Products.CMFCore.utils and _getAllowedRolesAndUsers() and
   _allowedRolesAndUsers() should now be imported from Products.CPSCore.utils.
+
 Bug fixes:
 ~~~~~~~~~~
--
+- A bug that appeared with LDAPLogin when you log in with a non-LDAP user
+  and has LDAPLogin first in the path fixed.
+
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -
