@@ -604,12 +604,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         plugins = self._get_plugins(IAuthenticationPlugin)
         props = plugins[0].listUserProperties()
         for plugin in plugins[1:]:
-            props2 = []
-            for prop in plugin.listUserProperties():
-                if prop in props:
-                    props2.append(prop)
-                props = props2
-                props2 = []
+            props = [prop for prop in plugin.listUserProperties() if prop in props]
         return tuple(props)
 
     def searchUsers(self, query={}, props=None, options=None, **kw):
@@ -865,7 +860,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             container = container.this()
             nc = BeforeTraverse.NameCaller(self.getId())
             BeforeTraverse.registerBeforeTraverse(container, nc, handle)
-    
+
     security.declareProtected(Permissions.manage_users, 'manage_registerTraverseHook')
     def manage_registerTraverseHook(self, REQUEST):
         """Registers the traverse hook for login page redirection."""
