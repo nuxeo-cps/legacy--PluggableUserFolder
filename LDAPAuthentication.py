@@ -21,42 +21,25 @@ __version__='$Revision$'[11:-2]
 
 from zLOG import LOG, DEBUG, ERROR
 
-from AccessControl import AuthEncoding
-from Globals import DTMLFile
 from Acquisition import aq_base
-from AccessControl.User import User
-from AccessControl.Role import RoleManager, DEFAULTMAXLISTUSERS
 from OFS.SimpleItem import SimpleItem
-from ZODB.PersistentMapping import PersistentMapping
 
 from PluginInterfaces import IAuthenticationPlugin
 from Products.LDAPUserFolder.LDAPUserFolder import LDAPUserFolder
 
 class LDAPAuthenticationPlugin(LDAPUserFolder):
     """This plugin stores the user definitions in the ZODB"""
-
-    __implements__ = (IAuthenticationPlugin,)
     meta_type = 'LDAP Authentication'
     id = 'ldap_authentication'
     title = 'LDAP Authentication'
     isPrincipiaFolderish=0
     isAUserFolder=0
-    maxlistusers = DEFAULTMAXLISTUSERS
 
-    encrypt_passwords = 0
+    __implements__ = (IAuthenticationPlugin,)
 
     manage_options=(
         LDAPUserFolder.manage_options[:6]+
         SimpleItem.manage_options
-        )
-
-    __ac_permissions__=(
-        ('Manage users',
-         ('manage_users','getUserNames', 'getUser', 'getUsers',
-          'getUserById', 'user_names', 'setDomainAuthenticationMode',
-          'userFolderAddUser', 'userFolderEditUser', 'userFolderDelUsers',
-          )
-         ),
         )
 
     def isReadOnly(self):

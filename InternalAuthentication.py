@@ -20,11 +20,11 @@ __doc__='''Internal Authentication Plugin'''
 __version__='$Revision$'[11:-2]
 
 #from AccessControl.User import UserFolder
-from AccessControl import AuthEncoding
 from Globals import DTMLFile
 from Acquisition import aq_base
+from AccessControl import AuthEncoding, ClassSecurityInfo
 from AccessControl.User import User
-from AccessControl.Role import RoleManager, DEFAULTMAXLISTUSERS
+from AccessControl.Role import DEFAULTMAXLISTUSERS
 from OFS.SimpleItem import SimpleItem
 from ZODB.PersistentMapping import PersistentMapping
 
@@ -32,16 +32,17 @@ from PluginInterfaces import IAuthenticationPlugin
 
 class InternalAuthenticationPlugin(SimpleItem):
     """This plugin stores the user definitions in the ZODB"""
+    security = ClassSecurityInfo()
 
-    __implements__ = (IAuthenticationPlugin,)
     meta_type = 'Internal Authentication'
     id = 'internal_authentication'
     title = 'Internal Authentication'
     isPrincipiaFolderish=0
     isAUserFolder=0
     maxlistusers = DEFAULTMAXLISTUSERS
-
     encrypt_passwords = 0
+
+    __implements__ = (IAuthenticationPlugin,)
 
     manage_options=(
         (
@@ -51,15 +52,6 @@ class InternalAuthenticationPlugin(SimpleItem):
          'help':('OFSP','User-Folder_Properties.stx')},
         )
         +SimpleItem.manage_options
-        )
-
-    __ac_permissions__=(
-        ('Manage users',
-         ('manage_users','getUserNames', 'getUser', 'getUsers',
-          'getUserById', 'user_names', 'setDomainAuthenticationMode',
-          'userFolderAddUser', 'userFolderEditUser', 'userFolderDelUsers',
-          )
-         ),
         )
 
     def isReadOnly(self):
@@ -78,7 +70,7 @@ class InternalAuthenticationPlugin(SimpleItem):
     #
     # ZMI methods
     #
-
+    security.declareProtected('Manage users', 'manage_setPluginProperties')
     def manage_setPluginProperties(self, encrypt_passwords=0,
                                        update_passwords=0,
                                        REQUEST=None):
@@ -110,19 +102,24 @@ class InternalAuthenticationPlugin(SimpleItem):
         else:
             return changed
 
+    security.declareProtected('Manage users', 'manage_main')
     manage_main=DTMLFile('zmi/mainUser', globals())
+
+    security.declareProtected('Manage users', 'manage_pluginPropertiesForm')
     manage_pluginPropertiesForm=DTMLFile('zmi/internalAuthProps', globals())
 
     #
     # Public API
     #
 
+    security.declareProtected('Manage users', 'getUserNames')
     def getUserNames(self):
         """Return a list of usernames"""
         names=self.data.keys()
         names.sort()
         return names
 
+    security.declareProtected('Manage users', 'getUsers')
     def getUsers(self):
         """Return a list of user objects"""
         data=self.data
@@ -134,6 +131,7 @@ class InternalAuthenticationPlugin(SimpleItem):
             f(data[n])
         return users
 
+    security.declareProtected('Manage users', 'getUser')
     def getUser(self, name, password=None):
         """Return the named user object or None"""
         return self.data.get(name, None)

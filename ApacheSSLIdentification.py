@@ -22,6 +22,7 @@ __version__='$Revision$'[11:-2]
 from zLOG import LOG, DEBUG, ERROR
 from base64 import decodestring, encodestring
 from Acquisition import aq_base
+from AccessControl import ClassSecurityInfo
 from OFS.PropertyManager import PropertyManager
 from OFS.SimpleItem import SimpleItem
 
@@ -30,11 +31,13 @@ from PluggableUserFolder import _no_password_check
 
 class ApacheSSLIdentificationPlugin(PropertyManager, SimpleItem):
     """This Basic HTTP Authentication support"""
+    security = ClassSecurityInfo()
 
-    __implements__ = (IIdentificationPlugin,)
     meta_type = 'Apache SSL Identification'
     id = 'apache_ssl_identification'
     title = 'Apache SSL Identification'
+
+    __implements__ = (IIdentificationPlugin,)
 
     _properties = ( {'id': 'ssl_id_source',
                      'type': 'string',
@@ -84,7 +87,7 @@ class ApacheSSLIdentificationPlugin(PropertyManager, SimpleItem):
             raise 'Bad Request', 'Invalid authentication token'
         return name, _no_password_check #password
 
-    #security.declarePublic('propertyLabel')
+    security.declarePublic('propertyLabel')
     def propertyLabel(self, id):
         """Return a label for the given property id
         """

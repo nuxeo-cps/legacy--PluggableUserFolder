@@ -26,12 +26,12 @@ from OFS.SimpleItem import SimpleItem
 from PluginInterfaces import IIdentificationPlugin
 
 class BasicIdentificationPlugin(SimpleItem):
-    """This Basic HTTP Authentication support"""
-
-    __implements__ = (IIdentificationPlugin,)
+    """Basic HTTP Authentication support"""
     meta_type = 'Basic Identification'
     id = 'basic_identification'
     title = 'Basic Identification'
+
+    __implements__ = (IIdentificationPlugin,)
 
     def makeAuthenticationString(self, request, auth):
         if auth and auth.lower().startswith('basic '):
@@ -49,7 +49,6 @@ class BasicIdentificationPlugin(SimpleItem):
         except:
             raise 'Bad Request', 'Invalid authentication token'
         return name, password
-
 
 
 def manage_addBasicIdentificationPlugin(self, REQUEST=None):

@@ -40,7 +40,8 @@ class IAuthenticationPlugin(Interface.Base):
         return the password, only authenticate it. By passing the
         password when retrieveing the user information, sources like
         LDAP only need one call for both passing and authenticating
-        the user."""
+        the user. Passing the password is therefore typically only
+        done from within UserFolder.authenticate()."""
 
     def _doAddUser(self, name, password, roles, domains, **kw):
         """Create a new user. This should be implemented by subclasses to

@@ -23,7 +23,8 @@ from zLOG import LOG, DEBUG, ERROR
 
 from Globals import DTMLFile, MessageDialog
 from Acquisition import aq_base
-from AccessControl.User import BasicUserFolder, UserFolder, _noroles, _remote_user_mode
+from AccessControl import ClassSecurityInfo
+from AccessControl.User import BasicUserFolder, _noroles
 from AccessControl.Role import RoleManager, DEFAULTMAXLISTUSERS
 from OFS.ObjectManager import ObjectManager
 from OFS.SimpleItem import Item
@@ -32,20 +33,19 @@ from PluginInterfaces import IAuthenticationPlugin, IIdentificationPlugin
 from InternalAuthentication import InternalAuthenticationPlugin
 from BasicIdentification import BasicIdentificationPlugin
 
-#here for debug
-from AccessControl import getSecurityManager
-from zExceptions import Unauthorized
-from AccessControl.SecurityManagement import newSecurityManager
-from AccessControl.SecurityManagement import noSecurityManager
-
-_marker=[]
-
 # Special marker for identification methods and
 # user storages that check the password as a part of
 # identification and user retrieval
 _no_password_check=[]
 
 class PluggableUserFolder(ObjectManager, BasicUserFolder):
+    """A user folder with plugins
+
+    With this user folder you can plug in different types of identification
+    and authentication, and use several of them at once.
+    """
+    security = ClassSecurityInfo()
+
     meta_type='Pluggable User Folder'
     id       ='acl_users'
     title    ='Pluggable User Folder'
@@ -65,15 +65,6 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         )
         +RoleManager.manage_options
         +Item.manage_options
-        )
-
-    __ac_permissions__=(
-        ('Manage users',
-         ('manage_users','getUserNames', 'getUser', 'getUsers',
-          'getUserById', 'user_names', 'setDomainAuthenticationMode',
-          'userFolderAddUser', 'userFolderEditUser', 'userFolderDelUsers',
-          )
-         ),
         )
 
     _product_interfaces = (IAuthenticationPlugin, IIdentificationPlugin)
@@ -117,12 +108,14 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
     # ZMI interfaces
     # ----------------------------------
 
+    security.declareProtected('Manage users', 'manage_userFolderProperties')
     manage_userFolderProperties = DTMLFile('zmi/userFolderProps', globals())
 
     # ----------------------------------
     # Public UserFolder object interface
     # ----------------------------------
 
+    security.declareProtected('Manage users', 'getUserNames')
     def getUserNames(self):
         """Return a list of usernames"""
         result = []
@@ -132,6 +125,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
                     result.append(username)
         return result
 
+    security.declareProtected('Manage users', 'getUsers')
     def getUsers(self):
         """Return a list of user objects"""
         usernames = []
@@ -143,6 +137,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
                     result.append(user)
         return result
 
+    security.declareProtected('Manage users', 'getUser')
     def getUser(self, name, password=None):
         """Return the named user object or None"""
         for plugin in self._get_plugins(IAuthenticationPlugin):
@@ -239,19 +234,18 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
     def authenticate(self, name, password, request):
         LOG('PluggableUserFolder', DEBUG, 'Authenticate',
             'Username: %s\nPassword %s\n' % (name, password))
-        LOG('PluggableUserFolder', DEBUG, password is _no_password_check)
-
         super = self._emergency_user
-
         if name is None:
             return None
 
         if super and name == super.getUserName():
             user = super
         else:
-            # This is the only change from BasicUserFolder.authenticate():
-            # password is passed to getUser()
+            # Change from BasicUserFolder.authenticate(),
+            # password is passed to getUser():
             user = self.getUser(name, password)
+        # Change from BasicUserFolder.authenticate(),
+        # check for the user being authenticated by Identify:
         if user is not None and \
             (password is _no_password_check or \
              user.authenticate(password, request)):

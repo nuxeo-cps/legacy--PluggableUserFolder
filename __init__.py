@@ -21,9 +21,15 @@ __version__='$Revision$'[11:-2]
 
 import PluggableUserFolder
 import InternalAuthentication
-import LDAPAuthentication
 import BasicIdentification
 import ApacheSSLIdentification
+
+try:
+    import LDAPAuthentication
+    LdapSupport = 1
+except ImportError:
+    LdapSupport = 0
+
 from AccessControl.Permissions import add_user_folders
 
 def initialize(context):
@@ -41,13 +47,6 @@ def initialize(context):
         visibility=None,
     )
     context.registerClass(
-        instance_class=LDAPAuthentication.LDAPAuthenticationPlugin,
-        permission=add_user_folders,
-        constructors=(LDAPAuthentication.manage_addLDAPAuthenticationPlugin,),
-        icon='zmi/UserFolder_icon.gif',
-        visibility=None,
-    )
-    context.registerClass(
         instance_class=BasicIdentification.BasicIdentificationPlugin,
         permission=add_user_folders,
         constructors=(BasicIdentification.manage_addBasicIdentificationPlugin,),
@@ -61,6 +60,15 @@ def initialize(context):
         icon='zmi/UserFolder_icon.gif',
         visibility=None,
     )
+
+    if LdapSupport:
+        context.registerClass(
+            instance_class=LDAPAuthentication.LDAPAuthenticationPlugin,
+            permission=add_user_folders,
+            constructors=(LDAPAuthentication.manage_addLDAPAuthenticationPlugin,),
+            icon='zmi/UserFolder_icon.gif',
+            visibility=None,
+        )
 
 
 # TODO: Make help

@@ -35,18 +35,35 @@ PluggableUserFolder: A Zope UserFolder with authentication plugins
   features added to the user folder can then also directly be enjoyed by
   anybody using an external data source.
 
+  Zope out of the box also supports only Basic HTTP Authentication. CMF adds
+  identification through Cookies with the CookieCrumbler product. It's using
+  a rather ugly, but well-working method of faking a Basic HTTP
+  Authentication header in the REQUEST object. It's possible to add new
+  Identification methods in a similar way, if needed. However, the
+  BasicUserFolder of Zope has an interface to let UserFolders handle
+  identifications without this kind of REQUEST header, and it would therefore
+  be possible to as a later stage add plugins for identification as well,
+  thereby letting site administrators mix several types of identification
+  schemes as needed, in an easy and predictable way.
+
   Future development
 
-    Zope out of the box also supports only Basic HTTP Authentication. CMF adds
-    identification through Cookies with the CookieCrumbler product. It's using
-    a rather ugly, but well-working method of faking a Basic HTTP
-    Authentication header in the REQUEST object. It's possible to add new
-    Identification methods in a similar way, if needed. However, the
-    BasicUserFolder of Zope has an interface to let UserFolders handle
-    identifications without this kind of REQUEST header, and it would therefore
-    be possible to as a later stage add plugins for identification as well,
-    thereby letting site administrators mix several types of identification
-    schemes as needed, in an easy and predictable way.
+    Zope by default has no group support. Loads of people want this, and
+    several group supports have been developed. These group supports to
+    typically work by giving users additional roles depending on group
+    membership.
+
+    Another feature not supported by pure Zope is blocking out roles
+    further down a hierarchy. Support for this has been created by
+    Torped, but it does seldom work with any other access control products.
+
+    By having plugins that allow modifications of the assigned roles to a user
+    both the group and the blacklist use case can be met, and they can even be
+    met independantly. It also allows you to select between different groups
+    support, like a simple groups support like the one for CPS2, a 'recursive'
+    group support (where groups can be member of other groups), a hierarchical
+    group tree, or the Workgroups support proposed in my AccessControlProposal
+    (http://www.zope.org//Wikis/DevSite/Projects/ComponentArchitecture/AccessControlProposal).
 
   Bugs
 
