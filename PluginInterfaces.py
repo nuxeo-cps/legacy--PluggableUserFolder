@@ -177,4 +177,11 @@ class IGroupObject(Interface.Base):
 
     def getUsers(self):
         """Returns the names of the members of the group"""
+        
+    def addUsers(self, userids):
+        """Adds the users with userids to the group"""
+
+    def removeUsers(self, userids):
+        """Removes the users with userids from the group"""
+
 

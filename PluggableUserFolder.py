@@ -326,6 +326,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             raise Exception('Group %s not found' % groupname)
         return default
 
+    security.declareProtected(Permissions.manage_users, 'getGroupsForUser')
     def getGroupsForUser(self, userid):
         ismemberof = []
         for plugin in self._get_plugins(IRolePlugin):
@@ -334,7 +335,58 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             str(ismemberof)+'\n')
         return tuple(ismemberof)
 
+    security.declareProtected(Permissions.manage_users, 'setGroupsOfUser')
+    def setGroupsOfUser(self, groupnames, username):
+        """Set the groups of a user"""
+        user = self.getUser(username)
+        usergroups = self.getGroupsForUser(username)
+        # Add to new groups
+        for group in groupnames:
+            if group not in usergroups:
+                groupob = self.getGroupById(group)
+                groupob.addUsers((username,))
+        # Remove from old groups
+        for group in usergroups:
+            if group not in groupnames:
+                groupob = self.getGroupById(group)
+                groupob.removeUsers((username,))
+
     # Roles plugin support
+    def setRolesOfUser(self, roles, username):
+        """Sets the users of a role"""
+        user = self.getUser(username)
+        user.roles = roles
+
+    def setUsersOfRole(self, usernames, role):
+        """Sets the users of a role
+        
+        Will set the roles on the user object directly. Any role plugins
+        that modify the global roles will be ignored.
+        """
+        for user in self.getUsers():
+            userroles = user.roles
+            if user.getUserName() in usernames:
+                if not role in userroles:
+                    userroles.append(role)
+                    user.roles = userroles
+            else:
+                if role in userroles:
+                    userroles.remove(role)
+                    user.roles = userroles
+
+    def getUsersOfRole(self, role):
+        """Gets the users of a role"""
+        users = []
+        for user in self.getUsers():
+            if user.has_role(role):
+                users.append(user.getUserName())
+        return users
+
+    def userFolderAddRole(self, role):
+        """Creates a role"""
+        portal = self.aq_inner.aq_parent
+        portal._addRole(role)
+
     def getRoleManagementOptions(self, types=['form']):
         options = []
         for plugin in self._get_plugins(IRolePlugin):
@@ -538,7 +590,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             for prop in plugin.listUserProperties():
                 if prop not in props:
                     props.append(prop)
-        return props
+        return tuple(props)
 
     def searchUsers(self, query={}, props=None, options=None, **kw):
         """Search for users having certain properties.

@@ -180,6 +180,25 @@ class PluggableUserMixin:
         LOG('PluggableUser', DEBUG, 'getGroups()')
         return self.acl_users.getGroupsForUser(self.getId())
 
+    def listProperties(self):
+        """Lists all properties that are set on the user."""
+        return []
+        
+    def hasProperty(self, id):
+        return 0
+
+    def getProperty(self, id, default=None):
+        raise NotImplementedError
+
+    def getProperties(self, ids):
+        raise NotImplementedError
+
+    def setProperty(self, id, value):
+        raise NotImplementedError
+
+    def setProperties(self, **kw):
+        raise NotImplementedError
+
 
 class PluggableUser(PluggableUserMixin, User):
     pass

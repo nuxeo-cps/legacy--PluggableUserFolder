@@ -23,6 +23,8 @@ from Products.PluggableUserFolder.PluginInterfaces import \
     IAuthenticationPlugin, IIdentificationPlugin, IRolePlugin
 from Products.PluggableUserFolder.BasicIdentification import \
     manage_addBasicIdentificationPlugin
+from Products.PluggableUserFolder.SimpleGroupRoles import \
+    manage_addSimpleGroupRolesPlugin
 
 ZopeLite.installProduct('PluggableUserFolder', 1)
 # These are installed so that there are products that should
@@ -41,12 +43,6 @@ class ReadonlyAuthenticationPlugin(InternalAuthenticationPlugin):
     def isReadOnly(self):
         return 1
 
-ZopeTestCase.installProduct('PluggableUserFolder')
-# Install some more products, just to make sure that there are
-# products that should NOT be listed in all_meta_types.
-ZopeTestCase.installProduct('ZCatalog')
-ZopeTestCase.installProduct('PageTemplates')
-
 class TestBase(ZopeTestCase.ZopeTestCase):
 
     _setup_fixture = 0
@@ -60,6 +56,7 @@ class TestBase(ZopeTestCase.ZopeTestCase):
         self.uf._addUser(_user_name, 'secret', 'secret', (_user_role,), ())
         self._user = self.uf.getUserById(_user_name).__of__(self.uf)
         self._setPermissions(_standard_permissions)
+        manage_addSimpleGroupRolesPlugin(self.uf)
 
     def beforeClose(self, call_close_hook=1):
         '''Clears out the fixture.'''
@@ -238,9 +235,7 @@ class TestPluginFolder(TestBase):
 
     def testGetAllPlugins(self):
         plugins = self.uf._get_plugins()
-        # XXX: what are they ?
-        # Plugins. Strange question. //Lennart
-        self.assertEquals(len(plugins), 3)
+        self.assertEquals(len(plugins), 4)
 
     def testGetAllAuthenticationPlugins(self):
         plugins = self.uf._get_plugins(interface=IAuthenticationPlugin)
@@ -248,7 +243,7 @@ class TestPluginFolder(TestBase):
 
     def testGetWritablePlugins(self):
         plugins = self.uf._get_plugins(include_readonly=0)
-        self.assertEquals(len(plugins), 2)
+        self.assertEquals(len(plugins), 3)
 
     def testGetWritableAuthenticationPlugins(self):
         plugins = self.uf._get_plugins(interface=IAuthenticationPlugin,
@@ -277,7 +272,7 @@ class TestInstallFolder(TestBase):
         manage_addBasicIdentificationPlugin(self.uf)
         self.failUnless(hasattr(self.uf, 'basic_identification'))
 
-class TestSearchAPI(TestBase):
+class TestCPSAPI(TestBase):
 
     def testSearchAPI(self):
         # test_user_1_ is already created. Create some more to test searching.
@@ -290,7 +285,7 @@ class TestSearchAPI(TestBase):
         # Matching id:
         self.assert_(self.uf.searchUsers(id='test_user_1_')
             == ['test_user_1_'])
-        # Partisl id:
+        # Partial id:
         self.assert_(len(self.uf.searchUsers(id='user')) == 3)
         # Several ids:
         self.assert_(len(self.uf.searchUsers(
@@ -317,6 +312,57 @@ class TestSearchAPI(TestBase):
         query['anotherkey'] = 'shouldnotfail'
         self.assert_(self.uf.searchUsers(query=query) == [])
 
+    def testPropertyGetting(self):
+        user = self.uf.getUser('test_user_1_')
+        self.assertEqual(user.listProperties(), [])
+        self.assert_(not user.hasProperty('prop'))
+        self.assertRaises(NotImplementedError, user.getProperty, ('',))
+        self.assertRaises(NotImplementedError, user.getProperties, ({},))
+
+    def testPropertySetting(self):
+        user = self.uf.getUser('test_user_1_')
+        self.assertRaises(NotImplementedError, user.setProperty,'','')
+        self.assertRaises(NotImplementedError, user.setProperties)
+
+
+    def testCPSRoleAPI(self):
+        _user_name2 = 'test_user_2_'
+        _user_role2 = 'test_role_2_'
+        self.uf.userFolderAddUser(_user_name2, 'pass', [], [])
+        self.uf.userFolderAddRole(_user_role2)
+        self.uf.setRolesOfUser((_user_role, _user_role2), _user_name)
+        self.uf.setUsersOfRole((_user_name, _user_name2), _user_role)
+        roles = list(self.uf.getUser(_user_name).getRoles())
+        roles.sort()
+        self.assertEquals(roles, ['Authenticated', _user_role, _user_role2])
+        owners = self.uf.getUsersOfRole(_user_role)
+        owners.sort()
+        self.assertEquals(owners, [_user_name, _user_name2])
+        f = self.uf.getUsersOfRole(_user_role2)
+        self.assertEquals(f, [_user_name])
+
+
+    def testCPSGroupAPI(self):
+        _user_name2 = 'test_user_2_'
+        _user_group = 'test_group_1_'
+        _user_group2 = 'test_group_2_'
+        self.uf.userFolderAddUser(_user_name2, 'pass', [], [])
+        self.uf.userFolderAddGroup(_user_group)
+        self.uf.userFolderAddGroup(_user_group2)
+        self.assert_(self.uf.getGroupById(_user_group) is not None)
+        groups = list(self.uf.getGroupNames())
+        groups.sort()
+        self.assert_(groups == [_user_group , _user_group2])
+        self.uf.setGroupsOfUser([_user_group, _user_group2], _user_name)
+        self.uf.setUsersOfGroup([_user_name2, _user_name], _user_group)
+        users = list(self.uf.getGroupById(_user_group).getUsers())
+        users.sort()
+        self.assert_(users == [_user_name, _user_name2])
+        groups = list(self.uf.getUser(_user_name).getGroups())
+        groups.sort()
+        self.assert_(groups == [_user_group, _user_group2])
+
+
 
 if __name__ == '__main__':
     framework(descriptions=0, verbosity=1)
@@ -329,6 +375,6 @@ else:
         suite.addTest(unittest.makeSuite(TestPluginFolder))
         suite.addTest(unittest.makeSuite(TestInstallFolder))
         suite.addTest(unittest.makeSuite(TestValidate))
-        suite.addTest(unittest.makeSuite(TestSearchAPI))
+        suite.addTest(unittest.makeSuite(TestCPSAPI))
         return suite
 

@@ -117,7 +117,7 @@ class SimpleGroup(SimpleItem):
 
     def manage_deleteUsers(self, selectedusers, REQUEST=None):
         """Delete the users in the "selectedusers" list of userids"""
-        self.deleteUsers(selectedusers)
+        self.removeUsers(selectedusers)
         if REQUEST is not None:
             return self.manage_groupForm(manage_tabs_message='Users deleted')
 
@@ -126,7 +126,7 @@ class SimpleGroup(SimpleItem):
             if not userid in self.members:
                 self.members.append(userid)
 
-    def deleteUsers(self, userids):
+    def removeUsers(self, userids):
         for userid in userids:
             if userid in self.members:
                 index = self.members.index(userid)
