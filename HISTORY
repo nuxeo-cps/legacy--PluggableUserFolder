@@ -1,17 +1,17 @@
 *******************************************
 ** PluggableUserFolder V2.2.0 [R1 build 2003/11/06-17:35 by regebro]
 
-ZODB Requires:
-~~~~~~~~~~~~~~
--
-
 New features:
 ~~~~~~~~~~~~~
--
+- Interface change: Added 'getLocalGroups' to IGroupPlugin to
+  get a list of groups that are active on the object.
+
+- Interface change:  Made 'object' a necessary parameter for
+  getUsersWithRoles on IRolePlugin.
 
 Bug fixes:
 ~~~~~~~~~~
-- SimpleGroupsRoles has some bugs in the getUsersWithRoles method.
+- SimpleGroupRoles has some bugs in the getUsersWithRoles method.
 
 - PluggableUser now adds the 'user:' prefix in the right
   places to be compatible with CMF/CPS.
@@ -19,10 +19,6 @@ Bug fixes:
 - mergedLocalRoles when called with withgroups=1 will now no longer
   expand groups into users, but add the Groups to the result, as CPS
   expects.
-
-New internal features:
-~~~~~~~~~~~~~~~~~~~~~~
--
 
 *******************************************
 ** PluggableUserFolder V2.1.1 [R1 build 2003/11/05-18:07 by regebro]
