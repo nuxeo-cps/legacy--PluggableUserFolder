@@ -7,7 +7,7 @@
 # LICENSE.txt for the terms of this license.
 #
 #####################################################################
-__version__='$Revision$'[11:-2]
+__version__ = '$Revision$'[11:-2]
 
 import ldap, sha, base64, copy, re
 
@@ -42,18 +42,18 @@ TREE = {}
 
 
 def initialize(conn_str):
-    """ Initialize a new connection """
+    """Initialize a new connection"""
     return FakeLDAPConnection()
 
 def explode_dn(dn, *ign, **ignored):
-    """ Get a DN's elements """
+    """Get a DN's elements"""
     return [x.strip() for x in dn.split(',')]
 
 def clearTree():
     TREE.clear()
 
 def addTreeItems(dn):
-    """ Add structure directly to the tree given a DN """
+    """Add structure directly to the tree given a DN"""
     elems = explode_dn(dn)
     elems.reverse()
     tree_pos = TREE
@@ -101,7 +101,8 @@ class FakeLDAPConnection:
             raise INVALID_CREDENTIALS
 
 
-    def search_s(self, base, scope=SCOPE_SUBTREE, query='(objectClass=*)', attrs=[]):
+    def search_s(self, base, scope=SCOPE_SUBTREE, query='(objectClass=*)', 
+                 attrs=[]):
         elems = explode_dn(base)
         elems.reverse()
         tree_pos = TREE
@@ -150,7 +151,6 @@ class FakeLDAPConnection:
                         res.append(('%s,%s' % (key, base), val))
 
             return res
- 
 
         else:
             res = []
@@ -272,5 +272,4 @@ class FakeLDAPConnection:
         
         del tree_pos[rdn]
         tree_pos[new_rdn] = rec
-
 

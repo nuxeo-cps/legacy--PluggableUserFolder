@@ -20,25 +20,25 @@ class TestPlugin(TestBase):
         self.plugin._addUser('test_user_3_','pass','pass',['Manager'])
         self.plugin._addUser('never_returned_','pass','pass',['Owner'])
         # Matching id:
-        self.assert_(self.plugin.searchUsers(id='test_user_1_')
-            == ['test_user_1_'])
+        self.assertEquals(self.plugin.searchUsers(id='test_user_1_'),
+                          ['test_user_1_'])
         # Partisl id:
-        self.assert_(len(self.plugin.searchUsers(id='user')) == 3)
+        self.assertEquals(len(self.plugin.searchUsers(id='user')), 3)
         # Several ids:
-        self.assert_(len(self.plugin.searchUsers(
-            id=['test_user_1_', 'test_user_2_'])) == 2)
+        self.assertEquals(
+            len(self.plugin.searchUsers(id=['test_user_1_', 'test_user_2_'])),
+            2)
         # Roles:
-        self.assert_(self.plugin.searchUsers(roles='Manager') ==
-            ['test_user_3_'])
-        query = { 'id': 'user',
-                  'roles': ['Owner', 'Manager']
-                }
-        self.assert_(self.plugin.searchUsers(query=query) ==
-            ['test_user_2_', 'test_user_3_'])
+        self.assertEquals(self.plugin.searchUsers(roles='Manager'),
+                          ['test_user_3_'])
+        query = {'id': 'user',
+                 'roles': ['Owner', 'Manager']}
+        self.assertEquals(self.plugin.searchUsers(query=query),
+                          ['test_user_2_', 'test_user_3_'])
         # Do a search that returns a properties dict.
-        props=['id', 'roles']
+        props = ['id', 'roles']
         result = self.plugin.searchUsers(query=query, props=props)
-        self.assert_(len(result) == 2)
+        self.assertEquals(len(result), 2)
         # Each entry in the result should be a tuple with an id and a dictionary.
         for id, dict in result:
             # Make sure each dict has the properties asked for:
@@ -47,7 +47,7 @@ class TestPlugin(TestBase):
 
         # Unsupported keys should mean nothing gets returned:
         query['anotherkey'] = 'shouldnotfail'
-        self.assert_(self.plugin.searchUsers(query=query) == [])
+        self.assertEquals(self.plugin.searchUsers(query=query), [])
 
 
 if __name__ == '__main__':

@@ -12,7 +12,7 @@ if __name__ == '__main__':
 from testUserFolder import TestBase
 from Testing.ZopeTestCase import _user_name
 from Products.PluggableUserFolder.CookieIdentification import \
-    CookieIdentificationPlugin, manage_addCookieIdentificationPlugin
+     manage_addCookieIdentificationPlugin
 
 class TestPlugin(TestBase):
 

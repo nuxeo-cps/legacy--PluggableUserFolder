@@ -16,7 +16,7 @@ from AccessControl import Unauthorized
 
 
 from Products.PluggableUserFolder.PluggableUserFolder import \
-    PluggableUserFolder, manage_addPluggableUserFolder
+    manage_addPluggableUserFolder
 from Products.PluggableUserFolder.InternalAuthentication import \
     InternalAuthenticationPlugin
 from Products.PluggableUserFolder.PluginInterfaces import \
@@ -192,7 +192,7 @@ class TestValidate(TestBase):
         auth = self._basicAuth(_user_name)
         user = self.uf.validate(request, auth, [_user_role])
         assert user is not None
-        assert user.getUserName() == _user_name
+        self.assertEquals(user.getUserName(), _user_name)
 
     def testNotAuthorize(self):
         # Validate should fail without auth
@@ -222,7 +222,7 @@ class TestValidate(TestBase):
         roles = self._call__roles__(self.folder[_pm])
         user = self.uf.validate(request, auth, roles)
         assert user is not None
-        assert user.getUserName() == _user_name
+        self.assertEquals(user.getUserName(), _user_name)
 
     def testNotAuthorize4(self):
         # Validate should deny us to call dm
@@ -260,11 +260,11 @@ class TestInstallFolder(TestBase):
     def testAllMetaTypes(self):
         # Install some other products, so there is stuff to show
         products = self.uf.all_meta_types()
-        for each in products:
-            isIdPlugin = IIdentificationPlugin in each['interfaces']
-            isAuthPlugin = IAuthenticationPlugin in each['interfaces']
-            isRolePlugin = IRolePlugin in each['interfaces']
-            self.assert_( isIdPlugin or isAuthPlugin or isRolePlugin)
+        for product in products:
+            isIdPlugin = IIdentificationPlugin in product['interfaces']
+            isAuthPlugin = IAuthenticationPlugin in product['interfaces']
+            isRolePlugin = IRolePlugin in product['interfaces']
+            self.assert_(isIdPlugin or isAuthPlugin or isRolePlugin)
 
     def testBasicIdPlugin(self):
         # This is used in most tests, and hence pretty well tested.
@@ -274,7 +274,7 @@ class TestInstallFolder(TestBase):
         # Test the manage_add method.
         self.uf._delObject('basic_identification')
         manage_addBasicIdentificationPlugin(self.uf)
-        self.failUnless(hasattr(self.uf, 'basic_identification'))
+        self.assert_(hasattr(self.uf, 'basic_identification'))
 
 class TestCPSAPI(TestBase):
 
@@ -287,23 +287,23 @@ class TestCPSAPI(TestBase):
         self.uf.internal_authentication._addUser(
             'never_returned_','pass','pass',['Owner'])
         # Matching id:
-        self.assert_(self.uf.searchUsers(id='test_user_1_')
-            == ['test_user_1_'])
+        self.assertEquals(self.uf.searchUsers(id='test_user_1_'),
+                          ['test_user_1_'])
         # Partial id:
-        self.assert_(len(self.uf.searchUsers(id='user')) == 3)
+        self.assertEquals(len(self.uf.searchUsers(id='user')), 3)
         # Several ids:
-        self.assert_(len(self.uf.searchUsers(
-            id=['test_user_1_', 'test_user_2_'])) == 2)
+        self.assertEquals(
+            len(self.uf.searchUsers(id=['test_user_1_', 'test_user_2_'])),
+            2)
         # Roles:
-        self.assert_(self.uf.searchUsers(roles='Manager') ==
-            ['test_user_3_'])
-        query = { 'id': 'user',
-                  'roles': ['Owner', 'Manager']
-                }
-        self.assert_(self.uf.searchUsers(query=query) ==
-            ['test_user_2_', 'test_user_3_'])
+        self.assertEquals(self.uf.searchUsers(roles='Manager'),
+                          ['test_user_3_'])
+        query = {'id': 'user',
+                 'roles': ['Owner', 'Manager']}
+        self.assertEquals(self.uf.searchUsers(query=query),
+                          ['test_user_2_', 'test_user_3_'])
         # Do a search that returns a properties dict.
-        props=['id', 'roles']
+        props = ['id', 'roles']
         result = self.uf.searchUsers(query=query, props=props)
         self.assert_(len(result) == 2)
         # Each entry in the result should be a tuple with an id and a dictionary.
@@ -322,10 +322,10 @@ class TestCPSAPI(TestBase):
         self.assert_(not user.hasProperty('prop'))
         self.assertEqual(user.getProperty('id'), user.getUserName())
         self.assertEqual(user.getProperty('roles'),
-                        (_user_role, 'Authenticated'))
-        self.assertEqual(user.getProperties( ('id','roles')),
-                {'id': 'test_user_1_',
-                 'roles': ('test_role_1_', 'Authenticated')} )
+                         (_user_role, 'Authenticated'))
+        self.assertEqual(user.getProperties(('id','roles')),
+                         {'id': 'test_user_1_',
+                          'roles': ('test_role_1_', 'Authenticated')})
 
     def testPropertySetting(self):
         user = self.uf.getUser('test_user_1_')
@@ -334,7 +334,6 @@ class TestCPSAPI(TestBase):
         self.assertEquals(user.roles, [_user_role, 'Manager', 'Owner'])
         user.setProperties(roles = [_user_role])
         self.assertEquals(user.roles, [_user_role])
-
 
     def testCPSRoleAPI(self):
         _user_name2 = 'test_user_2_'

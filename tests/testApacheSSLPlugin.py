@@ -13,7 +13,7 @@ from testUserFolder import TestBase
 from Testing.ZopeTestCase import _user_name
 from Products.PluggableUserFolder.PluggableUserFolder import _no_password_check
 from Products.PluggableUserFolder.ApacheSSLIdentification import \
-    ApacheSSLIdentificationPlugin, manage_addApacheSSLIdentificationPlugin
+    manage_addApacheSSLIdentificationPlugin
 
 class TestPlugin(TestBase):
 
@@ -21,7 +21,7 @@ class TestPlugin(TestBase):
         TestBase.afterSetUp(self)
         manage_addApacheSSLIdentificationPlugin(self.folder.acl_users)
         self.plugin = self.folder.acl_users.apache_ssl_identification
-        self.app.REQUEST.other['SERVER_URL'] = 'https://path.to.a.server/index.html'
+        self.app.REQUEST.other['SERVER_URL'] = 'https://path.to.a.server/'
         self.app.REQUEST.environ[self.plugin.ssl_id_source] = _user_name
 
     def testMakeAuthString(self):
@@ -33,7 +33,7 @@ class TestPlugin(TestBase):
         self.failUnless(pwd is _no_password_check)
 
     def testSSLRequired(self):
-        self.app.REQUEST.other['SERVER_URL'] = 'http://path.to.a.server/index.html'
+        self.app.REQUEST.other['SERVER_URL'] = 'http://path.to.a.server/'
         authstr = self.plugin.makeAuthenticationString(self.app.REQUEST, None)
         self.failUnless(authstr is None)
 
