@@ -117,6 +117,8 @@ class SimpleGroup(SimpleItem):
                 index = self.members.index(userid)
                 del self.members[index]
 
+    def setTitle(self, title):
+        self.title=title
 
 class SimpleGroupRolesPlugin(Folder):
     """This plugin stores the user definitions in the ZODB"""
