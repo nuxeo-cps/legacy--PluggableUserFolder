@@ -60,7 +60,6 @@ class CASIdentificationPlugin(PropertyManager, SimpleItem):
     manage_options = PropertyManager.manage_options + SimpleItem.manage_options
 
     def makeAuthenticationString(self, request, auth):
-        LOG('CASIdentification', DEBUG, 'makeAuthenticationString:1')
         session = request.SESSION
         username = None
         
