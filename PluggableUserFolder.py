@@ -348,9 +348,9 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             str(options) + '\n')
         return options
 
-    def mergedLocalRoles(self, object, withgroups=0, withpath=0):
+    def mergedLocalRoles(self, object, withgroups=0):
         """Returns all local roles valid for an object"""
-        # widthpath is there for CPS compatibility reasons, and is ignored
+
         LOG('PluggableUserFolder', DEBUG, 'mergedLocalRoles()')
 
         merged = {}
@@ -407,13 +407,100 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             for plugin in plugins:
                 for user in merged.keys():
                     result['user:' + user] = plugin.modifyLocalRoles(user,
-                                        object, merged[user])
+                                                                     object, merged[user])
             # Get the groups
             plugins = self._get_plugins(IGroupPlugin)
             for plugin in plugins:
                 for group in plugin.getLocalGroups(object):
                     result['group:' + group] = \
                         plugin.getGroupRolesOnObject(group, object)
+
+        return result
+
+    def mergedLocalRolesWithPath(self, object, withgroups=0):
+        """Returns all local roles valid for an object with path"""
+
+        LOG('PluggableUserFolder', DEBUG, 'mergedLocalRolesWithPath()')
+
+        merged = {}
+        innerobject = getattr(object, 'aq_inner', object)
+        from Products.CMFCore.utils import getToolByName
+        utool = getToolByName(innerobject, 'portal_url')
+
+        while 1:
+            if hasattr(innerobject, '__ac_local_roles__'):
+                dict = innerobject.__ac_local_roles__ or {}
+                if callable(dict):
+                    dict = dict()
+                obj_url = utool.getRelativeUrl(innerobject)
+                for user, roles in dict.items():
+                    if withgroups:
+                        user = 'user:'+user # groups
+                    if merged.has_key(user):
+                        merged[user].append({'url':obj_url,'roles':roles})
+                    else:
+                        merged[user] = [{'url':obj_url,'roles':roles}]
+            # deal with groups
+            if withgroups:
+                if hasattr(innerobject, '__ac_local_group_roles__'):
+                    dict = innerobject.__ac_local_group_roles__ or {}
+                    if callable(dict):
+                        dict = dict()
+                    obj_url = utool.getRelativeUrl(object)
+                    for group, roles in dict.items():
+                        group = 'group:'+group
+                        if merged.has_key(group):
+                            merged[group].append({'url':obj_url,'roles':roles})
+                        else:
+                            merged[group] = [{'url':obj_url,'roles':roles}]
+            # end groups
+            inner = getattr(innerobject, 'aq_inner', innerobject)
+            parent = getattr(inner, 'aq_parent', None)
+            if parent is not None:
+                innerobject = parent
+                continue
+            if hasattr(innerobject, 'im_self'):
+                innerobject = innerobject.im_self
+                innerobject = getattr(innerobject, 'aq_inner', innerobject)
+                continue
+            break
+
+        # deal with role management plugins, to get a better list
+        plugins = self._get_plugins(IRolePlugin)
+
+        if not withgroups:
+            # Not in a CPS
+            LOG("Pluggable User Folder : mergedLocalRolesWithPath",
+                DEBUG,
+                "Not implemented")
+        else:
+            # CPS does not expect you to expand users roles, instead
+            # It wants a list of users, and groups and their roles.
+            # First, go through the found users, to let the plugins
+            # Remove any roles. This may also add roles to the users
+            # if they are members of groups, but that is no problem,
+            # just overhead.
+            # Also this adds the 'user:' prefix to users that CPS
+            # wants when withgroups is given.
+            result = {}
+            for plugin in plugins:
+                for user in merged.keys():
+                    result[user] = []
+                    for dict in merged[user]:
+                        result[user].append(\
+                        {'url':dict['url'],
+                         'roles':plugin.modifyLocalRoles(user,
+                                                          object,
+                                                          dict['roles'])})
+            # Get the groups
+            plugins = self._get_plugins(IGroupPlugin)
+            for plugin in plugins:
+                for group in plugin.getLocalGroups(object):
+                    result['group:'+group] = []
+                    for dict in merged['group:'+group]:
+                        result['group:'+group].append(\
+                        {'url':dict['url'],
+                         'roles':plugin.getGroupRolesOnObject(group, object)})
 
         return result
 
@@ -428,7 +515,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             allowed[r] = 1
         localroles = self.mergedLocalRoles(ob, withgroups=1) # groups
         for user_or_group, roles in localroles.items():
-            if ':' in user_or_group:
+            if not ':' in user_or_group:
                 user_or_group = 'user:' + user_or_group
             for role in roles:
                 if allowed.has_key(role):
@@ -598,4 +685,3 @@ def manage_addPluggableUserFolder(self, REQUEST=None):
 
     if REQUEST is not None:
         REQUEST['RESPONSE'].redirect(self.absolute_url()+'/manage_main')
-
