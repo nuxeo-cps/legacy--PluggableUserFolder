@@ -70,14 +70,15 @@ def initialize(context):
         icon='zmi/UserFolder_icon.gif',
         visibility=None,
     )
-    context.registerClass(
-        instance_class=GroupRoles.GroupRolesPlugin,
-        permission=add_user_folders,
-        constructors=(GroupRoles.manage_addGroupRolesPlugin,),
-        icon='zmi/UserFolder_icon.gif',
-        visibility=None,
-    )
-    registerRolePlugin(GroupRoles.GroupRolesPlugin)
+    # Group support not yet finished, diabled in this release
+    #context.registerClass(
+    #    instance_class=GroupRoles.GroupRolesPlugin,
+    #    permission=add_user_folders,
+    #    constructors=(GroupRoles.manage_addGroupRolesPlugin,),
+    #    icon='zmi/UserFolder_icon.gif',
+    #    visibility=None,
+    #)
+    #registerRolePlugin(GroupRoles.GroupRolesPlugin)
 
     if LdapSupport:
         context.registerClass(

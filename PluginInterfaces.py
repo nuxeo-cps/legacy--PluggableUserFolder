@@ -139,3 +139,33 @@ class IRolePlugin(Interface.Base):
         previous is 0, in both cases needing no traversal at all.
         """
 
+class IGroupPlugin(IRolePlugin):
+    # XXX: I'm not sure if there are side effects of subclassinng
+    # Interfaces...
+
+    # This is a special type of IRolePlugin, to implement group support.
+    # It extends the role modification with an API to support groups.
+    # The API supports mainly the listing of groups, and also methods
+    # that allow CMF to display basic local role management interfaces
+    # for these groups.
+    #
+    # Group objects must in turn implement the IGroupObject interface.
+
+    def getGroupIds(self):
+        """Returns a list of the names of defined groups"""
+
+    def getGroupFromId(self, id):
+        """Returns the group object"""
+
+        
+class IGroupObject(Interface.Base):
+
+    def getMembers(self):
+        """Returns the names of the members of the group"""
+
+    def manageForm(self):
+        """Returns HTML code for a management form
+
+        This form should be made to be displayed inside a CMF template,
+        called on a RoleManager object.
+        """

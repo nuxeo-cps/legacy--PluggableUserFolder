@@ -28,7 +28,7 @@ from OFS.Folder import Folder
 from OFS.ObjectManager import checkValidId
 from ZODB.PersistentMapping import PersistentMapping
 
-from PluginInterfaces import IRolePlugin
+from PluginInterfaces import IRolePlugin, IGroupPlugin
 
 BadRequestException = 'Bad Request'
 
@@ -58,9 +58,6 @@ class Group(SimpleItem):
     # API
     #
 
-    def getAllUsers(self):
-        return self.acl_users.getuserids()
-
     def getMembers(self):
         return self.members.keys()
 
@@ -76,10 +73,24 @@ class Group(SimpleItem):
 
     def setMemberRoles(self, userid, roles):
         self.members[userid] = roles
+    #
+    # UI support functions (called from ZMI)
+    #
+    def getAllUsers(self):
+        """Returns all users available through acl_users"""
+        return self.acl_users.getuserids()
 
     def userHasRole(self, user, role):
+        """Checks for a certain role mapping
+
+        Mainly used to set a check box in the ZMI
+        """
         return self.members.has_key(user) and role in self.members[user]
 
+
+    #
+    # ZMI methods
+    #
     def manage_editSettings(self, title=None, REQUEST=None):
         """Change the settings of the group"""
         if title is not None:
@@ -118,10 +129,12 @@ class Group(SimpleItem):
         if REQUEST is not None:
             return self.manage_groupForm(manage_tabs_message='Users deleted')
 
+
+
 class GroupRolesPlugin(Folder):
     """This plugin stores the user definitions in the ZODB"""
     security = ClassSecurityInfo()
-    __implements__ = (IRolePlugin,)
+    __implements__ = (IGroupPlugin,)
 
     meta_type = 'Group Roles Plugin'
     id = 'group_roles'

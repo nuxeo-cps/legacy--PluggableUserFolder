@@ -29,7 +29,8 @@ from AccessControl.Role import RoleManager, DEFAULTMAXLISTUSERS
 from OFS.ObjectManager import ObjectManager
 from OFS.SimpleItem import Item
 
-from PluginInterfaces import IAuthenticationPlugin, IIdentificationPlugin, IRolePlugin
+from PluginInterfaces import IAuthenticationPlugin, IIdentificationPlugin, \
+    IRolePlugin, IGroupPlugin
 from InternalAuthentication import InternalAuthenticationPlugin
 from BasicIdentification import BasicIdentificationPlugin
 
@@ -70,7 +71,8 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         +Item.manage_options
         )
 
-    _product_interfaces = (IAuthenticationPlugin, IIdentificationPlugin, IRolePlugin)
+    _product_interfaces = (IAuthenticationPlugin, IIdentificationPlugin, \
+                           IRolePlugin, IGroupPlugin)
 
     def __init__(self):
         # As default, add the "Internal" plugins.
@@ -200,9 +202,15 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
     # XXX the group support here must be rewritten.
     # We need an interface for group objects, for example
     # and role plugins must tell us if they are group plugins.
+
+    # change to get GroupIds and set up alias.
     security.declareProtected(Permissions.manage_users, 'getGroupNames')
     def getGroupNames(self):
-        return []
+        LOG('PluggableUserFolder', DEBUG, 'getGroupNames called')
+        groups = []
+        for plugin in self._get_plugins(IRolePlugin):
+            groups.extend(plugin.getGroupIds())
+        return groups
 
     security.declareProtected(Permissions.manage_users, 'getGroupById')
     def getGroupById(self, groupname, default=_marker):
