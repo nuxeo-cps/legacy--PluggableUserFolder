@@ -28,7 +28,7 @@ from AccessControl import AuthEncoding, ClassSecurityInfo
 from AccessControl.User import _remote_user_mode
 from AccessControl.Role import DEFAULTMAXLISTUSERS
 from OFS.SimpleItem import SimpleItem
-from ZODB.PersistentMapping import PersistentMapping
+from Globals import PersistentMapping
 
 from PluggableUser import PluggableUser
 from PluginInterfaces import IAuthenticationPlugin

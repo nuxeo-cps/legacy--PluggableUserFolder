@@ -27,7 +27,10 @@ from AccessControl import ClassSecurityInfo
 from OFS.SimpleItem import SimpleItem
 from OFS.Folder import Folder
 from OFS.ObjectManager import checkValidId
-from ZODB.PersistentList import PersistentList
+try: # Zope <= 2.7
+    from ZODB.PersistentList import PersistentList
+except: # Zope >= 2.8
+    from persistent.list import PersistentList
 
 from PluginInterfaces import IRolePlugin, IGroupPlugin
 
