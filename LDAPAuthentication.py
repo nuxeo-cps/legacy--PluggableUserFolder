@@ -47,6 +47,10 @@ class LDAPAuthenticationPlugin(LDAPUserFolder):
         """Returns 1 if you can not add, change or delete users"""
         return 1
 
+    def getUser(self, name, password=None):
+        return PluggableUserWrapper(
+                   LDAPUserFolder.getUser(self, name, password))
+
 
 addLDAPAuthenticationPlugin = DTMLFile('zmi/addLDAPAuthenticationPlugin', \
                               globals())
