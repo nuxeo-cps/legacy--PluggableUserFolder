@@ -49,8 +49,8 @@ class PluggableUserMixin:
             'Acquisition chain: %s\n' % self.aq_chain, error=sys.exc_info())
             return ()
 
-        plugins = self.acl_users._get_plugins(IRolePlugin)
-        # plugins = self._sort_plugins(plugins, self.role_order)
+        plugins = aclu._get_plugins(IRolePlugin)
+        plugins = aclu._sort_plugins(plugins, aclu.group_role_order)
         roles = self.roles[:] # Make sure it's a copy, and not the original
         for plugin in plugins:
             roles = plugin.modifyGlobalRoles(self.getId(), roles)
