@@ -47,9 +47,9 @@ PluggableUserFolder: A Zope UserFolder with authentication plugins
 
   More information
 
-    There is now a "cps-devel Mailing
+    There is now a "cps-devel mailing
     list":http://lists.nuxeo.com/mailman/listinfo/cps-devel for CPS3 (and CPS2)
-    developers, as well for other products developped by Nuxeo. 
+    developers, as well as for other products developped by Nuxeo. 
     
     CPS users lists ("cps-users
     (english)":http://lists.nuxeo.com/mailman/listinfo/cps-users and
