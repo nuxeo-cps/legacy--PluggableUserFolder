@@ -67,8 +67,10 @@ class LDAPLoginPlugin(LDAPUserFolder):
         else:
             LOG('LDAP Login', DEBUG, 'getUser',
                 'Username: %s\nPassword: %s\n' % (name, password))
-            return PluggableUserWrapper(
-                       LDAPUserFolder.getUser(self, name, password))
+            user = LDAPUserFolder.getUser(self, name, password)
+            if user is not None:
+                user = PluggableUserWrapper(user)
+            return user
 
 
 addLDAPLoginPlugin = DTMLFile('zmi/addLDAPLoginPlugin', globals())
