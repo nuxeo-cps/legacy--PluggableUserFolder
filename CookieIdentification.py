@@ -20,7 +20,7 @@
 __doc__ = '''Apache SSL Identification Plugin'''
 __version__ = '$Revision$'[11:-2]
 
-import sys, random
+import random
 from urllib import quote, unquote
 
 from PluggableUserFolder import LOG, DEBUG, ERROR
@@ -65,7 +65,6 @@ class CookieIdentificationPlugin(PropertyManager, SimpleItem):
     #
     # Public API
     #
-
     def makeAuthenticationString(self, request, auth):
         LOG('CookieIdentification', DEBUG, 'makeAuthenticationString')
         if not isinstance(request, HTTPRequest):
@@ -77,8 +76,8 @@ class CookieIdentificationPlugin(PropertyManager, SimpleItem):
             LOG('CookieIdentification', DEBUG, 'Not a GET, PUT or POST')
             return None
 
-        # WebDAV isn't supported because there is no way to set the cookies, since
-        # you need a login web page to set them.
+        # WebDAV isn't supported because there is no way to set the cookies,
+        # since you need a login web page to set them.
         if request.environ.has_key('WEBDAV_SOURCE_PORT'):
             LOG('CookieIdentification', DEBUG, 'WebDAV not supported')
             return None
@@ -92,12 +91,12 @@ class CookieIdentificationPlugin(PropertyManager, SimpleItem):
             if not self.zeo_compatibility:
                 # Store the password in a temporary storage with a ticket
                 # Send a ticket instead of the password in the cookie.
-                # This means the unencrypted password is no longer sent
-                # with each request.
+                # This means the unencrypted password is no longer sent with
+                # each request.
                 if not hasattr(self, '__tickets'):
                     self.__tickets = MountedTemporaryFolder('__tickets')
-                ticket = str(random.randint(100000000, 999999999 )) + \
-                         str(random.randint(100000000, 999999999 ))
+                ticket = str(random.randint(100000000, 999999999)) + \
+                         str(random.randint(100000000, 999999999))
                 if hasattr(self.__tickets, name):
                     delattr(self.__tickets, name)
                 setattr(self.__tickets, name, '%s:%s' % (ticket, pw))
@@ -153,7 +152,6 @@ class CookieIdentificationPlugin(PropertyManager, SimpleItem):
         resp = req['RESPONSE']
         resp.expireCookie(self.auth_cookie, path='/')
         # XXX No redirect is done. Check with CookieCrimbler
-
 
     #
     # Internal methods

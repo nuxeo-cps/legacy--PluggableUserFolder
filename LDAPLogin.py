@@ -24,11 +24,9 @@ from PluggableUserFolder import LOG, DEBUG, ERROR
 
 from Globals import MessageDialog, DTMLFile
 from Acquisition import aq_base
-from OFS.SimpleItem import SimpleItem
 
 from LDAPAuthentication import LDAPAuthenticationPlugin, _ldap_user_groups
 from PluginInterfaces import IAuthenticationPlugin
-from PluggableUser import PluggableUserWrapper
 
 class LDAPLoginPlugin(LDAPAuthenticationPlugin):
     """This plugin stores the user definitions in the ZODB"""
@@ -48,8 +46,8 @@ class LDAPLoginPlugin(LDAPAuthenticationPlugin):
 
     def getUsers(self, authenticated=None):
         LOG('LDAPLogin', DEBUG, 'getUsers()')
-        if authenticated==1:
-            return LDAPUserFolder.getUsers(self,authenticated)
+        if authenticated == 1:
+            return LDAPUserFolder.getUsers(self, authenticated)
         return []
 
     def getUser(self, name, password=None):

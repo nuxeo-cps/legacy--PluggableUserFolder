@@ -19,7 +19,6 @@
 
 __doc__ = '''PluggableUserFolder init'''
 __version__ = '$Revision$'[11:-2]
-import ZODB
 from zLOG import LOG, DEBUG
 import CMFPatch
 
@@ -58,28 +57,28 @@ def initialize(context):
     context.registerClass(
         instance_class = InternalAuthentication.InternalAuthenticationPlugin,
         permission = add_user_folders,
-        constructors = \
+        constructors =
             (InternalAuthentication.manage_addInternalAuthenticationPlugin,),
         icon = 'zmi/UserFolder_icon.gif',
         visibility = None)
     context.registerClass(
         instance_class = BasicIdentification.BasicIdentificationPlugin,
         permission = add_user_folders,
-        constructors = \
+        constructors =
            (BasicIdentification.manage_addBasicIdentificationPlugin,),
         icon = 'zmi/UserFolder_icon.gif',
         visibility = None)
     context.registerClass(
         instance_class = ApacheSSLIdentification.ApacheSSLIdentificationPlugin,
         permission = add_user_folders,
-        constructors = \
+        constructors =
             (ApacheSSLIdentification.manage_addApacheSSLIdentificationPlugin,),
         icon = 'zmi/UserFolder_icon.gif',
         visibility = None)
     context.registerClass(
         instance_class = CookieIdentification.CookieIdentificationPlugin,
         permission = add_user_folders,
-        constructors = \
+        constructors =
             (CookieIdentification.manage_addCookieIdentificationPlugin,),
         icon = 'zmi/UserFolder_icon.gif',
         visibility = None)
@@ -124,8 +123,8 @@ def registerRolePlugin(plugin):
         uid = 'manage_' + plugin.plugin_id + method['id']
         action = getattr(plugin, method['action'])
         LOG('PluggableFolder', DEBUG, 'Add method on RoleManager',
-            'Name: %s \nMethod: <%s>.%s\n' % (uid, plugin.meta_type,
-            method['action']))
+            'Name: %s \nMethod: <%s>.%s\n' % (
+                uid, plugin.meta_type, method['action']))
         setattr(RoleManager, uid, action)
 
 if not hasattr(RoleManager, 'manage_permissions'):

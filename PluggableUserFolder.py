@@ -24,7 +24,8 @@ __version__ = '$Revision$'[11:-2]
 # so don't remove them even though they are unused.
 from zLOG import LOG, DEBUG, BLATHER, INFO, PROBLEM, WARNING, ERROR
 import os
-from urllib import quote, unquote
+from urllib import quote
+
 if os.environ.get("ZOPE_PLUGGABLE_LOGGING", None) == "OFF":
     def LOG(*args, **kw):
         pass
@@ -74,17 +75,15 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
     encrypt_passwords = 0
 
     manage_options = (
-        (
-        {'label':'Contents', 'action':'manage_main',
-         'help':('OFSP','Folder_View.stx')},
-        {'label':'Properties', 'action':'manage_userFolderProperties',
-         'help':('OFSP','User-Folder_Properties.stx')},
-        )
-        +RoleManager.manage_options
-        +Item.manage_options
+        ({'label':'Contents', 'action':'manage_main',
+          'help':('OFSP','Folder_View.stx')},
+         {'label':'Properties', 'action':'manage_userFolderProperties',
+          'help':('OFSP','User-Folder_Properties.stx')},)
+        + RoleManager.manage_options
+        + Item.manage_options
         )
 
-    _product_interfaces = (IAuthenticationPlugin, IIdentificationPlugin, \
+    _product_interfaces = (IAuthenticationPlugin, IIdentificationPlugin,
                            IRolePlugin, IGroupPlugin)
 
     def __init__(self):
@@ -95,13 +94,14 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         self._setObject(ob.id, ob)
 
     def all_meta_types(self, interfaces=None):
-
         if interfaces is None:
             if hasattr(self, '_product_interfaces'):
                 interfaces = self._product_interfaces
             elif hasattr(self, 'aq_acquire'):
-                try: interfaces = self.aq_acquire('_product_interfaces')
-                except: pass    # Bleah generic pass is bad
+                try: 
+                    interfaces = self.aq_acquire('_product_interfaces')
+                except:
+                    pass    # Bleah generic pass is bad
 
         return ObjectManager.all_meta_types(self, interfaces)
 
@@ -173,7 +173,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
     # ZMI interfaces
     # ----------------------------------
 
-    security.declareProtected(Permissions.manage_users, \
+    security.declareProtected(Permissions.manage_users,
         'manage_userFolderProperties')
     manage_userFolderProperties = DTMLFile('zmi/userFolderProps', globals())
 
@@ -188,12 +188,11 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             if plug in existing_plugs:
                 existing_plugs.remove(plug)
             else:
-                message = message + 'Error: Plugin %s not found\n' % plug
+                message += 'Error: Plugin %s not found\n' % plug
                 error = 1
         if not error:
             for plug in existing_plugs:
-                message = message + \
-                'Plugin %s not included in list, appending.\n' % plug
+                message += 'Plugin %s not included in list, appending.\n' % plug
                 plugs.append(plug)
         return plugs, message, error
 
@@ -208,20 +207,19 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         """
         message = ''
         error = 0
-        iplugs, msg, err = self._munge_order(identification_order, \
+        iplugs, msg, err = self._munge_order(identification_order,
                                              IIdentificationPlugin)
         message = message + msg
         if err:
             error = 1
 
-        aplugs, msg, err = self._munge_order(authentication_order, \
+        aplugs, msg, err = self._munge_order(authentication_order,
                                              IAuthenticationPlugin)
         message = message + msg
         if err:
             error = 1
 
-        gplugs, msg, err = self._munge_order(group_role_order, \
-                                             IGroupPlugin)
+        gplugs, msg, err = self._munge_order(group_role_order, IGroupPlugin)
         message = message + msg
         if err:
             error = 1
@@ -242,7 +240,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             message = message + 'Saved Changes.\n'
 
         if self.login_page is not None:
-            self.login_page=login_page
+            self.login_page = login_page
 
         if REQUEST is not None:
             return self.manage_userFolderProperties(
@@ -469,16 +467,15 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             # CPS does not expect you to expand users roles, instead
             # It wants a list of users, and groups and their roles.
             # First, go through the found users, to let the plugins
-            # Remove any roles. This may also add roles to the users
-            # if they are members of groups, but that is no problem,
-            # just overhead.
+            # Remove any roles. This may also add roles to the users if they
+            # are members of groups, but that is no problem, just overhead.
             # Also this adds the 'user:' prefix to users that CPS
             # wants when withgroups is given.
             result = {}
             for plugin in plugins:
                 for user in merged.keys():
-                    result['user:' + user] = plugin.modifyLocalRoles(user,
-                                                                     object, merged[user])
+                    result['user:' + user] = plugin.modifyLocalRoles(
+                        user, object, merged[user])
             # Get the groups
             plugins = self._get_plugins(IGroupPlugin)
             for plugin in plugins:
@@ -506,12 +503,12 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
                 obj_url = utool.getRelativeUrl(innerobject)
                 for user, roles in dict.items():
                     if withgroups:
-                        user = 'user:'+user # groups
+                        user = 'user:' + user # groups
                     if merged.has_key(user):
-                        merged[user].append({'url':obj_url,'roles':roles})
+                        merged[user].append({'url': obj_url,'roles': roles})
                     else:
-                        merged[user] = [{'url':obj_url,'roles':roles}]
-            # deal with groups
+                        merged[user] = [{'url': obj_url,'roles': roles}]
+            # Deal with groups.
             if withgroups:
                 if hasattr(innerobject, '__ac_local_group_roles__'):
                     dict = innerobject.__ac_local_group_roles__ or {}
@@ -519,11 +516,12 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
                         dict = dict()
                     obj_url = utool.getRelativeUrl(object)
                     for group, roles in dict.items():
-                        group = 'group:'+group
+                        group = 'group:' + group
                         if merged.has_key(group):
-                            merged[group].append({'url':obj_url,'roles':roles})
+                            merged[group].append(
+                                {'url': obj_url, 'roles': roles})
                         else:
-                            merged[group] = [{'url':obj_url,'roles':roles}]
+                            merged[group] = [{'url': obj_url, 'roles': roles}]
             # end groups
             inner = getattr(innerobject, 'aq_inner', innerobject)
             parent = getattr(inner, 'aq_parent', None)
@@ -542,36 +540,33 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         if not withgroups:
             # Not in a CPS
             LOG("Pluggable User Folder : mergedLocalRolesWithPath",
-                DEBUG,
-                "Not implemented")
+                DEBUG, "Not implemented")
         else:
-            # CPS does not expect you to expand users roles, instead
+            # CPS does not expect you to expand users roles, instead.
             # It wants a list of users, and groups and their roles.
-            # First, go through the found users, to let the plugins
-            # Remove any roles. This may also add roles to the users
-            # if they are members of groups, but that is no problem,
-            # just overhead.
-            # Also this adds the 'user:' prefix to users that CPS
-            # wants when withgroups is given.
+            # First, go through the found users, to let the plugins.
+            # Remove any roles. This may also add roles to the users if they
+            # are members of groups, but that is no problem, just overhead.
+            # Also this adds the 'user:' prefix to users that CPS wants when
+            # withgroups is given.
             result = {}
             for plugin in plugins:
                 for user in merged.keys():
                     result[user] = []
                     for dict in merged[user]:
-                        result[user].append(\
-                        {'url':dict['url'],
-                         'roles':plugin.modifyLocalRoles(user,
-                                                          object,
-                                                          dict['roles'])})
+                        result[user].append(
+                            {'url': dict['url'],
+                             'roles': plugin.modifyLocalRoles(
+                                        user, object, dict['roles'])})
             # Get the groups
             plugins = self._get_plugins(IGroupPlugin)
             for plugin in plugins:
                 for group in plugin.getLocalGroups(object):
                     result['group:'+group] = []
                     for dict in merged['group:'+group]:
-                        result['group:'+group].append(\
-                        {'url':dict['url'],
-                         'roles':plugin.getGroupRolesOnObject(group, object)})
+                        result['group:'+group].append(
+                            {'url': dict['url'],
+                             'roles': plugin.getGroupRolesOnObject(group, object)})
 
         return result
 
@@ -606,7 +601,8 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         plugins = self._get_plugins(IAuthenticationPlugin)
         props = plugins[0].listUserProperties()
         for plugin in plugins[1:]:
-            props = [prop for prop in plugin.listUserProperties() if prop in props]
+            props = [prop for prop in plugin.listUserProperties() 
+                          if prop in props]
         return tuple(props)
 
     def searchUsers(self, query={}, props=None, options=None, **kw):
@@ -637,11 +633,11 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
     def _doAddUser(self, name, password, roles, domains, **kw):
         """Create a new user.
 
-         Finds the first plugin that is not read only, and creates
-         the user there. This is here for compability reasons only.
-         It's better to call the plugin directly, so you have
-         control over where the user is stored.
-         """
+        Finds the first plugin that is not read only, and creates
+        the user there. This is here for compability reasons only.
+        It's better to call the plugin directly, so you have
+        control over where the user is stored.
+        """
         plugins = self._get_plugins(IAuthenticationPlugin, include_readonly=0)
         plugins = self._sort_plugins(plugins, self.authentication_order)
         if not plugins: # TODO change to object exception
@@ -674,18 +670,17 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             for username in names:
                 if plugin.getUser(username):
                     localnames.append(username)
-                    named.remove(username) # Only delete from first plugin.
+                    names.remove(username) # Only delete from first plugin.
             if localnames:
                 plugin._doDelUsers(localnames)
 
     def _createInitialUser(self):
         """
-        If there are no users or only one user in this user folder,
-        populates from the 'inituser' file in INSTANCE_HOME.
-        We have to do this even when there is already a user
-        just in case the initial user ignored the setup messages.
-        We don't do it for more than one user to avoid
-        abuse of this mechanism.
+        If there are no users or only one user in this user folder, populates
+        from the 'inituser' file in INSTANCE_HOME.
+        We have to do this even when there is already a user just in case the
+        initial user ignored the setup messages.
+        We don't do it for more than one user to avoid abuse of this mechanism.
         Called only by OFS.Application.initialize().
         """
         if len(self.getUserNames()) >= 1:
@@ -766,7 +761,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         # Change from BasicUserFolder.authenticate(),
         # check for the user being authenticated by Identify:
         if user is not None and \
-            (password is _no_password_check or \
+            (password is _no_password_check or
              user.authenticate(password, request)):
             LOG('PluggableUserFolder', DEBUG, 'authenticate()',
                 'User %s validated\n' % name)
@@ -785,9 +780,9 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         resp = self.REQUEST['RESPONSE']
         if req.__class__ is not HTTPRequest:
             return
-        if not req[ 'REQUEST_METHOD' ] in ( 'HEAD', 'GET', 'PUT', 'POST' ):
+        if not req['REQUEST_METHOD'] in ('HEAD', 'GET', 'PUT', 'POST'):
             return
-        if req.environ.has_key( 'WEBDAV_SOURCE_PORT' ):
+        if req.environ.has_key('WEBDAV_SOURCE_PORT'):
             return
         if req.get('disable_login_page__', 0):
             return
@@ -877,9 +872,9 @@ def manage_addPluggableUserFolder(self, REQUEST=None):
     self = self.this()
     if hasattr(aq_base(self), 'acl_users'):
         return MessageDialog(
-            title  ='Item Exists',
+            title='Item Exists',
             message='This object already contains a User Folder',
-            action ='%s/manage_main' % REQUEST['URL1'])
+            action='%s/manage_main' % REQUEST['URL1'])
     self._setObject('acl_users', f)
     self.__allow_groups__ = f
 

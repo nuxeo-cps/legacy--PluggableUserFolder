@@ -23,7 +23,7 @@ __version__ = ' $Revision$'[11:-2]
 from zLOG import LOG, DEBUG, ERROR
 
 from Globals import MessageDialog, DTMLFile
-from Acquisition import aq_base, aq_parent
+from Acquisition import aq_base
 from OFS.SimpleItem import SimpleItem
 
 try:
@@ -83,7 +83,8 @@ class LDAPAuthenticationPlugin(LDAPUserFolder):
                 self._log.log(7, msg)
             return cached_user
 
-        user_roles, user_dn, user_attrs, user_groups = self._lookupuser(uid=name, pwd=pwd)
+        user_roles, user_dn, user_attrs, user_groups = \
+            self._lookupuser(uid=name, pwd=pwd)
         if user_dn is None:
             msg = 'getUser: "%s" not found' % name
             self.verbose > 3 and self._log.log(4, msg)
@@ -103,7 +104,7 @@ class LDAPAuthenticationPlugin(LDAPUserFolder):
             login_name = login_name[0]
 
         if _ldap_user_groups:
-            user_obj = PluggableLDAPUser( login_name
+            user_obj = PluggableLDAPUser(login_name
                             , pwd or 'undef'
                             , user_roles or []
                             , user_groups or []
@@ -112,10 +113,9 @@ class LDAPAuthenticationPlugin(LDAPUserFolder):
                             , user_dn
                             , user_attrs
                             , self.getMappedUserAttrs()
-                            , self.getMultivaluedUserAttrs()
-                            )
+                            , self.getMultivaluedUserAttrs())
         else:
-            user_obj = PluggableLDAPUser( login_name
+            user_obj = PluggableLDAPUser(login_name
                             , pwd or 'undef'
                             , user_roles or []
                             , user_groups or []
@@ -123,8 +123,7 @@ class LDAPAuthenticationPlugin(LDAPUserFolder):
                             , user_dn
                             , user_attrs
                             , self.getMappedUserAttrs()
-                            , self.getMultivaluedUserAttrs()
-                            )
+                            , self.getMultivaluedUserAttrs())
 
         if pwd is not None:
             self._authenticated_cache.set(name, user_obj)
@@ -134,7 +133,7 @@ class LDAPAuthenticationPlugin(LDAPUserFolder):
         return user_obj
 
 
-addLDAPAuthenticationPlugin = DTMLFile('zmi/addLDAPAuthenticationPlugin', \
+addLDAPAuthenticationPlugin = DTMLFile('zmi/addLDAPAuthenticationPlugin',
                               globals())
 
 def manage_addLDAPAuthenticationPlugin(self, id, title, LDAP_server, login_attr

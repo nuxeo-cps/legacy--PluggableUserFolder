@@ -23,7 +23,7 @@ __version__ = '$Revision$'[11:-2]
 
 from PluggableUserFolder import LOG, DEBUG, ERROR
 
-from Acquisition import aq_base, Implicit
+from Acquisition import Implicit
 from AccessControl import ClassSecurityInfo
 from AccessControl.User import User
 from AccessControl.PermissionRole import _what_not_even_god_should_do
@@ -37,7 +37,7 @@ class PluggableUserMixin:
     def getUserFolder(self):
         try:
             return self.acl_users
-        except: # This hsould never happen, but does, and this code is for debugging:
+        except: # This sould never happen, but does, and this code is for debugging:
             import sys
             LOG('PluggableUserFolder', ERROR, 'User could not acquire acl_users',
             'Acquisition chain: %s\n' % self.aq_chain, error=sys.exc_info())
