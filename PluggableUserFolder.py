@@ -29,8 +29,14 @@ from OFS.ObjectManager import ObjectManager
 from OFS.SimpleItem import Item
 
 from PluginInterfaces import IAuthenticationPlugin, IIdentificationPlugin
-from Products.PluggableUserFolder.InternalAuthentication import \
-    InternalAuthenticationPlugin
+from InternalAuthentication import InternalAuthenticationPlugin
+from BasicIdentification import BasicIdentificationPlugin
+
+#here for debug
+from AccessControl import getSecurityManager
+from zExceptions import Unauthorized
+from AccessControl.SecurityManagement import newSecurityManager
+from AccessControl.SecurityManagement import noSecurityManager
 
 _marker=[]
 
@@ -70,6 +76,8 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
     def __init__(self):
         # As default, add the "Internal" plugins.
         ob=InternalAuthenticationPlugin()
+        self._setObject(ob.id, ob)
+        ob=BasicIdentificationPlugin()
         self._setObject(ob.id, ob)
 
     def all_meta_types(self, interfaces=None):
@@ -130,10 +138,10 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
                     result.append(user)
         return result
 
-    def getUser(self, name):
+    def getUser(self, name, password=None):
         """Return the named user object or None"""
         for plugin in self._get_plugins(IAuthenticationPlugin):
-            user = plugin.getUser(name)
+            user = plugin.getUser(name, password)
             if user:
                 return user
         return None
@@ -147,7 +155,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
          control over where the user is stored.
          """
         plugins = self._get_plugins(IAuthenticationPlugin, 0)
-        if not plugins:
+        if not plugins: # TODO change to object exception
             raise 'Can not create user. All Authentication plugins are read-only.'
         return plugins[0]._doAddUser(name, password, roles, domains, **kw)
 
@@ -157,7 +165,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         Only here for compatibility, just as _doAddUser.
         """
         plugins = self._get_plugins(IAuthenticationPlugin, 0)
-        if not plugins:
+        if not plugins: # TODO change to object exception
             raise 'Can not change user. All Authentication plugins are read-only.'
         return plugins[0]._doChangeUser(name, password, roles, domains, **kw)
 
@@ -169,7 +177,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         in ALL plugins!
         """
         plugins = self._get_plugins(IAuthenticationPlugin, 0)
-        if not plugins:
+        if not plugins: # TODO change to object exception
             raise 'Can not delete user(s). All Authentication plugins are read-only.'
         for plugin in plugins:
             localnames = []
@@ -179,6 +187,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             plugin._doDelUsers(localnames)
 
     def _createInitialUser(self):
+        return #TODO: Fix this so it aint bypassed
         """
         If there are no users or only one user in this user folder,
         populates from the 'inituser' file in INSTANCE_HOME.
@@ -205,6 +214,9 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         for plugin in plugins:
             if plugin.canIdentify(auth):
                 return plugin.identify(auth)
+
+        LOG('PluggableUserFolder', ERROR, 'identify',
+            'No plugins able to identify user\n' )
         return None, None
 
     def validate(self, request, auth='', roles=_noroles):
@@ -216,7 +228,39 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         # What to do if none of the plugins could make a string?
         # Currently just continue with auth=None. Might not be a good
         # idea, I'm not sure.
-        return BasicUserFolder.validate(self, request, auth, roles)
+        u = BasicUserFolder.validate(self, request, auth, roles)
+        return u
+
+    def authenticate(self, name, password, request):
+        super = self._emergency_user
+
+        if name is None:
+            return None
+
+        if super and name == super.getUserName():
+            user = super
+        else:
+            user = self.getUser(name, password)
+        if user is not None and user.authenticate(password, request):
+            return user
+        else:
+            return None
+
+
+    def authorize(self, user, accessed, container, name, value, roles):
+        user = getattr(user, 'aq_base', user).__of__(self)
+        newSecurityManager(None, user)
+        security = getSecurityManager()
+        try:
+            try:
+                if security.validate(accessed, container, name, value, roles):
+                    return 1
+            except:
+                noSecurityManager()
+                raise
+        except Unauthorized: pass
+        return 0
+
 
 
 def manage_addPluggableUserFolder(self, REQUEST=None):

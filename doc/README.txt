@@ -48,5 +48,25 @@ PluggableUserFolder: A Zope UserFolder with authentication plugins
     thereby letting site administrators mix several types of identification
     schemes as needed, in an easy and predictable way.
 
+  Bugs
 
+    You are currently able to delete all identification plugins, inclusing
+    BasicIdentification. If you do this on a root acl_users, you are in big
+    trouble, since you  will not be able to log in, period. Not even the
+    Emergency User will work. This will need to be adressed, somehow.
 
+      - Not being able to delete the last identification plugin!
+
+      - Automatically adding the BasicIdentification if no other
+        autentification plugins exist on startup?
+
+      - Having a magic file, like access and inituser either in the root
+        or in the PluggableUserFolder dir that when it exists, makes some
+        kind of 'restore', ie adds BasicIdentification. That file +
+        access would then reenable the emergency user.
+
+      - Automatically add BasicIdentification if access exists?
+
+      - Make a built-in, always existing 'EmergencyIdentification' plugin,
+        or somehow otherwise always allow Basic identification together with
+        the emergency user?

@@ -134,7 +134,7 @@ class InternalAuthenticationPlugin(SimpleItem):
             f(data[n])
         return users
 
-    def getUser(self, name):
+    def getUser(self, name, password=None):
         """Return the named user object or None"""
         return self.data.get(name, None)
 

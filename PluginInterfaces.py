@@ -32,8 +32,15 @@ class IAuthenticationPlugin(Interface.Base):
     def getUsers(self):
         """Return a list of user objects"""
 
-    def getUser(self, name):
-        """Return the named user object or None"""
+    def getUser(self, name, password=None):
+        """Return the named user object or None
+
+        password should be passed when the user is retrieved for
+        validation, since some authentication sources can't
+        return the password, only authenticate it. By passing the
+        password when retrieveing the user information, sources like
+        LDAP only need one call for both passing and authenticating
+        the user."""
 
     def _doAddUser(self, name, password, roles, domains, **kw):
         """Create a new user. This should be implemented by subclasses to

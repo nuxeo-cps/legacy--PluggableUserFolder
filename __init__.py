@@ -21,6 +21,7 @@ __version__='$Revision$'[11:-2]
 
 import PluggableUserFolder
 import InternalAuthentication
+import LDAPAuthentication
 import BasicIdentification
 import ApacheSSLIdentification
 from AccessControl.Permissions import add_user_folders
@@ -36,6 +37,13 @@ def initialize(context):
         instance_class=InternalAuthentication.InternalAuthenticationPlugin,
         permission=add_user_folders,
         constructors=(InternalAuthentication.manage_addInternalAuthenticationPlugin,),
+        icon='zmi/UserFolder_icon.gif',
+        visibility=None,
+    )
+    context.registerClass(
+        instance_class=LDAPAuthentication.LDAPAuthenticationPlugin,
+        permission=add_user_folders,
+        constructors=(LDAPAuthentication.manage_addLDAPAuthenticationPlugin,),
         icon='zmi/UserFolder_icon.gif',
         visibility=None,
     )
