@@ -91,7 +91,7 @@ class CookieIdentificationPlugin(PropertyManager, SimpleItem):
             return 'CookieAuth %s' % ac
         if request.has_key(self.auth_cookie):
             ac = unquote(request[self.auth_cookie])
-            self.delRequestVar(req, self.auth_cookie)
+            self.delRequestVar(request, self.auth_cookie)
             LOG('CookieIdentification', DEBUG, 'Found cookie login', ac+'\n')
             return 'CookieAuth %s' % ac
         return None
