@@ -1,4 +1,26 @@
 *******************************************
+** PluggableUserFolder V2.1.0 [R1 build 2003-10/07-16:08 by regebro]
+
+ZODB Requires:
+~~~~~~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+- The group support API has been generalized to accomodate multiple group
+  support implementations. mergedLocalRoles() should now be imported from
+  Products.CMFCore.utils and _getAllowedRolesAndUsers() and
+  _allowedRolesAndUsers() should now be imported from Products.CPSCore.utils.
+
+Bug fixes:
+~~~~~~~~~~
+- A bug that appeared with LDAPLogin when you log in with a non-LDAP user
+  and has LDAPLogin first in the path fixed.
+- A bug in mergedLocalRoles() when there was no roles plugins solved.
+
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+-
+*******************************************
 ** PluggableUserFolder V2.0.0 [R1 build 2003-09/15-16:30 by regebro]
 
 ZODB Requires:
