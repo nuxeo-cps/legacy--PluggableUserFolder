@@ -48,6 +48,7 @@ class SimpleGroup(SimpleItem):
     )
     manage_groupForm = DTMLFile('zmi/simpleGroupRolesEditGroup', globals())
     manage_main = manage_groupForm
+    groups = None
 
     def __init__(self, id, title):
         self.id = id
@@ -81,6 +82,8 @@ class SimpleGroup(SimpleItem):
 
     def getGroups(self):
         """Returns all groups that are member of this group"""
+        if self.groups is None:
+            self.groups = PersistentList()
         return tuple(self.groups)
 
     #

@@ -27,7 +27,17 @@ __version__ = '$Revision$'[11:-2]
 from PluggableUserFolder import LOG, INFO, DEBUG, PluggableUserFolder
 from AccessControl.PermissionRole import rolesForPermissionOn
 
-def cmfpatch():
+# These CMF patches is also done by CPS3, so if it is already done, skip it.
+
+_cmf_localroles_patch = 0
+try:
+    import CPSCore.utils
+    _cmf_localroles_patch = 1
+except ImportError:
+    pass
+
+if not _cmf_localroles_patch:
+    # Used outside CPS.
     try:
         from Products.CMFCore import utils
         from Products.CMFCore.CatalogTool import IndexableObjectWrapper,\
@@ -95,8 +105,3 @@ def cmfpatch():
         # Not a CMF Installation. No patching needed.
         pass
 
-try:
-    import Products.CPSCore
-    # This is a CPS3 installation, the patching is redundant
-except ImportError:
-    cmfpath()
