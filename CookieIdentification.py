@@ -92,9 +92,12 @@ class CookieIdentificationPlugin(PropertyManager, SimpleItem):
             if not self.zeo_compatibility:
                 # Store the password in a temporary storage with a ticket
                 # Send a ticket instead of the password in the cookie.
+                # This means the unencrypted password is no longer sent
+                # with each request.
                 if not hasattr(self, '__tickets'):
                     self.__tickets = MountedTemporaryFolder('__tickets')
-                ticket = str(random.randint(100000000, 999999999 ))
+                ticket = str(random.randint(100000000, 999999999 )) + \
+                         str(random.randint(100000000, 999999999 ))
                 if hasattr(self.__tickets, name):
                     delattr(self.__tickets, name)
                 setattr(self.__tickets, name, '%s:%s' % (ticket, pw))
