@@ -288,10 +288,10 @@ class SimpleGroupRolesPlugin(Folder):
     def getGroupRolesOnObject(self, group, object=None):
         if object is None:
             object = self
-        attr = getattr(object, ROLEATTRIBUTENAME, {})
-        if not attr.has_key(group):
-            return []
-        return attr[group]
+        attr = getattr(object, ROLEATTRIBUTENAME, None)
+        if attr and attr.has_key(group):
+            return attr[group]
+        return []
 
     def setGroupRolesOnObject(self, grouprolesmapping, object=None):
         if object is None:
