@@ -11,7 +11,7 @@ if __name__ == '__main__':
 
 from Testing import ZopeTestCase
 from Testing.ZopeTestCase import _user_name, _user_role, _folder_name, \
-    _standard_permissions
+    _standard_permissions, ZopeLite
 from AccessControl import Unauthorized
 
 from Products.PluggableUserFolder.PluggableUserFolder import \
@@ -19,7 +19,7 @@ from Products.PluggableUserFolder.PluggableUserFolder import \
 from Products.PluggableUserFolder.InternalAuthentication import \
     InternalAuthenticationPlugin
 from Products.PluggableUserFolder.PluginInterfaces import \
-    IAuthenticationPlugin
+    IAuthenticationPlugin, IIdentificationPlugin, IRolePlugin
 
 _pm = 'ThePublishedMethod'
 
@@ -102,41 +102,40 @@ class TestUserFolder(TestBase):
     def testGetRoles(self):
         user = self.uf.getUser(_user_name)
         assert _user_role in user.getRoles()
-    
+
     def testGetRolesInContext(self):
         user = self.uf.getUser(_user_name)
         self.folder.manage_addLocalRoles(_user_name, ['Owner'])
         roles = user.getRolesInContext(self.folder)
         assert _user_role in roles
         assert 'Owner' in roles
-    
+
     def testHasRole(self):
         user = self.uf.getUser(_user_name)
         assert user.has_role(_user_role, self.folder)
-    
+
     def testHasLocalRole(self):
         user = self.uf.getUser(_user_name)
         self.folder.manage_addLocalRoles(_user_name, ['Owner'])
         assert user.has_role('Owner', self.folder)
-    
+
     def testHasPermission(self):
         user = self.uf.getUser(_user_name)
-        self.folder.manage_role(_user_role, 
+        self.folder.manage_role(_user_role,
             _standard_permissions + ['Add Folders'])
-        self.login()   # !!!
+        self.login()
         assert user.has_permission('Add Folders', self.folder)
-    
+
     def testHasLocalPermission(self):
         user = self.uf.getUser(_user_name)
         self.folder.manage_role('Owner', ['Add Folders'])
         self.folder.manage_addLocalRoles(_user_name, ['Owner'])
-        self.login()   # !!!
+        self.login()
         assert user.has_permission('Add Folders', self.folder)
-    
+
     def testAuthenticate(self):
         user = self.uf.getUser(_user_name)
         assert user.authenticate('secret', self.app.REQUEST)
-
 
 class TestAccess(TestBase):
     '''Test UF is protecting access'''
@@ -144,7 +143,7 @@ class TestAccess(TestBase):
     def afterSetUp(self):
         TestBase.afterSetUp(self)
         self._setupPublishedMethod()
-            
+
     def testAllowAccess(self):
         self.login()
         try:
@@ -237,8 +236,26 @@ class TestPluginFolder(TestBase):
     # (deprecated) UserFolder interfaces
     # Add test for _createInitialUser()
 
-# TODO: Create testsuites for each and every plugin used.
+class TestInstallFolder(TestBase):
 
+    def afterSetUp(self):
+        TestBase.afterSetUp(self)
+        ZopeLite.installProduct('PluggableUserFolder', 1)
+
+    def testAllMetaTypes(self):
+        """Only plugins should be listed"""
+        # Install some other products, so there is stuff to show
+        ZopeLite.installProduct('ZCatalog', 1)
+        ZopeLite.installProduct('PageTemplates', 1)
+        products = self.uf.all_meta_types()
+        for each in products:
+            isIdPlugin = IIdentificationPlugin in each['interfaces']
+            isAuthPlugin = IAuthenticationPlugin in each['interfaces']
+            isRolePlugin = IRolePlugin in each['interfaces']
+            self.assert_( isIdPlugin or isAuthPlugin or isRolePlugin)
+
+
+# TODO: Create testsuites for each and every plugin used.
 
 if __name__ == '__main__':
     framework(descriptions=0, verbosity=1)
@@ -250,5 +267,6 @@ else:
         suite.addTest(unittest.makeSuite(TestAccess))
         suite.addTest(unittest.makeSuite(TestValidate))
         suite.addTest(unittest.makeSuite(TestPluginFolder))
+        suite.addTest(unittest.makeSuite(TestInstallFolder))
         return suite
 
