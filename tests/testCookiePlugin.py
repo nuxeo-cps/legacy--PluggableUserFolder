@@ -15,18 +15,6 @@ from Products.PluggableUserFolder.PluggableUserFolder import _no_password_check
 from Products.PluggableUserFolder.CookieIdentification import \
     CookieIdentificationPlugin, manage_addCookieIdentificationPlugin
 
-def makerequest(app, stdout=sys.stdout):
-    '''Just make a fresh request'''
-    from ZPublisher.HTTPRequest import HTTPRequest
-    from ZPublisher.HTTPResponse import HTTPResponse
-    from ZPublisher.BaseRequest import RequestContainer
-    resp = HTTPResponse(stdout=stdout)
-    environ = {}
-    environ['SERVER_NAME'] = _Z2HOST or 'nohost'
-    environ['SERVER_PORT'] = '%d' %(_Z2PORT or 80)
-    environ['REQUEST_METHOD'] = 'GET'
-    return HTTPRequest(sys.stdin, environ, resp)
-
 class TestPlugin(TestBase):
 
     def afterSetUp(self):
@@ -44,12 +32,43 @@ class TestPlugin(TestBase):
         name, pwd = self.plugin.identify(authstr)
         self.failUnless(name == _user_name)
         self.failUnless(pwd == 'secret')
+        # Now test the username and password cookies are gone:
+        self.failIf(self.app.REQUEST.has_key(self.plugin.name_cookie))
+        self.failIf(self.app.REQUEST.has_key(self.plugin.pw_cookie))
+
+        # But there should be an auth cookie with the authstr
+        cki = self.app.REQUEST['RESPONSE'].cookies.get(self.plugin.auth_cookie)
+        self.failUnless(cki)
+        # That cookie should be enugh to reauthenticate. Fake a new request with
+        # this cookie
+        self.app.REQUEST[self.plugin.auth_cookie] = cki['value']
+        authstr = self.plugin.makeAuthenticationString(self.app.REQUEST, None)
+        self.failUnless(authstr)
+        self.failUnless(self.plugin.canIdentify(authstr))
+        name, pwd = self.plugin.identify(authstr)
+        self.failUnless(name == _user_name)
+        self.failUnless(pwd == 'secret')
 
     def testNotCookieAuth(self):
         self.failIf(self.plugin.canIdentify('basic KJHKJHKJHKHKHKHK'))
         # Note: identify() can raise a 'Bad Request' exception, but these
         # are not object exceptions, so we can't test that.
 
+    def testNotRequest(self):
+        # Should not accept anything else than real REQUESTs as REQUEST.
+        self.failIf(self.plugin.makeAuthenticationString(self.app, None))
+
+    def testNotWebDAV(self):
+        self.app.REQUEST.environ['WEBDAV_SOURCE_PORT'] = 'something'
+        self.failIf(self.plugin.makeAuthenticationString(self.app.REQUEST, None))
+
+    def testNoName(self):
+        self.plugin.delRequestVar(self.app.REQUEST, self.plugin.name_cookie)
+        self.failIf(self.plugin.makeAuthenticationString(self.app.REQUEST, None))
+
+    def testNoPass(self):
+        self.plugin.delRequestVar(self.app.REQUEST, self.plugin.pw_cookie)
+        self.failIf(self.plugin.makeAuthenticationString(self.app.REQUEST, None))
 
 if __name__ == '__main__':
     framework(descriptions=0, verbosity=1)
@@ -58,5 +77,6 @@ else:
     def test_suite():
         suite = unittest.TestSuite()
         suite.addTest(unittest.makeSuite(TestPlugin))
+        suite.addTest(unittest.makeSuite(TestPlugin2))
         return suite
 
