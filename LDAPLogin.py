@@ -52,6 +52,14 @@ class LDAPLoginPlugin(LDAPUserFolder):
     def getUsers(self):
         return []
 
+    def getUser(self, name, password=None):
+        LOG('LDAP Login', DEBUG, 'getUser',
+            'Username: %s\nPassword: %s\n' % (name, password))
+        if password is None:
+            return None
+        else:
+            return LDAPUserFolder.getUser(self, name, password)
+
 
 addLDAPLoginPlugin = DTMLFile('zmi/addLDAPLoginPlugin', globals())
 

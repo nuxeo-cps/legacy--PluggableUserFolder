@@ -400,8 +400,10 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         if user is not None and \
             (password is _no_password_check or \
              user.authenticate(password, request)):
+            LOG('PluggableUserFolder', DEBUG, 'User %s validated' % name)
             return user
         else:
+            LOG('PluggableUserFolder', DEBUG, 'User %s NOT validated' % name)
             return None
 
 
