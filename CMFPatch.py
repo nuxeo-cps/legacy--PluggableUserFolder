@@ -57,7 +57,7 @@ if not _cmf_localroles_patch:
         utils._mergedLocalRoles = mergedLocalRoles
 
         def _allowedRolesAndUsers(ob):
-            aclu = object.acl_users
+            aclu = ob.acl_users
             if hasattr(aclu, '_allowedRolesAndUsers'):
                 return aclu._allowedRolesAndUsers(ob)
             # The userfolder does not have CPS group support

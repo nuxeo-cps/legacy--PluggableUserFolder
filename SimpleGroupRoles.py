@@ -78,6 +78,7 @@ class SimpleGroup(SimpleItem):
                     if user not in users:
                         users.append(user)
                 groups.append(group)
+        LOG('SimpleGroupRoles', -199, str(users))
         return tuple(users)
 
     def getGroups(self):
@@ -319,7 +320,7 @@ class SimpleGroupRolesPlugin(Folder):
     def getGroupsForUser(self, userid):
         userismemberof = []
         for group in self.getGroups():
-            if userid in group.getMembers():
+            if userid in group.getUsers():
                 userismemberof.append(group.getId())
         return userismemberof
 
@@ -339,7 +340,7 @@ class SimpleGroupRolesPlugin(Folder):
         roles = []
         for groupid in self.getGroupsOnObject(object):
             groupob = self.getGroup(groupid)
-            if user in groupob.getMembers():
+            if user in groupob.getUsers():
                 roles.extend(self.getGroupRolesOnObject(groupid, object))
         return roles
 
@@ -347,7 +348,7 @@ class SimpleGroupRolesPlugin(Folder):
         for groupid in self.getGroupsOnObject(object):
             if role in self.getGroupRolesOnObject(groupid, object):
                 groupob = self.getGroup(groupid)
-                if user in groupob.getMembers():
+                if user in groupob.getUsers():
                     return 1
         return 0
 
@@ -377,7 +378,7 @@ class SimpleGroupRolesPlugin(Folder):
         groups = self.getGroupsOnObject(object) + \
                  tuple(self.getAcquiredGroups(object))
         for group in groups:
-            for userid in group.getMembers():
+            for userid in group.getUsers():
                 users[userid] = 1
         return users.keys()
 
