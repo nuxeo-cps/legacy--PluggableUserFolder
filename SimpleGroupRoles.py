@@ -178,7 +178,7 @@ class SimpleGroup(SimpleItem):
                 index = self.groups.index(groupid)
                 del self.groups[index]
 
-                
+
 class SimpleGroupRolesPlugin(Folder):
     """This plugin stores the user definitions in the ZODB"""
     security = ClassSecurityInfo()
@@ -238,8 +238,7 @@ class SimpleGroupRolesPlugin(Folder):
     def manage_delGroups(self, selected, REQUEST):
         """Delete the groups whos id is in the list 'selected'"""
         for id in selected:
-            if hasattr(aq_base(self), id):
-                self._delObject(id)
+            self.delGroup(id)
         if REQUEST is not None:
             REQUEST['RESPONSE'].redirect(
                 self.absolute_url() + '/manage_workspace')
@@ -326,6 +325,13 @@ class SimpleGroupRolesPlugin(Folder):
 
     def addGroup(self, id, title):
         self._setObject(id,SimpleGroup(id, title))
+
+    def delGroup(self, id):
+        if self.hasGroup(id):
+            self._delObject(id)
+
+    def hasGroup(self, id):
+        return hasattr(aq_base(self), id)
 
     def getGroupIds(self):
         return self.objectIds('Simple Group')

@@ -3,11 +3,12 @@ Requires:
 -
 New features:
 ~~~~~~~~~~~~~
--
+- PluggableUser now implements property handling (needed for CPS3)
 Bug fixes:
 ~~~~~~~~~~
 - Compatibility with LDAPUserGroupsFolder was buggy.
-- InternalAuthentication search did not handle '*' searches
+- InternalAuthentication search did not handle '*' searches.
+- Group plugins can now delete groups!
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -

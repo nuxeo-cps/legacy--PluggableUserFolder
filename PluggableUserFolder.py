@@ -306,7 +306,12 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
     security.declareProtected(Permissions.manage_users, 'userFolderDelGroups')
     def userFolderDelGroups(self, groupnames):
         """Deletes groups"""
-        pass
+        plugins = self._get_plugins(IGroupPlugin)
+        for group in groupnames:
+            for plugin in plugins:
+                if plugin.hasGroup(group):
+                    plugin.delGroup(group)
+                    break # No need to search the other groups
 
     security.declareProtected(Permissions.manage_users, 'getGroupNames')
     def getGroupNames(self):
@@ -594,14 +599,17 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
 
     def listUserProperties(self):
         """Lists properties settable or searchable on the users."""
-        # Currently I do a union of all props. Maybe an intersection would
-        # be better, so only properties all plugins support are listed?
-        # /Lennart
-        props = ['id', 'roles', 'groups']
-        for plugin in self._get_plugins(IAuthenticationPlugin):
+        # MemberTool patch assumes that all user are equal. Therefore
+        # only properties all plugins support should be returned.
+        plugins = self._get_plugins(IAuthenticationPlugin)
+        props = plugins[0].listUserProperties()
+        for plugin in plugins[1:]:
+            props2 = []
             for prop in plugin.listUserProperties():
-                if prop not in props:
-                    props.append(prop)
+                if prop in props:
+                    props2.append(prop)
+                props = props2
+                props2 = []
         return tuple(props)
 
     def searchUsers(self, query={}, props=None, options=None, **kw):

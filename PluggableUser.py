@@ -34,6 +34,15 @@ class PluggableUserMixin:
     """A mixin for user that overrides the methods for getting roles"""
     security = ClassSecurityInfo()
 
+    def getUserFolder(self):
+        try:
+            return self.acl_users
+        except: # This hsould never happen, but does, and this code is for debugging:
+            import sys
+            LOG('PluggableUserFolder', ERROR, 'User could not acquire acl_users',
+            'Acquisition chain: %s\n' % self.aq_chain, error=sys.exc_info())
+            return ()
+
     def getUserName(self):
         return str(self.name)
 
@@ -41,14 +50,8 @@ class PluggableUserMixin:
         """Return the list of roles assigned to a user."""
         LOG('PluggableUser', DEBUG, 'getRoles',
             'User: %s\n' % self.getId())
-        try:
-            aclu = self.acl_users
-        except: # This hsould never happen, but does, and this code is for debugging:
-            import sys
-            LOG('PluggableUserFolder', ERROR, 'User could not acquire acl_users',
-            'Acquisition chain: %s\n' % self.aq_chain, error=sys.exc_info())
-            return ()
 
+        aclu = self.getUserFolder()
         plugins = aclu._get_plugins(IRolePlugin)
         plugins = aclu._sort_plugins(plugins, aclu.group_role_order)
         roles = self.roles[:] # Make sure it's a copy, and not the original
@@ -182,22 +185,37 @@ class PluggableUserMixin:
 
     def listProperties(self):
         """Lists all properties that are set on the user."""
-        return []
-        
+        return ['id', 'roles', 'groups']
+
     def hasProperty(self, id):
         return 0
 
     def getProperty(self, id, default=None):
-        raise NotImplementedError
+        if id == 'id':
+            return self.getUserName()
+        elif id == 'roles':
+            return self.getRoles()
+        elif id == 'groups':
+            self.getUserFolder().getGroupsForUser(self.getId())
+        else:
+            return self._getProperty(id, default)
 
+    def _getProperty(self, id, default=None):
+        return default
+        
     def getProperties(self, ids):
-        raise NotImplementedError
+        res = {}
+        for prop in ids:
+            res[prop] = self.getProperty(prop)
+        return res
 
     def setProperty(self, id, value):
-        raise NotImplementedError
+        if id == 'roles':
+            self.setRoles(value)
 
     def setProperties(self, **kw):
-        raise NotImplementedError
+        for key, val in kw.items():
+            self.setProperty(key, val)
 
 
 class PluggableUser(PluggableUserMixin, User):
