@@ -106,6 +106,20 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
 
         return result
 
+    def _sort_plugins(self, plugin_list, order_string):
+        order = [p.strip() for p in order_string.split(',') if p.strip()]
+        sorted_list = []
+        for plugin_name in order:
+            for plugin in plugin_list:
+                if plugin.id == plugin_name:
+                    sorted_list.append(plugin)
+                    plugin_list.remove(plugin)
+                    break
+        # Add all the remaining unsorted plugins onto the end:
+        sorted_list.extend(plugin_list)
+        return sorted_list
+
+
     # ----------------------------------
     # ZMI interfaces
     # ----------------------------------
@@ -180,7 +194,8 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
     def getUserNames(self):
         """Return a list of usernames"""
         result = []
-        for plugin in self._get_plugins(IAuthenticationPlugin):
+        plugs = self._get_plugins(IAuthenticationPlugin)
+        for plugin in self._sort_plugins(plugs, self.authentication_order):
             for username in plugin.getUserNames():
                 if username not in result:
                     result.append(username)
@@ -191,7 +206,8 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         """Return a list of user objects"""
         usernames = []
         result = []
-        for plugin in self._get_plugins(IAuthenticationPlugin):
+        plugs = self._get_plugins(IAuthenticationPlugin)
+        for plugin in self._sort_plugins(plugs, self.authentication_order):
             for user in plugin.getUsers():
                 if user.getId() not in usernames:
                     usernames.append(user.getId())
@@ -201,7 +217,8 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
     security.declareProtected('Manage users', 'getUser')
     def getUser(self, name, password=None):
         """Return the named user object or None"""
-        for plugin in self._get_plugins(IAuthenticationPlugin):
+        plugs = self._get_plugins(IAuthenticationPlugin)
+        for plugin in self._sort_plugins(plugs, self.authentication_order):
             user = plugin.getUser(name, password)
             if user:
                 return user
@@ -217,7 +234,8 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
          It's better to call the plugin directly, so you have
          control over where the user is stored.
          """
-        plugins = self._get_plugins(IAuthenticationPlugin, 0)
+        plugins = self._get_plugins(IAuthenticationPlugin)
+        plugins = self._sort_plugins(plugins, self.authentication_order)
         if not plugins: # TODO change to object exception
             raise 'Can not create user. All Authentication plugins are read-only.'
         return plugins[0]._doAddUser(name, password, roles, domains, **kw)
@@ -227,7 +245,8 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
 
         Only here for compatibility, just as _doAddUser.
         """
-        plugins = self._get_plugins(IAuthenticationPlugin, 0)
+        plugins = self._get_plugins(IAuthenticationPlugin)
+        plugins = self._sort_plugins(plugins, self.authentication_order)
         if not plugins: # TODO change to object exception
             raise 'Can not change user. All Authentication plugins are read-only.'
         return plugins[0]._doChangeUser(name, password, roles, domains, **kw)
@@ -239,7 +258,8 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         NB! If one user name exists in several plugins, it will be deleted
         in ALL plugins!
         """
-        plugins = self._get_plugins(IAuthenticationPlugin, 0)
+        plugins = self._get_plugins(IAuthenticationPlugin)
+        plugins = self._sort_plugins(plugins, self.authentication_order)
         if not plugins: # TODO change to object exception
             raise 'Can not delete user(s). All Authentication plugins are read-only.'
         for plugin in plugins:
@@ -274,6 +294,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
 
     def identify(self, auth):
         plugins = self._get_plugins(IIdentificationPlugin)
+        plugins = self._sort_plugins(plugins, self.identification_order)
         for plugin in plugins:
             if plugin.canIdentify(auth):
                 return plugin.identify(auth)
@@ -284,6 +305,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
 
     def validate(self, request, auth='', roles=_noroles):
         plugins = self._get_plugins(IIdentificationPlugin)
+        plugins = self._sort_plugins(plugins, self.identification_order)
         for plugin in plugins:
             auth = plugin.makeAuthenticationString(request, auth)
             if auth is not None:
