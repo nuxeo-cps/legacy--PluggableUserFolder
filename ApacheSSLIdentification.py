@@ -55,9 +55,9 @@ class ApacheSSLIdentificationPlugin(PropertyManager, SimpleItem):
         if not request.other['SERVER_URL'].startswith('https://'):
             return None
         ssl_id_source = self.ssl_id_source.strip()
-        LOG('ApacheSSLIdentification', DEBUG, 'makeAuthenticationString',
-            'Using %s for Id source\n' % ssl_id_source)
         username = request.environ.get(ssl_id_source)
+        LOG('ApacheSSLIdentification', DEBUG, 'makeAuthenticationString',
+            'Using %s for Id source\nUsername: %s\n' % (ssl_id_source,username))
         if username is None:
             return None
         user = self.acl_users.getUser(username)
@@ -65,13 +65,6 @@ class ApacheSSLIdentificationPlugin(PropertyManager, SimpleItem):
             # The user in the certificate does not exist
             return None
 
-        # Currently we look up the password, and send it on.
-        # This has the drawback of only working with cleartext
-        # passwords. This will most likely have to be solved.
-        # One way is to use a special User object that always
-        # returns OK on Authenticate. Another could be to
-        # separate Authentication and user storage.
-        #password = user._getPassword()
         password = ''
         ac = encodestring('%s:%s' % (username, password))
         return 'ApacheSSL %s' % ac

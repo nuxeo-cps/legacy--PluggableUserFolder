@@ -2,14 +2,14 @@
 <dtml-var manage_tabs>
 
 <form action="manage_users" method="post">
-<dtml-if user_names>
+<dtml-if getUserNames>
 <p class="form-help">
 The following users have been defined. Click on the name of a 
 user to edit that user.
 </p>
 
 <table cellspacing="0" cellpadding="2" border="0">
-<dtml-in user_names>
+<dtml-in getUserNames>
 <dtml-if sequence-odd>
 <tr class="row-normal">
 <dtml-else>
@@ -29,7 +29,7 @@ user to edit that user.
   </div>
   </td>
 </tr>
-</dtml-in user_names>
+</dtml-in getUserNames>
 <tr>
   <td align="left" valign="top">&nbsp;
   </td>
@@ -41,7 +41,7 @@ user to edit that user.
   </td>
 </tr>
 </table>
-<dtml-else user_names>
+<dtml-else getUserNames>
 <p class="std-text">
 There are no users defined.
 </p>
@@ -51,7 +51,7 @@ There are no users defined.
 <input class="form-element" type="submit" name="submit" value="Add..." />
 </div>
 </p>
-</dtml-if user_names>
+</dtml-if getUserNames>
 </form>
 
 <dtml-var manage_page_footer>
