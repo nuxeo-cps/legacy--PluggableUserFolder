@@ -29,6 +29,7 @@ import GroupRoles
 
 try:
     import LDAPAuthentication
+    import LDAPLogin
     LdapSupport = 1
 except ImportError:
     LdapSupport = 0
@@ -86,6 +87,14 @@ def initialize(context):
             permission=add_user_folders,
             constructors=(LDAPAuthentication.addLDAPAuthenticationPlugin,
                           LDAPAuthentication.manage_addLDAPAuthenticationPlugin,),
+            icon='zmi/UserFolder_icon.gif',
+            visibility=None,
+        )
+        context.registerClass(
+            instance_class=LDAPLogin.LDAPLoginPlugin,
+            permission=add_user_folders,
+            constructors=(LDAPLogin.addLDAPLoginPlugin,
+                          LDAPLogin.manage_addLDAPLoginPlugin,),
             icon='zmi/UserFolder_icon.gif',
             visibility=None,
         )
