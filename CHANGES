@@ -3,11 +3,15 @@ ZODB Requires:
 -
 New features:
 ~~~~~~~~~~~~~
--
+- CookieAuthentication can now be prevented from sending the password as a
+  cookie. This prevents both the password being sent every request, as well
+  as it's storage as a cookie on the client. Doing this is not compatible with
+  ZEO, however, so it is only invoked when "ZEO Combatibility" is unchecked.
+  
 Bug fixes:
 ~~~~~~~~~~
 - The clever Acquisition wrapping of LDAP users did not work. This prevented
-  LDAP users from getting roles from groups. 
+  LDAP users from getting roles from groups.
 
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
