@@ -21,7 +21,7 @@ __version__ = '$Revision$'[11:-2]
 
 from zLOG import LOG, DEBUG
 from Globals import DTMLFile, MessageDialog
-from Acquisition import aq_base
+from Acquisition import aq_base, aq_inner
 from AccessControl import ClassSecurityInfo
 from OFS.SimpleItem import SimpleItem
 from OFS.Folder import Folder
@@ -180,14 +180,39 @@ class SimpleGroupRolesPlugin(Folder):
     def getGroupsOnObject(self, object=None):
         if object is None:
             object = self
-        roledict = getattr(object, ROLEATTRIBUTENAME, {})
+        roledict = getattr(aq_base(object), ROLEATTRIBUTENAME, None)
+        if roledict is None:
+            return ()
         return roledict.keys()
 
-    def addGroupsOnObject(self, groups):
-        pass
+    def addGroupsOnObject(self, addgroups, roles=(), REQUEST=None):
+        """Add groups for local roles on self"""
+        roledict = getattr(aq_inner(self), ROLEATTRIBUTENAME, None)
+        if roledict is None:
+            roledict = {}
+        currentgroups = roledict.keys()
+        for groupid in addgroups:
+            if not groupid in currentgroups:
+                roledict[groupid] = roles
+        setattr(self, ROLEATTRIBUTENAME, roledict)
+        if REQUEST is not None:
+            return self.manage_simpleGroupRolesLocalGroups( \
+                manage_tabs_message='Groups added')
 
-    def deleteGroupsOnObject(self, groups):
-        pass
+
+    def deleteGroupsOnObject(self, delgroups, roles=(), REQUEST=None):
+        """Remove groups from the local roles on self"""
+        roledict = getattr(aq_base(self), ROLEATTRIBUTENAME)
+        if roledict is None:
+            return
+        currentgroups = roledict.keys()
+        for groupid in delgroups:
+            if groupid in currentgroups:
+                del roledict[groupid]
+        setattr(self, ROLEATTRIBUTENAME, roledict)
+        if REQUEST is not None:
+            return self.manage_simpleGroupRolesLocalGroups( \
+                manage_tabs_message='Groups added')
 
     def getGroupRolesOnObject(self, group, object=None):
         if object is None:
@@ -244,7 +269,7 @@ class SimpleGroupRolesPlugin(Folder):
     def userHasLocalRole(self, user, object, role):
         for groupid in self.getGroupsOnObject(object):
             if role in self.getGroupRolesOnObject(groupid, object):
-                groupob = self.getGroup(group)
+                groupob = self.getGroup(groupid)
                 if user in groupob.getMembers():
                     return 1
         return 0
