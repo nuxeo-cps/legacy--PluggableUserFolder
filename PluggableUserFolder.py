@@ -276,9 +276,6 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         for plugin in self._sort_plugins(plugs, self.authentication_order):
             user = plugin.getUser(name, password)
             if user:
-                # To get to the role plugins, we need to make sure the
-                # user knows where the user folder is:
-                user._v_acl_users = self
                 return user
         LOG('PluggableUserFolder', DEBUG, 'getUser',
             'Could not find user %s\n' % name)
@@ -335,7 +332,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             ismemberof.extend(plugin.getGroupsForUser(userid))
         LOG('PluggableUserFolder', DEBUG, 'getGroupsForUser',
             str(ismemberof)+'\n')
-        return ismemberof
+        return tuple(ismemberof)
 
     # Roles plugin support
     def getRoleManagementOptions(self, types=['form']):
