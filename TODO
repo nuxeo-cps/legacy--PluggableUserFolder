@@ -12,3 +12,10 @@
     to PLuggableUserFolder will probably be needed.
     
   o Create documentation on how to make new Plugins
+
+  o There should be a property to set the redirection page on login errors.
+
+  o All IdentificationPlugins should have a logout method.
+
+  o We need to make sure that you can't be logged in with more than one
+    IdentificationMethod at one time.
