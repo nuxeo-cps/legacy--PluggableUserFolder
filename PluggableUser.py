@@ -66,12 +66,11 @@ class PluggableUserMixin:
         inner_object = getattr(object, 'aq_inner', object)
         while 1:
             local_roles = getattr(inner_object, '__ac_local_roles__', None)
-            if local_roles:
-                if callable(local_roles):
-                    local_roles = local_roles()
-                dict = local_roles or {}
-                for r in dict.get(userid, []):
-                    local[r] = 1
+            dict = local_roles or {}
+            if callable(dict):
+                dict = dict()
+            for r in dict.get(userid, []):
+                local[r] = 1
             inner = getattr(inner_object, 'aq_inner', inner_object)
             parent = getattr(inner, 'aq_parent', None)
             if parent is not None:

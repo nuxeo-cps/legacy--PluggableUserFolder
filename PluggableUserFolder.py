@@ -243,10 +243,46 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
     # Public UserFolder object interface
     # ----------------------------------
 
-    # XXX the group support here must be rewritten.
-    # We need an interface for group objects, for example
-    # and role plugins must tell us if they are group plugins.
-    # change to get GroupIds and set up alias.
+    security.declareProtected(Permissions.manage_users, 'getUserNames')
+    def getUserNames(self):
+        """Return a list of usernames"""
+        result = []
+        plugs = self._get_plugins(IAuthenticationPlugin)
+        for plugin in self._sort_plugins(plugs, self.authentication_order):
+            for username in plugin.getUserNames():
+                if username not in result:
+                    result.append(username)
+        return result
+
+    security.declareProtected(Permissions.manage_users, 'getUsers')
+    def getUsers(self):
+        """Return a list of user objects"""
+        usernames = []
+        result = []
+        plugs = self._get_plugins(IAuthenticationPlugin)
+        for plugin in self._sort_plugins(plugs, self.authentication_order):
+            for user in plugin.getUsers():
+                if user.getId() not in usernames:
+                    usernames.append(user.getId())
+                    result.append(user)
+        return result
+
+    security.declareProtected(Permissions.manage_users, 'getUser')
+    def getUser(self, name, password=None):
+        """Return the named user object or None"""
+        plugs = self._get_plugins(IAuthenticationPlugin)
+        for plugin in self._sort_plugins(plugs, self.authentication_order):
+            user = plugin.getUser(name, password)
+            if user:
+                # To get to the role plugins, we need to make sure the
+                # user knows where the user folder is:
+                user._v_acl_users = self
+                return user
+        LOG('PluggableUserFolder', DEBUG, 'getUser',
+            'Could not find user %s\n' % name)
+        return None
+
+    # Group Support
     security.declareProtected(Permissions.manage_users, 'setUsersOfGroup')
     def setUsersOfGroup(self, users, group):
         LOG('PluggableUserFolder', DEBUG, 'setUsersOfGroup',
@@ -291,45 +327,6 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             raise Exception('Group %s not found' % groupname)
         return default
 
-    security.declareProtected(Permissions.manage_users, 'getUserNames')
-    def getUserNames(self):
-        """Return a list of usernames"""
-        result = []
-        plugs = self._get_plugins(IAuthenticationPlugin)
-        for plugin in self._sort_plugins(plugs, self.authentication_order):
-            for username in plugin.getUserNames():
-                if username not in result:
-                    result.append(username)
-        return result
-
-    security.declareProtected(Permissions.manage_users, 'getUsers')
-    def getUsers(self):
-        """Return a list of user objects"""
-        usernames = []
-        result = []
-        plugs = self._get_plugins(IAuthenticationPlugin)
-        for plugin in self._sort_plugins(plugs, self.authentication_order):
-            for user in plugin.getUsers():
-                if user.getId() not in usernames:
-                    usernames.append(user.getId())
-                    result.append(user)
-        return result
-
-    security.declareProtected(Permissions.manage_users, 'getUser')
-    def getUser(self, name, password=None):
-        """Return the named user object or None"""
-        plugs = self._get_plugins(IAuthenticationPlugin)
-        for plugin in self._sort_plugins(plugs, self.authentication_order):
-            user = plugin.getUser(name, password)
-            if user:
-                # To get to the role plugins, we need to make sure the
-                # user knows where the user folder is:
-                user._v_acl_users = self
-                return user
-        LOG('PluggableUserFolder', DEBUG, 'getUser',
-            'Could not find user %s\n' % name)
-        return None
-
     def getGroupsForUser(self, userid):
         ismemberof = []
         for plugin in self._get_plugins(IRolePlugin):
@@ -338,6 +335,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             str(ismemberof)+'\n')
         return ismemberof
 
+    # Roles plugin support
     def getRoleManagementOptions(self, types=['form']):
         options = []
         for plugin in self._get_plugins(IRolePlugin):
@@ -350,6 +348,38 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         LOG('PluggableUserFolder', DEBUG, 'Role Management Options',
             str(options) + '\n')
         return options
+
+    def mergedLocalRoles(object):
+        """Returns all local roles valid for an object"""
+        LOG('PluggableUserFolder', 0, 'mergedLocalRoles()')
+        merged = {}
+        innerobject = getattr(object, 'aq_inner', object)
+        while 1:
+            if hasattr(innerobject, '__ac_local_roles__'):
+                dict = innerobject.__ac_local_roles__ or {}
+                if callable(dict): dict = dict()
+                for user, roles in dict.items():
+                    if not merged.has_key(user):
+                        merged[user] = []
+                    merged[user].extend(list(roles))
+
+            inner = getattr(innerobject, 'aq_inner', innerobject)
+            parent = getattr(inner, 'aq_parent', None)
+            if parent is not None:
+                innerobject = parent
+                continue
+            if hasattr(innerobject, 'im_self'):
+                innerobject=innerobject.im_self
+                innerobject=getattr(innerobject, 'aq_inner', innerobject)
+                continue
+            break
+
+        # deal with groups
+        for user, roles in merged.items():
+            merged[user] = modifyLocalRoles(user, object, roles)
+
+        return merged
+
 
     # ----------------------------------
     # Private methods
@@ -409,19 +439,35 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         abuse of this mechanism.
         Called only by OFS.Application.initialize().
         """
-        return #TODO: Fix this so it aint bypassed
-        if len(self.data) <= 1:
-            info = readUserAccessFile('inituser')
-            if info:
-                name, password, domains, remote_user_mode = info
-                self._doDelUsers(self.getUserNames())
-                self._doAddUser(name, password, ('Manager',), domains)
-                try:
-                    import os
-                    os.remove(os.path.join(INSTANCE_HOME, 'inituser'))
-                except:
-                    pass
+        if len(self.getUserNames()) >= 1:
+            # Don't do this if more than one user
+            return
+        info = readUserAccessFile('inituser')
+        if not info:
+            return # No inituser to create
+        if len(self._get_plugins(IAuthenticationPlugin,
+           include_readonly=0)) == 0:
+            # There are only readonly authentication plugins.
+            # Create an internal authetication plugin
+            try:
+                from InternalAuthentication import InternalAuthenticationPlugin
+                iaplug = InternalAuthenticationPlugin()
+                self._setObject(iaplug.getId(), iaplug)
+            except ImportError:
+                return
 
+        name, password, domains, remote_user_mode = info
+        self._doDelUsers(self.getUserNames())
+        self._doAddUser(name, password, ('Manager',), domains)
+        try:
+            import os
+            os.remove(os.path.join(INSTANCE_HOME, 'inituser'))
+        except:
+            pass
+
+    # ----------------------------------
+    # UserFolder overrides
+    # ----------------------------------
 
     def identify(self, auth):
         plugins = self._get_plugins(IIdentificationPlugin)

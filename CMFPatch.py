@@ -40,42 +40,9 @@ try:
         __ac_local_roles__.
         When called with withgroups=1, the keys are
         of the form user:foo and group:bar."""
-        # Modified from AccessControl.User.getRolesInContext().
-        LOG('PluggableUserFolder', DEBUG, 'Patched mergedLocalRoles()')
-        merged = {}
-        object = getattr(object, 'aq_inner', object)
-        while 1:
-            if hasattr(object, '__ac_local_roles__'):
-                dict = object.__ac_local_roles__ or {}
-                if callable(dict): dict = dict()
-                for k, v in dict.items():
-                    if withgroups: k = 'user:'+k # groups
-                    if merged.has_key(k):
-                        merged[k] = merged[k] + v
-                    else:
-                        merged[k] = v
-            # deal with groups
-            if withgroups:
-                if hasattr(object, '__ac_local_group_roles__'):
-                    dict = object.__ac_local_group_roles__ or {}
-                    if callable(dict): dict = dict()
-                    for k, v in dict.items():
-                        k = 'group:'+k
-                        if merged.has_key(k):
-                            merged[k] = merged[k] + v
-                        else:
-                            merged[k] = v
-            # end groups
-            if hasattr(object, 'aq_parent'):
-                object = object.aq_parent
-                object = getattr(object, 'aq_inner', object)
-                continue
-            if hasattr(object, 'im_self'):
-                object = object.im_self
-                object = getattr(object, 'aq_inner', object)
-                continue
-            break
-        return merged
+
+        # withgroups are currently ignored
+        return object.acl_users.mergedLocalRoles(object)
     utils.mergedLocalRoles = mergedLocalRoles
 
 
@@ -84,7 +51,7 @@ try:
         Return a list of roles, users and groups with View permission.
         Used by PortalCatalog to filter out items you're not allowed to see.
         """
-        LOG('PluggableUserFolder', DEBUG, 'Patched allowedRolesAndUsers()')
+        LOG('PluggableUserFolder', 0, 'Patched allowedRolesAndUsers()')
         ob = self._IndexableObjectWrapper__ob # Eeek, manual name mangling
         allowed = {}
         for r in rolesForPermissionOn('View', ob):
