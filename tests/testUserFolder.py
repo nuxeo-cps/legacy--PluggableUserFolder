@@ -247,7 +247,6 @@ class TestInstallFolder(TestBase):
         TestBase.afterSetUp(self)
 
     def testAllMetaTypes(self):
-        """Only plugins should be listed"""
         # Install some other products, so there is stuff to show
         products = self.uf.all_meta_types()
         for each in products:
