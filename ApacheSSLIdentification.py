@@ -78,9 +78,10 @@ class ApacheSSLIdentificationPlugin(PropertyManager, SimpleItem):
         try: 
             name, password = tuple(decodestring(
                                    auth.split(' ')[-1]).split(':', 1))
-        except:
+        except: #TODO: Check what kind of exceptions can happen here.
+                #Bad request exceptions must be non-object exceptions.
             raise 'Bad Request', 'Invalid authentication token'
-        return name, _no_password_check #password
+        return name, _no_password_check
 
     security.declarePublic('propertyLabel')
     def propertyLabel(self, id):

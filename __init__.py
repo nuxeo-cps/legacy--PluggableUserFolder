@@ -18,7 +18,7 @@
 
 __doc__ = '''PluggableUserFolder init'''
 __version__ = '$Revision$'[11:-2]
-
+import ZODB
 from zLOG import LOG, DEBUG
 import PluggableUserFolder
 import InternalAuthentication
@@ -47,75 +47,69 @@ from AccessControl.Permissions import add_user_folders
 def initialize(context):
     context.registerClass(
         PluggableUserFolder.PluggableUserFolder,
-        permission=add_user_folders,
-        constructors=(PluggableUserFolder.manage_addPluggableUserFolder,),
-        icon='zmi/UserFolder_icon.gif',
-    )
+        permission = add_user_folders,
+        constructors = (PluggableUserFolder.manage_addPluggableUserFolder,),
+        icon = 'zmi/UserFolder_icon.gif')
     context.registerClass(
-        instance_class=InternalAuthentication.InternalAuthenticationPlugin,
-        permission=add_user_folders,
-        constructors=(InternalAuthentication.manage_addInternalAuthenticationPlugin,),
-        icon='zmi/UserFolder_icon.gif',
-        visibility=None,
-    )
+        instance_class = InternalAuthentication.InternalAuthenticationPlugin,
+        permission = add_user_folders,
+        constructors = \
+            (InternalAuthentication.manage_addInternalAuthenticationPlugin,),
+        icon = 'zmi/UserFolder_icon.gif',
+        visibility = None)
     context.registerClass(
-        instance_class=BasicIdentification.BasicIdentificationPlugin,
-        permission=add_user_folders,
-        constructors=(BasicIdentification.manage_addBasicIdentificationPlugin,),
-        icon='zmi/UserFolder_icon.gif',
-        visibility=None,
-    )
+        instance_class = BasicIdentification.BasicIdentificationPlugin,
+        permission = add_user_folders,
+        constructors = \
+           (BasicIdentification.manage_addBasicIdentificationPlugin,),
+        icon = 'zmi/UserFolder_icon.gif',
+        visibility = None)
     context.registerClass(
-        instance_class=ApacheSSLIdentification.ApacheSSLIdentificationPlugin,
-        permission=add_user_folders,
-        constructors=(ApacheSSLIdentification.manage_addApacheSSLIdentificationPlugin,),
-        icon='zmi/UserFolder_icon.gif',
-        visibility=None,
-    )
+        instance_class = ApacheSSLIdentification.ApacheSSLIdentificationPlugin,
+        permission = add_user_folders,
+        constructors = \
+            (ApacheSSLIdentification.manage_addApacheSSLIdentificationPlugin,),
+        icon = 'zmi/UserFolder_icon.gif',
+        visibility = None)
     context.registerClass(
-        instance_class=CookieIdentification.CookieIdentificationPlugin,
-        permission=add_user_folders,
-        constructors=(CookieIdentification.manage_addCookieIdentificationPlugin,),
-        icon='zmi/UserFolder_icon.gif',
-        visibility=None,
-    )
+        instance_class = CookieIdentification.CookieIdentificationPlugin,
+        permission = add_user_folders,
+        constructors = \
+            (CookieIdentification.manage_addCookieIdentificationPlugin,),
+        icon = 'zmi/UserFolder_icon.gif',
+        visibility = None)
     context.registerClass(
-        instance_class=GroupRoles.GroupRolesPlugin,
-        permission=add_user_folders,
-        constructors=(GroupRoles.manage_addGroupRolesPlugin,),
-        icon='zmi/UserFolder_icon.gif',
-        visibility=None,
-    )
+        instance_class = GroupRoles.GroupRolesPlugin,
+        permission = add_user_folders,
+        constructors = (GroupRoles.manage_addGroupRolesPlugin,),
+        icon = 'zmi/UserFolder_icon.gif',
+        visibility = None)
     registerRolePlugin(GroupRoles.GroupRolesPlugin)
     context.registerClass(
-        instance_class=SimpleGroupRoles.SimpleGroupRolesPlugin,
-        permission=add_user_folders,
-        constructors=(SimpleGroupRoles.manage_addSimpleGroupRolesPlugin,),
-        icon='zmi/UserFolder_icon.gif',
-        visibility=None,
-    )
+        instance_class = SimpleGroupRoles.SimpleGroupRolesPlugin,
+        permission = add_user_folders,
+        constructors = (SimpleGroupRoles.manage_addSimpleGroupRolesPlugin,),
+        icon = 'zmi/UserFolder_icon.gif',
+        visibility = None)
     registerRolePlugin(SimpleGroupRoles.SimpleGroupRolesPlugin)
 
     if LdapSupport:
         context.registerClass(
-            instance_class=LDAPAuthentication.LDAPAuthenticationPlugin,
-            permission=add_user_folders,
-            constructors=(LDAPAuthentication.addLDAPAuthenticationPlugin,
-                          LDAPAuthentication.manage_addLDAPAuthenticationPlugin,),
-            icon='zmi/UserFolder_icon.gif',
-            visibility=None,
-        )
+            instance_class = LDAPAuthentication.LDAPAuthenticationPlugin,
+            permission = add_user_folders,
+            constructors = (LDAPAuthentication.addLDAPAuthenticationPlugin,
+                LDAPAuthentication.manage_addLDAPAuthenticationPlugin,),
+            icon = 'zmi/UserFolder_icon.gif',
+            visibility = None)
         context.registerClass(
-            instance_class=LDAPLogin.LDAPLoginPlugin,
-            permission=add_user_folders,
-            constructors=(LDAPLogin.addLDAPLoginPlugin,
-                          LDAPLogin.manage_addLDAPLoginPlugin,),
-            icon='zmi/UserFolder_icon.gif',
-            visibility=None,
-        )
+            instance_class = LDAPLogin.LDAPLoginPlugin,
+            permission = add_user_folders,
+            constructors = (LDAPLogin.addLDAPLoginPlugin,
+                LDAPLogin.manage_addLDAPLoginPlugin,),
+            icon = 'zmi/UserFolder_icon.gif',
+            visibility = None)
 
-from AccessControl.Role import RoleManager, _isNotBeingUsedAsAMethod, \
-    _isBeingUsedAsAMethod
+from AccessControl.Role import RoleManager
 from Globals import DTMLFile
 
 def registerRolePlugin(plugin):

@@ -44,8 +44,6 @@ class TestBase(ZopeTestCase.ZopeTestCase):
         self.uf._setObject(ob.id, ob)
         self.uf._addUser(_user_name, 'secret', 'secret', (_user_role,), ())
         self._user = self.uf.getUserById(_user_name).__of__(self.uf)
-        #self.uf.internal_authentication._addUser(_user_name, 'secret', 'secret', (_user_role,), ())
-        #self._user = self.uf.internal_authentication.getUserById(_user_name).__of__(self.uf)
         self._setPermissions(_standard_permissions)
 
     def afterClear(self):

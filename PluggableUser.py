@@ -16,19 +16,14 @@
 #
 # $Id$
 
-__doc__='''Pluggable User'''
-__version__='$Revision$'[11:-2]
+__doc__ = '''Pluggable User'''
+__version__ = '$Revision$'[11:-2]
 
 from zLOG import LOG, DEBUG, ERROR
 
-from Globals import DTMLFile, MessageDialog
-from Acquisition import aq_base
 from AccessControl import ClassSecurityInfo
 from AccessControl.User import User
-from AccessControl.Role import RoleManager, DEFAULTMAXLISTUSERS
 from AccessControl.PermissionRole import _what_not_even_god_should_do
-from OFS.ObjectManager import ObjectManager
-from OFS.SimpleItem import Item
 
 from PluginInterfaces import IRolePlugin
 
@@ -54,29 +49,29 @@ class PluggableUserMixin:
            the passed in object."""
 
         # XXX should call the plugins modifyLocalRoles
-        userid=self.getId()
-        roles=self.getRoles()
-        local={}
-        object=getattr(object, 'aq_inner', object)
+        userid = self.getId()
+        roles = self.getRoles()
+        local = {}
+        object = getattr(object, 'aq_inner', object)
         while 1:
             local_roles = getattr(object, '__ac_local_roles__', None)
             if local_roles:
                 if callable(local_roles):
-                    local_roles=local_roles()
-                dict=local_roles or {}
+                    local_roles = local_roles()
+                dict = local_roles or {}
                 for r in dict.get(userid, []):
-                    local[r]=1
+                    local[r] = 1
             inner = getattr(object, 'aq_inner', object)
             parent = getattr(inner, 'aq_parent', None)
             if parent is not None:
                 object = parent
                 continue
             if hasattr(object, 'im_self'):
-                object=object.im_self
-                object=getattr(object, 'aq_inner', object)
+                object = object.im_self
+                object = getattr(object, 'aq_inner', object)
                 continue
             break
-        roles=list(roles) + local.keys()
+        roles = list(roles) + local.keys()
         return roles
 
     def allowed(self, object, object_roles=None):
@@ -120,7 +115,7 @@ class PluggableUserMixin:
         plugins = self._v_acl_users._get_plugins(IRolePlugin)
         LOG('PluggableUser', DEBUG, 'allowed',
             'Roles: %s\nUser: %s\nPlugins: %s\n' % \
-            (object_roles, userid, str(plugins))  )
+            (object_roles, userid, str(plugins)))
         while 1:
             local_roles = getattr(inner_obj, '__ac_local_roles__', None)
             if local_roles:
@@ -153,8 +148,8 @@ class PluggableUserMixin:
                 inner_obj = parent
                 continue
             if hasattr(inner_obj, 'im_self'):
-                inner_obj=inner_obj.im_self
-                inner_obj=getattr(inner_obj, 'aq_inner', inner_obj)
+                inner_obj = inner_obj.im_self
+                inner_obj = getattr(inner_obj, 'aq_inner', inner_obj)
                 continue
             break
         return None

@@ -161,7 +161,8 @@ class SimpleGroupRolesPlugin(Folder):
 
     manage_groupsForm = DTMLFile('zmi/groupRolesGroups', globals())
     manage_addGroupForm = DTMLFile('zmi/groupRolesAddGroup', globals())
-    manage_localGroupsForm = DTMLFile('zmi/simpleGroupRolesLocalGroups', globals())
+    manage_localGroupsForm = DTMLFile('zmi/simpleGroupRolesLocalGroups', \
+        globals())
 
     def _checkId(self, id):
         if id in ('acl_users', 'group_roles'):

@@ -16,8 +16,8 @@
 #
 # $Id$
 
-__doc__='''Apache SSL Identification Plugin'''
-__version__='$Revision$'[11:-2]
+__doc__ = '''Apache SSL Identification Plugin'''
+__version__ = '$Revision$'[11:-2]
 
 from urllib import quote, unquote
 
@@ -31,7 +31,6 @@ from OFS.SimpleItem import SimpleItem
 from ZPublisher.HTTPRequest import HTTPRequest
 
 from PluginInterfaces import IIdentificationPlugin
-from PluggableUserFolder import _no_password_check
 
 class CookieIdentificationPlugin(PropertyManager, SimpleItem):
     """This Basic HTTP Authentication support"""
@@ -55,7 +54,7 @@ class CookieIdentificationPlugin(PropertyManager, SimpleItem):
     name_cookie = '__ac_name'
     pw_cookie = '__ac_password'
 
-    manage_options= PropertyManager.manage_options + SimpleItem.manage_options
+    manage_options = PropertyManager.manage_options + SimpleItem.manage_options
 
     #
     # Public API
@@ -119,7 +118,7 @@ class CookieIdentificationPlugin(PropertyManager, SimpleItem):
         '''Log out the user and redirect to the logout page.'''
         req = self.REQUEST
         resp = req['RESPONSE']
-        resp.expireCookie( self.auth_cookie, path='/')
+        resp.expireCookie(self.auth_cookie, path='/')
         redir = 0
 
     #

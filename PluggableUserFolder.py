@@ -16,13 +16,13 @@
 #
 # $Id$
 
-__doc__='''Pluggable User Folder'''
-__version__='$Revision$'[11:-2]
+__doc__ = '''Pluggable User Folder'''
+__version__ = '$Revision$'[11:-2]
 
 from zLOG import LOG, DEBUG, ERROR
 
 from Globals import DTMLFile, MessageDialog
-from Acquisition import aq_base, aq_parent
+from Acquisition import aq_base
 from AccessControl import ClassSecurityInfo, Permissions
 from AccessControl.User import BasicUserFolder, _noroles
 from AccessControl.Role import RoleManager, DEFAULTMAXLISTUSERS
@@ -37,7 +37,7 @@ from BasicIdentification import BasicIdentificationPlugin
 # Special marker for identification methods and
 # user storages that check the password as a part of
 # identification and user retrieval
-_no_password_check=[]
+_no_password_check = []
 _marker = []
 
 class PluggableUserFolder(ObjectManager, BasicUserFolder):
@@ -48,12 +48,12 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
     """
     security = ClassSecurityInfo()
 
-    meta_type='Pluggable User Folder'
-    id       ='acl_users'
-    title    ='Pluggable User Folder'
+    meta_type = 'Pluggable User Folder'
+    id = 'acl_users'
+    title = 'Pluggable User Folder'
 
-    isPrincipiaFolderish=1
-    isAUserFolder=1
+    isPrincipiaFolderish = 1
+    isAUserFolder = 1
     maxlistusers = DEFAULTMAXLISTUSERS
     identification_order = 'basic_identification'
     authentication_order = 'internal_authentication'
@@ -61,7 +61,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
 
     encrypt_passwords = 0
 
-    manage_options=(
+    manage_options = (
         (
         {'label':'Contents', 'action':'manage_main',
          'help':('OFSP','Folder_View.stx')},
@@ -77,18 +77,18 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
 
     def __init__(self):
         # As default, add the "Internal" plugins.
-        ob=InternalAuthenticationPlugin()
+        ob = InternalAuthenticationPlugin()
         self._setObject(ob.id, ob)
-        ob=BasicIdentificationPlugin()
+        ob = BasicIdentificationPlugin()
         self._setObject(ob.id, ob)
 
     def all_meta_types(self, interfaces=None):
 
         if interfaces is None:
             if hasattr(self, '_product_interfaces'):
-                interfaces=self._product_interfaces
+                interfaces = self._product_interfaces
             elif hasattr(self, 'aq_acquire'):
-                try: interfaces=self.aq_acquire('_product_interfaces')
+                try: interfaces = self.aq_acquire('_product_interfaces')
                 except: pass    # Bleah generic pass is bad
 
         return ObjectManager.all_meta_types(self, interfaces)
@@ -103,7 +103,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         result = []
         for plugin in self.objectValues():
             if interface:
-                implements = getattr(plugin, '__implements__', () )
+                implements = getattr(plugin, '__implements__', ())
                 if not interface in implements:
                     continue
             if not include_readonly and hasattr(plugin, 'isReadOnly') and \
@@ -159,7 +159,8 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
     # ZMI interfaces
     # ----------------------------------
 
-    security.declareProtected(Permissions.manage_users, 'manage_userFolderProperties')
+    security.declareProtected(Permissions.manage_users, \
+        'manage_userFolderProperties')
     manage_userFolderProperties = DTMLFile('zmi/userFolderProps', globals())
 
     def _munge_order(self, order, interface):
@@ -217,13 +218,13 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             message = message + 'Max user list number is not a number'
 
         if error:
-            message= message + 'Changes NOT saved.\n'
+            message = message + 'Changes NOT saved.\n'
         else:
             self.identification_order = ', '.join(iplugs)
             self.authentication_order = ', '.join(aplugs)
             self.group_role_order = ', '.join(gplugs)
             self.maxlistusers = maxlistusers
-            message= message + 'Saved Changes.\n'
+            message = message + 'Saved Changes.\n'
 
         if REQUEST is not None:
             return self.manage_userFolderProperties(
@@ -411,7 +412,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
                 return plugin.identify(auth)
 
         LOG('PluggableUserFolder', ERROR, 'identify',
-            'No plugins able to identify user\n' )
+            'No plugins able to identify user\n')
         return None, None
 
     def validate(self, request, auth='', roles=_noroles):
@@ -456,15 +457,15 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
 
 def manage_addPluggableUserFolder(self, REQUEST=None):
     """ """
-    f=PluggableUserFolder()
-    self=self.this()
+    f = PluggableUserFolder()
+    self = self.this()
     if hasattr(aq_base(self), 'acl_users'):
         return MessageDialog(
             title  ='Item Exists',
             message='This object already contains a User Folder',
             action ='%s/manage_main' % REQUEST['URL1'])
     self._setObject('acl_users', f)
-    self.__allow_groups__=f
+    self.__allow_groups__ = f
 
     if REQUEST is not None:
         REQUEST['RESPONSE'].redirect(self.absolute_url()+'/manage_main')

@@ -16,14 +16,14 @@
 #
 # $Id$
 
-__doc__='''Internal Authentication Plugin'''
-__version__='$Revision$'[11:-2]
+__doc__ = '''Internal Authentication Plugin'''
+__version__ = '$Revision$'[11:-2]
 
 #from AccessControl.User import UserFolder
 from Globals import DTMLFile, MessageDialog
 from Acquisition import aq_base, aq_parent
 from AccessControl import AuthEncoding, ClassSecurityInfo
-from AccessControl.User import User, _remote_user_mode
+from AccessControl.User import _remote_user_mode
 from AccessControl.Role import DEFAULTMAXLISTUSERS
 from OFS.SimpleItem import SimpleItem
 from ZODB.PersistentMapping import PersistentMapping
@@ -38,14 +38,14 @@ class InternalAuthenticationPlugin(SimpleItem):
     meta_type = 'Internal Authentication'
     id = 'internal_authentication'
     title = 'Internal Authentication'
-    isPrincipiaFolderish=0
-    isAUserFolder=0
+    isPrincipiaFolderish = 0
+    isAUserFolder = 0
     maxlistusers = DEFAULTMAXLISTUSERS
     encrypt_passwords = 0
 
     __implements__ = (IAuthenticationPlugin,)
 
-    manage_options=(
+    manage_options = (
         (
         {'label':'Contents', 'action':'manage_main',
          'help':('OFSP','User-Folder_Contents.stx')},
@@ -63,23 +63,23 @@ class InternalAuthenticationPlugin(SimpleItem):
         return 0
 
     def __init__(self):
-        self.data=PersistentMapping()
+        self.data = PersistentMapping()
 
     security.declareProtected('Manage users', 'getUserNames')
     def getUserNames(self):
         """Return a list of usernames"""
-        names=self.data.keys()
+        names = self.data.keys()
         names.sort()
         return names
 
     security.declareProtected('Manage users', 'getUsers')
     def getUsers(self):
         """Return a list of user objects"""
-        data=self.data
-        names=data.keys()
+        data = self.data
+        names = data.keys()
         names.sort()
-        users=[]
-        f=users.append
+        users = []
+        f = users.append
         for n in names:
             f(data[n])
         return users
@@ -93,19 +93,19 @@ class InternalAuthenticationPlugin(SimpleItem):
     # ZMI methods
     #
     security.declareProtected('Manage users', '_mainUser')
-    _mainUser=DTMLFile('zmi/mainUser', globals())
+    _mainUser = DTMLFile('zmi/mainUser', globals())
     security.declareProtected('Manage users', '_add_User')
-    _add_User=DTMLFile('zmi/addUser', globals(),
+    _add_User = DTMLFile('zmi/addUser', globals(),
                        remote_user_mode__=_remote_user_mode)
     security.declareProtected('Manage users', '_editUser')
-    _editUser=DTMLFile('zmi/editUser', globals(),
+    _editUser = DTMLFile('zmi/editUser', globals(),
                        remote_user_mode__=_remote_user_mode)
     security.declareProtected('Manage users', 'manage_main')
-    manage=manage_main=_mainUser
+    manage = manage_main = _mainUser
     manage_main._setName('manage_main')
 
     security.declareProtected('Manage users', 'manage_pluginPropertiesForm')
-    manage_pluginPropertiesForm=DTMLFile('zmi/internalAuthProps', globals())
+    manage_pluginPropertiesForm = DTMLFile('zmi/internalAuthProps', globals())
 
     security.declareProtected('Manage users', 'manage_setPluginProperties')
     def manage_setPluginProperties(self, encrypt_passwords=0,
@@ -117,7 +117,7 @@ class InternalAuthenticationPlugin(SimpleItem):
         self.encrypt_passwords = not not encrypt_passwords
 
         msg = 'Saved changes.'
-        changed=0
+        changed = 0
         if encrypt_passwords and update_passwords:
             changed = 0
             for u in self.getUsers():
@@ -148,7 +148,7 @@ class InternalAuthenticationPlugin(SimpleItem):
             return self._add_User(self, REQUEST)
 
         if submit=='Edit':
-            try:    user=self.getUser(REQUEST.get('name'))
+            try:    user = self.getUser(REQUEST.get('name'))
             except: return MessageDialog(
                     title  ='Illegal value',
                     message='The specified user does not exist',
@@ -156,24 +156,24 @@ class InternalAuthenticationPlugin(SimpleItem):
             return self._editUser(self,REQUEST,user=user,password=user.__)
 
         if submit=='Add':
-            name    =REQUEST.get('name')
-            password=REQUEST.get('password')
-            confirm =REQUEST.get('confirm')
-            roles   =REQUEST.get('roles')
-            domains =REQUEST.get('domains')
+            name     = REQUEST.get('name')
+            password = REQUEST.get('password')
+            confirm  = REQUEST.get('confirm')
+            roles    = REQUEST.get('roles')
+            domains  = REQUEST.get('domains')
             return self._addUser(name,password,confirm,roles,domains,REQUEST)
 
         if submit=='Change':
-            name    =REQUEST.get('name')
-            password=REQUEST.get('password')
-            confirm =REQUEST.get('confirm')
-            roles   =REQUEST.get('roles')
-            domains =REQUEST.get('domains')
+            name     = REQUEST.get('name')
+            password = REQUEST.get('password')
+            confirm  = REQUEST.get('confirm')
+            roles    = REQUEST.get('roles')
+            domains  = REQUEST.get('domains')
             return self._changeUser(name,password,confirm,roles,
                                     domains,REQUEST)
 
         if submit=='Delete':
-            names=REQUEST.get('names')
+            names = REQUEST.get('names')
             return self._delUsers(names,REQUEST)
 
         return self.manage_main(self, REQUEST)
@@ -191,16 +191,17 @@ class InternalAuthenticationPlugin(SimpleItem):
         """Create a new user"""
         if password is not None and self.encrypt_passwords:
             password = self._encryptPassword(password)
-        self.data[name]=PluggableUser(name,password,roles,domains)
+        self.data[name] = PluggableUser(name,password,roles,domains)
 
     def _doChangeUser(self, name, password, roles, domains, **kw):
-        user=self.data[name]
+        user = self.data[name]
         if password is not None:
-            if self.encrypt_passwords and not self._isPasswordEncrypted(password):
+            if self.encrypt_passwords and not \
+               self._isPasswordEncrypted(password):
                 password = self._encryptPassword(password)
-            user.__=password
-        user.roles=roles
-        user.domains=domains
+            user.__ = password
+        user.roles = roles
+        user.domains = domains
 
     def _doDelUsers(self, names):
         for name in names:
@@ -219,7 +220,7 @@ class InternalAuthenticationPlugin(SimpleItem):
                    message='Password and confirmation must be specified',
                    action ='manage_main')
         if self.getUser(name) or (aq_parent(self)._emergency_user and
-                                  name == aq_parent(self)._emergency_user.getUserName()):
+           name == aq_parent(self)._emergency_user.getUserName()):
             return MessageDialog(
                    title  ='Illegal value',
                    message='A user with the specified name already exists',
@@ -230,8 +231,8 @@ class InternalAuthenticationPlugin(SimpleItem):
                    message='Password and confirmation do not match',
                    action ='manage_main')
 
-        if not roles: roles=[]
-        if not domains: domains=[]
+        if not roles: roles = []
+        if not domains: domains = []
 
         if domains and not self.domainSpecValidate(domains):
             return MessageDialog(
@@ -268,8 +269,8 @@ class InternalAuthenticationPlugin(SimpleItem):
                    message='Password and confirmation do not match',
                    action ='manage_main')
 
-        if not roles: roles=[]
-        if not domains: domains=[]
+        if not roles: roles = []
+        if not domains: domains = []
 
         if domains and not self.domainSpecValidate(domains):
             return MessageDialog(
@@ -291,8 +292,8 @@ class InternalAuthenticationPlugin(SimpleItem):
 
 def manage_addInternalAuthenticationPlugin(self, REQUEST=None):
     """ """
-    ob=InternalAuthenticationPlugin()
-    self=self.this()
+    ob = InternalAuthenticationPlugin()
+    self = self.this()
     if hasattr(aq_base(self), ob.id):
         return MessageDialog(
             title  ='Item Exists',
