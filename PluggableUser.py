@@ -217,7 +217,7 @@ class PluggableUserMixin:
         elif id == 'groups':
             self.getUserFolder().setGroupsForUser(self.getId(), value)
         else:
-            return self._setProperty(id, default)
+            return self._setProperty(id, value)
 
     def _setProperty(self, id, value):
         raise AttributeError('User does not have property %s', id)
