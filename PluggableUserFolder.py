@@ -23,12 +23,12 @@ from zLOG import LOG, DEBUG, ERROR
 
 from Globals import DTMLFile, MessageDialog
 from Acquisition import aq_base
-from AccessControl.User import BasicUserFolder, UserFolder
+from AccessControl.User import BasicUserFolder, UserFolder, _noroles, _remote_user_mode
 from AccessControl.Role import RoleManager, DEFAULTMAXLISTUSERS
 from OFS.ObjectManager import ObjectManager
 from OFS.SimpleItem import Item
 
-from PluginInterfaces import IAuthenticationPlugin
+from PluginInterfaces import IAuthenticationPlugin, IIdentificationPlugin
 from Products.PluggableUserFolder.InternalAuthentication import \
     InternalAuthenticationPlugin
 
@@ -65,7 +65,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
          ),
         )
 
-    _product_interfaces = (IAuthenticationPlugin,)
+    _product_interfaces = (IAuthenticationPlugin, IIdentificationPlugin)
 
     def __init__(self):
         # As default, add the "Internal" plugins.
@@ -89,7 +89,8 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
     def _get_plugins(self, interface=None, include_readonly=1):
         result = []
         for plugin in self.objectValues():
-            if not include_readonly and plugin.isReadOnly():
+            if not include_readonly and hasattr(plugin, 'isReadOnly') and \
+                plugin.isReadOnly():
                 continue
             if interface:
                 implements = getattr(plugin, '__implements__', () )
@@ -98,6 +99,16 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             result.append(plugin)
 
         return result
+
+    def identify(self, auth):
+        if auth and auth.lower().startswith('basic '):
+            try: name, password=tuple(decodestring(
+                                      auth.split(' ')[-1]).split(':', 1))
+            except:
+                raise 'Bad Request', 'Invalid authentication token'
+            return name, password
+        else:
+            return None, None
 
     # ----------------------------------
     # ZMI interfaces
@@ -197,6 +208,29 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
                     os.remove(os.path.join(INSTANCE_HOME, 'inituser'))
                 except:
                     pass
+
+
+    def identify(self, auth):
+        LOG('identify', ERROR, "#%s@" % auth)
+        plugins = self._get_plugins(IIdentificationPlugin)
+        LOG('validate', ERROR, str(plugins))
+        for plugin in plugins:
+            if plugin.canIdentify(auth):
+                return plugin.identify(auth)
+        return None, None
+
+    def validate(self, request, auth='', roles=_noroles):
+        LOG('validate', ERROR, str( (request, auth, roles)))
+        plugins = self._get_plugins(IIdentificationPlugin)
+        LOG('validate', ERROR, str(plugins))
+        for plugin in plugins:
+            auth = plugin.makeAuthenticationString(request, auth)
+            if auth is not None:
+                break
+        # What to do if none of the plugins could make a string?
+        # Currently just continue with auth=None. Might not be a good
+        # idea, I'm not sure.
+        return BasicUserFolder.validate(self, request, auth, roles)
 
 
 def manage_addPluggableUserFolder(self, REQUEST=None):

@@ -21,6 +21,7 @@ __version__='$Revision$'[11:-2]
 
 import PluggableUserFolder
 import InternalAuthentication
+import BasicIdentification
 from AccessControl.Permissions import add_user_folders
 
 def initialize(context):
@@ -34,6 +35,13 @@ def initialize(context):
         instance_class=InternalAuthentication.InternalAuthenticationPlugin,
         permission=add_user_folders,
         constructors=(InternalAuthentication.manage_addInternalAuthenticationPlugin,),
+        icon='zmi/UserFolder_icon.gif',
+        visibility=None,
+    )
+    context.registerClass(
+        instance_class=BasicIdentification.BasicIdentificationPlugin,
+        permission=add_user_folders,
+        constructors=(BasicIdentification.manage_addBasicIdentificationPlugin,),
         icon='zmi/UserFolder_icon.gif',
         visibility=None,
     )
