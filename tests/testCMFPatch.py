@@ -11,7 +11,11 @@ if __name__ == '__main__':
 #os.environ['STUPID_LOG_SEVERITY'] = '-200'  # DEBUG
 
 from testUserFolder import TestBase
-from Products.PluggableUserFolder.CMFPatch import mergedLocalRoles
+
+try:
+    from Products.PluggableUserFolder.CMFPatch import mergedLocalRoles
+except:
+    from Products.CPSCore.utils import mergedLocalRoles
 
 # It's only possible to test the CMF patching if CMF is installed and CPS not.
 test_cmf_support = 0
