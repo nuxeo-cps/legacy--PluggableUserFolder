@@ -237,27 +237,22 @@ class TestPluginFolder(TestBase):
     def testGetAllPlugins(self):
         plugins = self.uf._get_plugins()
         # XXX: what are they ?
+        # Plugins. Strange question. //Lennart
         self.assertEquals(len(plugins), 3)
 
     def testGetAllAuthenticationPlugins(self):
         plugins = self.uf._get_plugins(interface=IAuthenticationPlugin)
-        # XXX: what are they ?
         self.assertEquals(len(plugins), 2)
 
     def testGetWritablePlugins(self):
         plugins = self.uf._get_plugins(include_readonly=0)
-        # XXX: what are they ?
         self.assertEquals(len(plugins), 2)
 
     def testGetWritableAuthenticationPlugins(self):
         plugins = self.uf._get_plugins(interface=IAuthenticationPlugin,
             include_readonly=0)
-        # XXX: what are they ?
         self.assertEquals(len(plugins), 1)
 
-    # TODO: Add tests for adding, changing and deleting users to the
-    # (deprecated) UserFolder interfaces
-    # Add test for _createInitialUser()
 
 class TestInstallFolder(TestBase):
 
