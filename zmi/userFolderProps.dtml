@@ -16,6 +16,28 @@
 
 </table>
 
+<table cellspacing="0" cellpadding="2" border="0">
+
+<tr>
+ <td align="left" valign="center" class="form-label">
+  Call order of Identification Plugins
+ </td>
+ <td align="left" valign="center" class="form-element" >
+ <input type=text name="identification_order" value="&dtml.missing-identification_order;" size=100>
+ </td>
+</tr>
+
+<tr>
+ <td align="left" valign="center" class="form-label">
+  Call order of Authentication Plugins
+ </td>
+ <td align="left" valign="center" class="form-element" >
+ <input type=text name="authentication_order" value="&dtml.missing-authentication_order;" size=100>
+ </td>
+</tr>
+
+</table>
+
 <p>
 <div class="form-element">
 <input class="form-element" type="submit" name="submit" value="Save changes" />

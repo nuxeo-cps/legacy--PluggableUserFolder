@@ -53,6 +53,8 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
     isPrincipiaFolderish=1
     isAUserFolder=1
     maxlistusers = DEFAULTMAXLISTUSERS
+    identification_order = 'basic_identification'
+    authentication_order = 'internal_authentication'
 
     encrypt_passwords = 0
 
@@ -110,6 +112,65 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
 
     security.declareProtected('Manage users', 'manage_userFolderProperties')
     manage_userFolderProperties = DTMLFile('zmi/userFolderProps', globals())
+
+    def manage_setUserFolderProperties(self, maxlistusers=DEFAULTMAXLISTUSERS,
+                                       identification_order=None,
+                                       authentication_order=None,
+                                       REQUEST=None):
+        """
+        Sets the properties of the user folder.
+        """
+        message = ''
+        error = 0
+        if identification_order:
+            existing_plugs = [p.id for p in self._get_plugins(IIdentificationPlugin)]
+            iplugs = identification_order.split(',')
+            iplugs = [p.strip() for p in iplugs if p.strip()]
+            for plug in iplugs:
+                if plug in existing_plugs:
+                    existing_plugs.remove(plug)
+                else:
+                    message = message + 'Error: Plugin %s not found\n' % plug
+                    error = 1
+            if not error:
+                for plug in existing_plugs:
+                    message = message + \
+                    'Plugin %s not included in list, appending.\n' % plug
+                    iplugs.append(plug)
+
+        if authentication_order:
+            existing_plugs = [p.id for p in self._get_plugins(IAuthenticationPlugin)]
+            aplugs = authentication_order.split(',')
+            aplugs = [p.strip() for p in aplugs if p.strip()]
+            for plug in aplugs:
+                if plug in existing_plugs:
+                    existing_plugs.remove(plug)
+                else:
+                    message = message + 'Error: Plugin %s not found\n' % plug
+                    error = 1
+            if not error:
+                for plug in existing_plugs:
+                    message = message + \
+                    'Plugin %s not included in list, appending.\n' % plug
+                    aplugs.append(plug)
+
+        try:
+            maxlistusers = int(maxlistusers)
+        except ValueError:
+            error = 1
+            message = message + 'Max user list number is not a number'
+
+        if error:
+            message= message + 'Changes NOT saved.\n'
+        else:
+            self.identification_order = ', '.join(iplugs)
+            self.authentication_order = ', '.join(aplugs)
+            self.maxlistusers = DEFAULTMAXLISTUSERS
+            message= message + 'Saved Changes.\n'
+
+        if REQUEST is not None:
+            return self.manage_userFolderProperties(
+                REQUEST, manage_tabs_message=message)
 
     # ----------------------------------
     # Public UserFolder object interface
