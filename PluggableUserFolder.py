@@ -1,4 +1,5 @@
-# (c) 2003 Nuxeo SARL <http://nuxeo.com>
+# Copyright (c) 2003 Nuxeo SARL <http://nuxeo.com>
+# Copyright (c) 2003 CEA <http://www.cea.fr>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as published
@@ -401,6 +402,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
                 self._doDelUsers(self.getUserNames())
                 self._doAddUser(name, password, ('Manager',), domains)
                 try:
+                    import os
                     os.remove(os.path.join(INSTANCE_HOME, 'inituser'))
                 except:
                     pass

@@ -1,6 +1,7 @@
 ZODB Requires:
 ~~~~~~~~~~~~~~
 -
+
 New features:
 ~~~~~~~~~~~~~
 - Full group plugins support.
@@ -10,7 +11,8 @@ New features:
 
 Bug fixes:
 ~~~~~~~~~~
--
+- Fix copyright attribution
+
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -
