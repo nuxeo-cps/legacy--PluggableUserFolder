@@ -386,10 +386,13 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
                 if user not in merged.keys():
                     merged[user] = {}
 
+        for user, roles in merged.items():
+            merged[user] = roles.keys()
         for plugin in plugins:
-            for user, roles in merged.items():
+            for user in merged.keys():
                 merged[user] = plugin.modifyLocalRoles(user, object,
-                                    roles.keys())
+                                    merged[user])
+
         return merged
 
     def _allowedRolesAndUsers(self, ob):
