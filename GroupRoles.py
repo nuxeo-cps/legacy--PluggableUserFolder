@@ -185,6 +185,23 @@ class GroupRolesPlugin(Folder):
     def setGroupsOnObject(self, groups):
         return setattr(self, '_applied_groups', groups)
 
+    def getAcquiredGroups(self, object):
+        result = []
+        inner_obj = object
+        while 1:
+            if hasattr(inner_obj, 'im_self'):
+                inner_obj=inner_obj.im_self
+            inner = getattr(inner_obj, 'aq_inner', inner_obj)
+            parent = getattr(inner, 'aq_parent', None)
+            if parent is None:
+                break
+            inner_obj = parent
+            groups = self.getGroupsOnObject(inner_obj)
+            if groups:
+                result.append( {'obj': inner_obj, 'groups': groups})
+        return result
+
+
     #
     # API
     #
