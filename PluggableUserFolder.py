@@ -428,7 +428,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             allowed[r] = 1
         localroles = self.mergedLocalRoles(ob, withgroups=1) # groups
         for user_or_group, roles in localroles.items():
-            if user_or_group.find(':') == -1:
+            if ':' in user_or_group:
                 user_or_group = 'user:' + user_or_group
             for role in roles:
                 if allowed.has_key(role):
