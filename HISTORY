@@ -1,4 +1,27 @@
 *******************************************
+** PluggableUserFolder V2.3.1 [R1 build 2004/02/08-07:38 by fermigier]
+
+ZODB Requires:
+~~~~~~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+- CookieAuthentication can now be prevented from sending the password as a
+  cookie. This prevents both the password being sent every request, as well
+  as it's storage as a cookie on the client. Doing this is not compatible with
+  ZEO, however, so it is only invoked when "ZEO Combatibility" is unchecked.
+  
+Bug fixes:
+~~~~~~~~~~
+- The clever Acquisition wrapping of LDAP users did not work. This prevented
+  LDAP users from getting roles from groups.
+
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+- The wrapping of the user in the user folder is now done by the user folder,
+  and not by the plugin.
+
+*******************************************
 ** PluggableUserFolder V2.3.0 [R1 build 2004-01/06-15:04 by anguenot]
 
 Bug fixes:
