@@ -144,6 +144,8 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             user = plugin.getUser(name, password)
             if user:
                 return user
+        LOG('PluggableUserFolder', DEBUG, 'getUser',
+            'Could not find user %s\n' % name)
         return None
 
     def _doAddUser(self, name, password, roles, domains, **kw):
@@ -244,6 +246,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             # Change from BasicUserFolder.authenticate(),
             # password is passed to getUser():
             user = self.getUser(name, password)
+
         # Change from BasicUserFolder.authenticate(),
         # check for the user being authenticated by Identify:
         if user is not None and \

@@ -23,6 +23,7 @@ import PluggableUserFolder
 import InternalAuthentication
 import BasicIdentification
 import ApacheSSLIdentification
+import CookieIdentification
 
 try:
     import LDAPAuthentication
@@ -57,6 +58,13 @@ def initialize(context):
         instance_class=ApacheSSLIdentification.ApacheSSLIdentificationPlugin,
         permission=add_user_folders,
         constructors=(ApacheSSLIdentification.manage_addApacheSSLIdentificationPlugin,),
+        icon='zmi/UserFolder_icon.gif',
+        visibility=None,
+    )
+    context.registerClass(
+        instance_class=CookieIdentification.CookieIdentificationPlugin,
+        permission=add_user_folders,
+        constructors=(CookieIdentification.manage_addCookieIdentificationPlugin,),
         icon='zmi/UserFolder_icon.gif',
         visibility=None,
     )

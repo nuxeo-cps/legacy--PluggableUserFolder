@@ -19,6 +19,7 @@
 __doc__='''Basic Identification Plugin'''
 __version__='$Revision$'[11:-2]
 
+from zLOG import LOG, DEBUG, ERROR
 from base64 import decodestring
 
 from Globals import MessageDialog
@@ -50,6 +51,7 @@ class BasicIdentificationPlugin(SimpleItem):
                                 auth.split(' ')[-1]).split(':', 1))
         except:
             raise 'Bad Request', 'Invalid authentication token'
+        LOG('BasicIdentification', DEBUG, name)
         return name, password
 
 
