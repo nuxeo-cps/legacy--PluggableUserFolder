@@ -511,7 +511,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         return None, None
 
     def validate(self, request, auth='', roles=_noroles):
-        LOG('PluggableUseFolder', DEBUG, 'validate()',
+        LOG('PluggableUserFolder', DEBUG, 'validate()',
         'Roles: %s\n' % str(roles))
         plugins = self._get_plugins(IIdentificationPlugin)
         plugins = self._sort_plugins(plugins, self.identification_order)
