@@ -6,7 +6,10 @@ New features:
 -
 Bug fixes:
 ~~~~~~~~~~
--
+- With InternalAuthenticationPlugin, you edit users without roles 
+  through the ZMI.
+- There was a bug in the error handling of InternalAuthenticationPlugin
+  when acquisition of acl_users didn't work.
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -
