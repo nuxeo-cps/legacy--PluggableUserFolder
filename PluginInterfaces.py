@@ -44,6 +44,9 @@ class IAuthenticationPlugin(Interface.Base):
         the user. Passing the password is therefore typically only
         done from within UserFolder.authenticate()."""
 
+    def getUserOfRole(self, role):
+        """Return all the users that have a particular role"""
+        
     def _doAddUser(self, name, password, roles, domains, **kw):
         """Create a new user
         

@@ -243,7 +243,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
 
         if self.login_page is not None:
             self.login_page=login_page
-        
+
         if REQUEST is not None:
             return self.manage_userFolderProperties(
                 REQUEST, manage_tabs_message=message)
@@ -371,7 +371,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
 
     def setUsersOfRole(self, usernames, role):
         """Sets the users of a role
-        
+
         Will set the roles on the user object directly. Any role plugins
         that modify the global roles will be ignored.
         """
@@ -388,10 +388,12 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
 
     def getUsersOfRole(self, role):
         """Gets the users of a role"""
+        # XXX This ignores global role mokdifications, but currently
+        # There is no plugins that do that, so it's nnot a problem, yet.
         users = []
-        for user in self.getUsers():
-            if user.has_role(role):
-                users.append(user.getUserName())
+        plugs = self._get_plugins(IAuthenticationPlugin)
+        for plugin in self._sort_plugins(plugs, self.authentication_order):
+            users.extend(plugin.getUsersOfRole(role))
         return users
 
     def userFolderAddRole(self, role):

@@ -9,6 +9,7 @@ Bug fixes:
 - Compatibility with LDAPUserGroupsFolder was buggy.
 - InternalAuthentication search did not handle '*' searches.
 - Group plugins can now delete groups!
+- Doing a CPSDirectory search on members now work again.
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -

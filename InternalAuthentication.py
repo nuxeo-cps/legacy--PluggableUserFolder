@@ -90,6 +90,14 @@ class InternalAuthenticationPlugin(SimpleItem):
     def getUser(self, name, password=None):
         """Return the named user object or None"""
         return self.data.get(name, None)
+ 
+    def getUsersOfRole(self, role):
+        """Gets the users of a role"""
+        users = []
+        for user in self.getUsers():
+            if user.has_role(role):
+                users.append(user.getUserName())
+        return users
 
     def listUserProperties(self):
         """Lists properties settable or searchable on the users."""
