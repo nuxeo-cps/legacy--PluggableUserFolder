@@ -1,16 +1,12 @@
 ZODB Requires:
 ~~~~~~~~~~~~~~
 -
-
 New features:
 ~~~~~~~~~~~~~
-- 
-
+-
 Bug fixes:
 ~~~~~~~~~~
-- CMFPatch wasn't checking nicely the CPSCore patch of CPS3
-- Working with CPS3 
-
+-
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
-- Definition of a new method for CPS3 : mergedLocalRolesWithPath.
+-
