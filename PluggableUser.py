@@ -41,8 +41,14 @@ class PluggableUserMixin:
         """Return the list of roles assigned to a user."""
         LOG('PluggableUser', DEBUG, 'getRoles',
             'User: %s\n' % self.getId())
-        if not hasattr(self, 'acl_users'):
+        try:
+            aclu = self.acl_users
+        except: # This hsould never happen, but does, and this code is for debugging:
+            import sys
+            LOG('PluggableUserFolder', ERROR, 'User could not acquire acl_users',
+            'Acquisition chain: %s\n' % self.aq_chain, error=sys.exc_info())
             return ()
+
         plugins = self.acl_users._get_plugins(IRolePlugin)
         # plugins = self._sort_plugins(plugins, self.role_order)
         roles = self.roles[:] # Make sure it's a copy, and not the original
