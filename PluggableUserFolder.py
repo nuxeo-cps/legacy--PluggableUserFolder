@@ -374,8 +374,8 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
                 innerobject = parent
                 continue
             if hasattr(innerobject, 'im_self'):
-                innerobject=innerobject.im_self
-                innerobject=getattr(innerobject, 'aq_inner', innerobject)
+                innerobject = innerobject.im_self
+                innerobject = getattr(innerobject, 'aq_inner', innerobject)
                 continue
             break
 
@@ -521,10 +521,10 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         # Currently just continue with auth=None. Might not be a good
         # idea, I'm not sure.
         LOG('PluggableUserFolder', DEBUG, 'validate()',
-        'Call BasicUserFolder\n')
+            'Call BasicUserFolder\n')
         u = BasicUserFolder.validate(self, request, auth, roles)
         LOG('PluggableUserFolder', DEBUG, 'validate()',
-        'Validated User: %s\n' % str(u))
+            'Validated User: %s\n' % str(u))
         return u
 
     def authenticate(self, name, password, request):
@@ -547,11 +547,11 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             (password is _no_password_check or \
              user.authenticate(password, request)):
             LOG('PluggableUserFolder', DEBUG, 'authenticate()',
-            'User %s validated\n' % name)
+                'User %s validated\n' % name)
             return user
         else:
             LOG('PluggableUserFolder', DEBUG, 'authenticate()',
-            'User %s NOT validated\n' % name)
+                'User %s NOT validated\n' % name)
             return None
 
 

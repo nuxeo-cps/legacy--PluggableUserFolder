@@ -85,7 +85,7 @@ if not _cmf_localroles_patch:
         def _getAllowedRolesAndUsers(self, user):
             aclu = object.acl_users
             if hasattr(aclu, '_getAllowedRolesAndUsers'):
-                return aclu._getAllowedRolesAndUsers(ob)
+                return aclu._getAllowedRolesAndUsers(ob) # FIXME: this is a bug. What is "ob" ?
             # The userfolder does not have CPS group support
             result = list(user.getRoles())
             result.append('Anonymous')

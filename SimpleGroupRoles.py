@@ -116,8 +116,8 @@ class SimpleGroup(SimpleItem):
             return self.manage_groupForm(manage_tabs_message='Users added')
 
     def manage_deleteUsers(self, selectedusers, REQUEST=None):
-        """Delete the users in the "selected" list of userids"""
-        self.deleteUsers(selected)
+        """Delete the users in the "selectedusers" list of userids"""
+        self.deleteUsers(selectedusers)
         if REQUEST is not None:
             return self.manage_groupForm(manage_tabs_message='Users deleted')
 
@@ -151,8 +151,8 @@ class SimpleGroup(SimpleItem):
             return self.manage_groupForm(manage_tabs_message='Groups added')
 
     def manage_deleteGroups(self, selectedgroups, REQUEST=None):
-        """Delete the users in the "selected" list of userids"""
-        self.deleteGroups(selected)
+        """Delete the groups in the "selectedgroups" list of group ids"""
+        self.deleteGroups(selectedgroups)
         if REQUEST is not None:
             return self.manage_groupForm(manage_tabs_message='Groups deleted')
 
