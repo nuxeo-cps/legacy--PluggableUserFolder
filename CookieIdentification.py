@@ -71,7 +71,8 @@ class CookieIdentificationPlugin(PropertyManager, SimpleItem):
             LOG('CookieIdentification', DEBUG, 'Not a GET, PUT or POST')
             return None
 
-        # XXX: why isn't WebDAV supported ?
+        # WebDAV isn't supported because there is no way to set the cookies, since
+        # you need a login web page to set them.
         if request.environ.has_key('WEBDAV_SOURCE_PORT'):
             LOG('CookieIdentification', DEBUG, 'WebDAV not supported')
             return None
