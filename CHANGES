@@ -8,14 +8,7 @@ New features:
 
 Bug fixes:
 ~~~~~~~~~~
-- SimpleGroupsRoles has some bugs in the getUsersWithRoles method.
-
-- PluggableUser now adds the 'user:' prefix in the right
-  places to be compatible with CMF/CPS.
-
-- mergedLocalRoles when called with withgroups=1 will now no longer
-  expand groups into users, but add the Groups to the result, as CPS
-  expects.
+-
 
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
