@@ -6,7 +6,8 @@ New features:
 -
 Bug fixes:
 ~~~~~~~~~~
--
+- In SimpleGroupRoles there were several calls to getGroup() that did not
+  check if a group was returned.
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -

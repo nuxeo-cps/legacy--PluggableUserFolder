@@ -74,6 +74,8 @@ class SimpleGroup(SimpleItem):
             if group not in groups:
                 plugin = aq_parent(self)
                 groupob = plugin.getGroup(group)
+                if groupob is None:
+                    continue
                 for user in groupob.getUsers():
                     if user not in users:
                         users.append(user)
@@ -359,7 +361,7 @@ class SimpleGroupRolesPlugin(Folder):
                     user and user != 'Anonymous User':
                     return 1
                 groupob = self.getGroup(groupid)
-                if user in groupob.getComputedUsers():
+                if groupob is not None and user in groupob.getComputedUsers():
                     return 1
         return 0
 
@@ -385,7 +387,10 @@ class SimpleGroupRolesPlugin(Folder):
     def getUsersWithRoles(self, object):
         users = {}
         for group in self.getLocalGroups(object):
-            for userid in self.getGroup(group).getComputedUsers():
+            groupob = self.getGroup(group)
+            if groupob is None:
+                continue
+            for userid in groupob.getComputedUsers():
                 users[userid] = 1
         return users.keys()
 
