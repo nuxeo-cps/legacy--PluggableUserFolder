@@ -14,12 +14,17 @@ from Testing.ZopeTestCase import _user_name, _user_role, _folder_name, \
     _standard_permissions, ZopeLite
 from AccessControl import Unauthorized
 
+
 from Products.PluggableUserFolder.PluggableUserFolder import \
     PluggableUserFolder
 from Products.PluggableUserFolder.InternalAuthentication import \
     InternalAuthenticationPlugin
 from Products.PluggableUserFolder.PluginInterfaces import \
     IAuthenticationPlugin, IIdentificationPlugin, IRolePlugin
+
+ZopeLite.installProduct('PluggableUserFolder', 1)
+ZopeLite.installProduct('ZCatalog', 1)
+ZopeLite.installProduct('PageTemplates', 1)
 
 _pm = 'ThePublishedMethod'
 
@@ -240,13 +245,10 @@ class TestInstallFolder(TestBase):
 
     def afterSetUp(self):
         TestBase.afterSetUp(self)
-        ZopeLite.installProduct('PluggableUserFolder', 1)
 
     def testAllMetaTypes(self):
         """Only plugins should be listed"""
         # Install some other products, so there is stuff to show
-        ZopeLite.installProduct('ZCatalog', 1)
-        ZopeLite.installProduct('PageTemplates', 1)
         products = self.uf.all_meta_types()
         for each in products:
             isIdPlugin = IIdentificationPlugin in each['interfaces']
