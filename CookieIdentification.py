@@ -20,6 +20,7 @@
 __doc__ = '''Apache SSL Identification Plugin'''
 __version__ = '$Revision$'[11:-2]
 
+import sys, random
 from urllib import quote, unquote
 
 from PluggableUserFolder import LOG, DEBUG, ERROR
@@ -30,6 +31,7 @@ from AccessControl import ClassSecurityInfo
 from OFS.PropertyManager import PropertyManager
 from OFS.SimpleItem import SimpleItem
 from ZPublisher.HTTPRequest import HTTPRequest
+from Products.TemporaryFolder.TemporaryFolder import MountedTemporaryFolder
 
 from PluginInterfaces import IIdentificationPlugin
 
@@ -49,11 +51,14 @@ class CookieIdentificationPlugin(PropertyManager, SimpleItem):
                     'label':'User name form variable'},
                    {'id':'pw_cookie', 'type': 'string', 'mode':'w',
                     'label':'User password form variable'},
+                   {'id': 'zeo_compatibility', 'type': 'boolean', 'mode':'w',
+                    'label': 'ZEO Compatibility'},
                    )
 
     auth_cookie = '__ac'
     name_cookie = '__ac_name'
     pw_cookie = '__ac_password'
+    zeo_compatibility = 0
 
     manage_options = PropertyManager.manage_options + SimpleItem.manage_options
 
@@ -62,6 +67,7 @@ class CookieIdentificationPlugin(PropertyManager, SimpleItem):
     #
 
     def makeAuthenticationString(self, request, auth):
+        LOG('CookieIdentification', DEBUG, 'makeAuthenticationString')
         if not isinstance(request, HTTPRequest):
             LOG('CookieIdentification', DEBUG, 'Not an HTTP Request')
             return None
@@ -80,8 +86,20 @@ class CookieIdentificationPlugin(PropertyManager, SimpleItem):
         if request.has_key(self.pw_cookie) \
           and request.has_key(self.name_cookie):
             # Attempt to log in and set cookies.
+            LOG('CookieIdentification', DEBUG, 'Login attempt')
             name = request[self.name_cookie]
             pw = request[self.pw_cookie]
+            if not self.zeo_compatibility:
+                # Store the password in a temporary storage with a ticket
+                # Send a ticket instead of the password in the cookie.
+                if not hasattr(self, '__tickets'):
+                    self.__tickets = MountedTemporaryFolder('__tickets')
+                ticket = str(random.randint(100000000, 999999999 ))
+                if hasattr(self.__tickets, name):
+                    delattr(self.__tickets, name)
+                setattr(self.__tickets, name, '%s:%s' % (ticket, pw))
+                pw = ticket
+
             ac = encodestring('%s:%s' % (name, pw))
             response = request['RESPONSE']
             LOG('CookieIdentification', DEBUG, 'New cookie login', ac+'\n')
@@ -104,9 +122,21 @@ class CookieIdentificationPlugin(PropertyManager, SimpleItem):
         return 0
 
     def identify(self, auth):
-        try: 
+        try:
             name, password = tuple(decodestring(
                                    auth.split(' ')[-1]).split(':', 1))
+            if not self.zeo_compatibility:
+                ticket = getattr(self.__tickets, name, None)
+                if not ticket:
+                    # The user has not logged in but sends a ticket anyway.
+                    # Probably the server restarted.  Return a bogus password
+                    # to cause authentication errors and new login.
+                    return name, '{SHA}boguspassword'
+                token, pw = ticket.split(':', 1)
+                if not password == token:
+                    raise 'Bad Request', 'Invalid authentication token'
+                # Ok, we got the correct number, it is genuine!
+                password = pw
         except:
             raise 'Bad Request', 'Invalid authentication token'
         LOG('CookieIdentification', DEBUG, 'Identify',
