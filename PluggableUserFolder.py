@@ -202,8 +202,17 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
     # XXX the group support here must be rewritten.
     # We need an interface for group objects, for example
     # and role plugins must tell us if they are group plugins.
-
     # change to get GroupIds and set up alias.
+    security.declareProtected(ManageUsers, 'userFolderAddGroup')
+    def userFolderAddGroup(self, groupname, **kw):
+        """Creates a group"""
+        pass
+
+    security.declareProtected(ManageUsers, 'userFolderDelGroups')
+    def userFolderDelGroups(self, groupnames):
+        """Deletes groups"""
+        pass
+
     security.declareProtected(Permissions.manage_users, 'getGroupNames')
     def getGroupNames(self):
         LOG('PluggableUserFolder', DEBUG, 'getGroupNames called')
