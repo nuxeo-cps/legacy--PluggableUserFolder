@@ -22,17 +22,28 @@ __version__='$Revision$'[11:-2]
 from zLOG import LOG, ERROR
 from base64 import decodestring, encodestring
 from Acquisition import aq_base
+from OFS.PropertyManager import PropertyManager
 from OFS.SimpleItem import SimpleItem
 
 from PluginInterfaces import IIdentificationPlugin
+from PluggableUserFolder import _no_password_check
 
-class ApacheSSLIdentificationPlugin(SimpleItem):
+class ApacheSSLIdentificationPlugin(PropertyManager, SimpleItem):
     """This Basic HTTP Authentication support"""
 
     __implements__ = (IIdentificationPlugin,)
     meta_type = 'Apache SSL Identification'
     id = 'apache_ssl_identification'
     title = 'Apache SSL Identification'
+
+    _properties = ( {'id': 'ssl_id_source',
+                     'type': 'string',
+                     'label': 'SSL Id Source field: SSL_CLIENT_',
+                    },
+                   )
+    ssl_id_source = 'I_DN_CN'
+
+    manage_options= PropertyManager.manage_options + SimpleItem.manage_options
 
     def makeAuthenticationString(self, request, auth):
         # Make sure this is an SSL request via Apache
@@ -52,7 +63,8 @@ class ApacheSSLIdentificationPlugin(SimpleItem):
         # One way is to use a special User object that always
         # returns OK on Authenticate. Another could be to
         # separate Authentication and user storage.
-        password = user._getPassword()
+        #password = user._getPassword()
+        password = ''
         ac = encodestring('%s:%s' % (username, password))
         return 'ApacheSSL %s' % ac
 
@@ -66,8 +78,16 @@ class ApacheSSLIdentificationPlugin(SimpleItem):
                                 auth.split(' ')[-1]).split(':', 1))
         except:
             raise 'Bad Request', 'Invalid authentication token'
-        return name, password
+        return name, _no_password_check #password
 
+    #security.declarePublic('propertyLabel')
+    def propertyLabel(self, id):
+        """Return a label for the given property id
+        """
+        for p in self._properties:
+            if p['id'] == id:
+                return p.get('label', id)
+        return id
 
 
 def manage_addApacheSSLIdentificationPlugin(self, REQUEST=None):

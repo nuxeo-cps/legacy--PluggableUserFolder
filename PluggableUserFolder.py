@@ -40,6 +40,11 @@ from AccessControl.SecurityManagement import noSecurityManager
 
 _marker=[]
 
+# Special marker for identification methods and
+# user storages that check the password as a part of
+# identification and user retrieval
+_no_password_check=[]
+
 class PluggableUserFolder(ObjectManager, BasicUserFolder):
     meta_type='Pluggable User Folder'
     id       ='acl_users'
@@ -232,6 +237,10 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         return u
 
     def authenticate(self, name, password, request):
+        LOG('PluggableUserFolder', DEBUG, 'Authenticate',
+            'Username: %s\nPassword %s\n' % (name, password))
+        LOG('PluggableUserFolder', DEBUG, password is _no_password_check)
+
         super = self._emergency_user
 
         if name is None:
@@ -243,7 +252,9 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             # This is the only change from BasicUserFolder.authenticate():
             # password is passed to getUser()
             user = self.getUser(name, password)
-        if user is not None and user.authenticate(password, request):
+        if user is not None and \
+            (password is _no_password_check or \
+             user.authenticate(password, request)):
             return user
         else:
             return None
