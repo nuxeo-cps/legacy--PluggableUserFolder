@@ -10,6 +10,8 @@ New features:
   (like came_from) it wants to pass to the login-page.
 - A logout page setting added. The logout.py skin should now only
   call context.logout() when using PUF.
+- A ProtectedAuthInfo class is created that can be used to store
+  authentification information in sessions.
 Bug fixes:
 ~~~~~~~~~~
 New internal features:

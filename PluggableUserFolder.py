@@ -47,6 +47,24 @@ from PluginInterfaces import IAuthenticationPlugin, IIdentificationPlugin, \
 from InternalAuthentication import InternalAuthenticationPlugin
 from BasicIdentification import BasicIdentificationPlugin
 
+
+class ProtectedAuthInfo:
+    """An object where the username is not accessible from user code
+    
+    This object prevents the user name to be accessed or changed from
+    anything by protected code. This means that we can always be sure
+    that the username returned from _getUsername() has not been 
+    compromised by user code. This means we can store this object in a
+    session, to have a session authentication.
+    """
+    
+    def _setAuthInfo(self, authinfo):
+        self.__authinfo = authinfo
+    
+    def _getAuthInfo(self):
+        return self.__authinfo
+    
+    
 # Special marker for identification methods and
 # user storages that check the password as a part of
 # identification and user retrieval

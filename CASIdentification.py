@@ -30,7 +30,7 @@ from OFS.PropertyManager import PropertyManager
 from OFS.SimpleItem import SimpleItem
 
 from PluginInterfaces import IIdentificationPlugin
-from PluggableUserFolder import _no_password_check
+from PluggableUserFolder import _no_password_check, ProtectedAuthInfo
 
 class CASIdentificationPlugin(PropertyManager, SimpleItem):
     """Yale ITS Central Authentication Service support"""
@@ -55,13 +55,20 @@ class CASIdentificationPlugin(PropertyManager, SimpleItem):
                     },                    
                    )
     validate_url = ''
-    session_var = '__ac_cas_username'
+    session_var = '__ac'
 
     manage_options = PropertyManager.manage_options + SimpleItem.manage_options
 
     def makeAuthenticationString(self, request, auth):
+        LOG('CASIdentification', DEBUG, 'makeAuthenticationString:1')
         session = request.SESSION
-        username = getattr(session, self.session_var, None)
+        username = None
+        
+        # First check if we have a ProtectedAuthInfo in the session
+        ob = session.get(self.session_var)
+        if ob is not None and isinstance(ob, ProtectedAuthInfo):
+            username = ob._getAuthInfo()
+            
         if username is None: 
             # Not already authenticated. Is there a ticket in the URL?
             ticket = request.form.get('ticket')
@@ -71,8 +78,11 @@ class CASIdentificationPlugin(PropertyManager, SimpleItem):
             if username is None:
                 return None # Invalid CAS ticket
             
-            # Successfult CAS authentication. 
-            setattr(session, self.session_var, username)
+            # Successfull CAS authentication. Store the username
+            # in a ProtectedAuthInfo in the session.
+            ob = ProtectedAuthInfo()
+            ob._setAuthInfo(username)
+            session[self.session_var] = ob
             
         LOG('CASIdentification', DEBUG, 'makeAuthenticationString',
             'Username: %s\n' % (username))
@@ -110,7 +120,7 @@ class CASIdentificationPlugin(PropertyManager, SimpleItem):
 
     def _logout(self):
         session = self.REQUEST.SESSION
-        delattr(session, self.session_var)
+        session[self.session_var] = None
 
     def getLoginURLParams(self, request):
         came_from = request.get('came_from', None)
@@ -146,4 +156,4 @@ def manage_addCASIdentificationPlugin(self, REQUEST=None):
     self._setObject(ob.id, ob)
     if REQUEST is not None:
         REQUEST['RESPONSE'].redirect(self.absolute_url() + '/manage_main')
-
+    
