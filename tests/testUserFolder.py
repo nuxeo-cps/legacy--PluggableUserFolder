@@ -21,6 +21,8 @@ from Products.PluggableUserFolder.InternalAuthentication import \
     InternalAuthenticationPlugin
 from Products.PluggableUserFolder.PluginInterfaces import \
     IAuthenticationPlugin, IIdentificationPlugin, IRolePlugin
+from Products.PluggableUserFolder.BasicIdentification import \
+    manage_addBasicIdentificationPlugin
 
 ZopeLite.installProduct('PluggableUserFolder', 1)
 # These are installed so that there are products that should
@@ -41,7 +43,7 @@ class ReadonlyAuthenticationPlugin(InternalAuthenticationPlugin):
 
 ZopeTestCase.installProduct('PluggableUserFolder')
 # Install some more products, just to make sure that there are
-#products that should NOT be listed in all_meta_types.
+# products that should NOT be listed in all_meta_types.
 ZopeTestCase.installProduct('ZCatalog')
 ZopeTestCase.installProduct('PageTemplates')
 
@@ -265,8 +267,16 @@ class TestInstallFolder(TestBase):
             isRolePlugin = IRolePlugin in each['interfaces']
             self.assert_( isIdPlugin or isAuthPlugin or isRolePlugin)
 
+    def testBasicIdPlugin(self):
+        # This is used in most tests, and hence pretty well tested.
+        # So here are only tests of what doesn't get tested
+        # anywhere else.
 
-# TODO: Create testsuites for each and every plugin used.
+        # Test the manage_add method.
+        self.uf._delObject('basic_identification')
+        manage_addBasicIdentificationPlugin(self.uf)
+        self.failUnless(hasattr(self.uf, 'basic_identification'))
+
 
 if __name__ == '__main__':
     framework(descriptions=0, verbosity=1)
