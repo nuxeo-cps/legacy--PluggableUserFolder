@@ -10,6 +10,7 @@ Bug fixes:
 - InternalAuthentication search did not handle '*' searches.
 - Group plugins can now delete groups!
 - Doing a CPSDirectory search on members now work again.
+- Searching in roles now work again.
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -
