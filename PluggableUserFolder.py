@@ -177,7 +177,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             if hasattr(self, id):
                 plugin = getattr(self, id)
                 if not include_readonly and hasattr(plugin, 'isReadOnly') \
-                   and plugin.isReadonly():
+                   and plugin.isReadOnly():
                     continue
                 break
         if plugin is None:
