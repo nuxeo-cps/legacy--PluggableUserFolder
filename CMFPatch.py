@@ -31,7 +31,7 @@ from AccessControl.PermissionRole import rolesForPermissionOn
 
 _cmf_localroles_patch = 0
 try:
-    import CPSCore.utils
+    import Products.CPSCore.utils
     _cmf_localroles_patch = 1
 except ImportError:
     pass
@@ -45,10 +45,10 @@ if not _cmf_localroles_patch:
 
         LOG('PluggableUserFolder', INFO, 'Patching CMF')
 
-        def mergedLocalRoles(object, withgroups=0, withpath=0):
+        def mergedLocalRoles(object, withgroups=0):
             aclu = object.acl_users
             if hasattr(aclu, 'mergedLocalRoles'):
-                return aclu.mergedLocalRoles(object, withgroups, withpath)
+                return aclu.mergedLocalRoles(object, withgroups)
             return utils.old_mergedLocalRoles(object)
 
         if not hasattr(utils, 'old_mergedLocalRoles'):
@@ -86,7 +86,7 @@ if not _cmf_localroles_patch:
         def _getAllowedRolesAndUsers(user):
             """Returns a list with all roles this user has + the username"""
             LOG('CPSCore utils', DEBUG, '_getAllowedRolesAndUsers()')
-            
+
             result = list(user.getRoles())
             result.append('Anonymous')
             result.append('user:%s' % user.getUserName())
@@ -115,4 +115,3 @@ if not _cmf_localroles_patch:
     except ImportError:
         # Not a CMF Installation. No patching needed.
         pass
-
