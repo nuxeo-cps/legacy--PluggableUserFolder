@@ -533,9 +533,8 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         # Currently I do a union of all props. Maybe an intersection would
         # be better, so only properties all plugins support are listed?
         # /Lennart
-        plugs = self._get_plugins(IAuthenticationPlugin)
         props = ['id', 'roles', 'groups']
-        for plugin in self._sort_plugins(plugs, self.authentication_order):
+        for plugin in self._get_plugins(IAuthenticationPlugin):
             for prop in plugin.listUserProperties():
                 if prop not in props:
                     props.append(prop)
@@ -556,9 +555,8 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
 
         Special properties are 'id', 'roles', 'groups'.
         """
-        plugs = self._get_plugins(IAuthenticationPlugin)
         result = []
-        for plugin in self._sort_plugins(plugs, self.authentication_order):
+        for plugin in self._get_plugins(IAuthenticationPlugin):
             result.extend(plugin.searchUsers(query, props, options, **kw))
         # XXX: Filter on roles
         return result
