@@ -350,11 +350,8 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
 
     def mergedLocalRoles(self, object, withgroups=0, withpath=0):
         """Returns all local roles valid for an object"""
-        # withgroups and widthpath is there fore CPS compatibility reasons
-        # they are currently ignored
+        # widthpath is there for CPS compatibility reasons, and is ignored
         LOG('PluggableUserFolder', DEBUG, 'mergedLocalRoles()')
-
-        userprefix = withgroups and 'user:' or ''
 
         merged = {}
         innerobject = getattr(object, 'aq_inner', object)
@@ -379,20 +376,44 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
                 continue
             break
 
-        # deal with groups
-        plugins = self._get_plugins(IRolePlugin)
-        for plugin in plugins:
-            for user in plugin.getUsersWithRoles():
-                if not merged.has_key(user):
-                    merged[user] = {}
-
         for user, roles in merged.items():
             merged[user] = roles.keys()
-        result = {}
-        for plugin in plugins:
-            for user in merged.keys():
-                result[userprefix + user] = plugin.modifyLocalRoles(user,
-                                    object, merged[user])
+
+        # deal with role management plugins, to get a better list
+        plugins = self._get_plugins(IRolePlugin)
+
+        if not withgroups:
+            # This is probably not CPS. We will simply return a correct and
+            # complete list of all users and their roles in this place.
+            for plugin in plugins:
+                for user in plugin.getUsersWithRoles():
+                    if not merged.has_key(user):
+                        merged[user] = ()
+
+            for plugin in plugins:
+                for user in merged.keys():
+                    merged[user] = plugin.modifyLocalRoles(user,
+                                        object, merged[user])
+        else:
+            # CPS does not expect you to expand users roles, instead
+            # It wants a list of users, and groups and their roles.
+            # First, go through the found users, to let the plugins
+            # Remove any roles. This may also add roles to the users
+            # if they are members of groups, but that is no problem,
+            # just overhead.
+            # Also this adds the 'user:' prefix to users that CPS
+            # wants when withgroups is given.
+            result = {}
+            for plugin in plugins:
+                for user in merged.keys():
+                    result['user:' + user] = plugin.modifyLocalRoles(user,
+                                        object, merged[user])
+            # Get the groups
+            plugins = self._get_plugins(IGroupPlugin)
+            for plugin in plugins:
+                for group in plugin.getLocalGroups(object):
+                    result['group:' + group] = \
+                        plugin.getGroupRolesOnObject(group, object)
 
         return result
 
