@@ -40,9 +40,7 @@ class PluggableUserMixin:
         """Return the list of roles assigned to a user."""
         LOG('PluggableUser', DEBUG, 'getRoles',
             'User: %s\n' % self.getId())
-        LOG('========================================', DEBUG, type(self))
         from Acquisition import aq_base
-        LOG('========================================', DEBUG, type(aq_base(self)))
         plugins = self.acl_users._get_plugins(IRolePlugin)
         # plugins = self._sort_plugins(plugins, self.role_order)
         roles = self.roles[:] # Make sure it's a copy, and not the original

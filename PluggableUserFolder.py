@@ -353,6 +353,9 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         # withgroups and widthpath is there fore CPS compatibility reasons
         # they are currently ignored
         LOG('PluggableUserFolder', DEBUG, 'mergedLocalRoles()')
+
+        userprefix = withgroups and 'user:' or ''
+
         merged = {}
         innerobject = getattr(object, 'aq_inner', object)
         while 1:
@@ -385,29 +388,35 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
 
         for user, roles in merged.items():
             merged[user] = roles.keys()
+        result = {}
         for plugin in plugins:
             for user in merged.keys():
-                merged[user] = plugin.modifyLocalRoles(user, object,
-                                    merged[user])
+                result[userprefix + user] = plugin.modifyLocalRoles(user,
+                                    object, merged[user])
 
-        return merged
+        return result
 
     def _allowedRolesAndUsers(self, ob):
         """
         Return a list of roles, users and groups with View permission.
         Used by PortalCatalog to filter out items you're not allowed to see.
         """
+        LOG('PluggableUserFolder', DEBUG, '_allowedRolesAndUsers()')
         allowed = {}
         for r in rolesForPermissionOn('View', ob):
             allowed[r] = 1
         localroles = self.mergedLocalRoles(ob, withgroups=1) # groups
         for user_or_group, roles in localroles.items():
+            if user_or_group.find(':') == -1:
+                user_or_group = 'user:' + user_or_group
             for role in roles:
                 if allowed.has_key(role):
                     allowed[user_or_group] = 1
         if allowed.has_key('Owner'):
             del allowed['Owner']
         return list(allowed.keys())
+
+    allowedRolesAndUsers = _allowedRolesAndUsers
 
     # ----------------------------------
     # Private methods

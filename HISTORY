@@ -18,6 +18,7 @@ New internal features:
 
 - Changed the PluggableUserWrapper from a gettattr wrapper to an
   acquisition wrapper.
+
 *******************************************
 ** PluggableUserFolder V2.1.0 [R1 build 2003-10/07-16:08 by regebro]
 
