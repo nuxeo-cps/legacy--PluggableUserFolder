@@ -22,7 +22,7 @@ __version__ = '$Revision$'[11:-2]
 
 from PluggableUserFolder import LOG, DEBUG, ERROR
 
-import Acquisition
+from Acquisition import aq_base, Implicit
 from AccessControl import ClassSecurityInfo
 from AccessControl.User import User
 from AccessControl.PermissionRole import _what_not_even_god_should_do
@@ -40,7 +40,6 @@ class PluggableUserMixin:
         """Return the list of roles assigned to a user."""
         LOG('PluggableUser', DEBUG, 'getRoles',
             'User: %s\n' % self.getId())
-        from Acquisition import aq_base
         plugins = self.acl_users._get_plugins(IRolePlugin)
         # plugins = self._sort_plugins(plugins, self.role_order)
         roles = self.roles[:] # Make sure it's a copy, and not the original
@@ -185,5 +184,5 @@ class PluggableUser(PluggableUserMixin, User):
     pass
 
 
-class PluggableUserWrapper(PluggableUserMixin, Acquisition.Implicit):
+class PluggableUserWrapper(PluggableUserMixin, Implicit):
     pass
