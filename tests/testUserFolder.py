@@ -329,5 +329,6 @@ else:
         suite.addTest(unittest.makeSuite(TestPluginFolder))
         suite.addTest(unittest.makeSuite(TestInstallFolder))
         suite.addTest(unittest.makeSuite(TestValidate))
+        suite.addTest(unittest.makeSuite(TestSearchAPI))
         return suite
 
