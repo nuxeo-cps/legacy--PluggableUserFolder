@@ -22,7 +22,7 @@ __version__ = '$Revision$'[11:-2]
 
 # Note that these imports are imported here to be available,
 # so don't remove them even though they are unused.
-from zLOG import LOG, DEBUG, BLATHER, PROBLEM, WARNING, ERROR
+from zLOG import LOG, DEBUG, BLATHER, INFO, PROBLEM, WARNING, ERROR
 import os
 if os.environ.get("ZOPE_PLUGGABLE_LOGGING", None) == "OFF":
     def LOG(*args, **kw):

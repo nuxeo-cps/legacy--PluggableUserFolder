@@ -24,7 +24,7 @@
 
 __version__ = '$Revision$'[11:-2]
 
-from zLOG import LOG, INFO, DEBUG
+from PluggableUserFolder import LOG, INFO, DEBUG
 
 from AccessControl.PermissionRole import rolesForPermissionOn
 
@@ -58,7 +58,7 @@ try:
         Return a list of roles, users and groups with View permission.
         Used by PortalCatalog to filter out items you're not allowed to see.
         """
-        LOG('PluggableUserFolder', 0, 'Patched allowedRolesAndUsers()')
+        LOG('PluggableUserFolder', DEBUG, 'Patched allowedRolesAndUsers()')
         ob = self._IndexableObjectWrapper__ob # Eeek, manual name mangling
         allowed = {}
         for r in rolesForPermissionOn('View', ob):
