@@ -88,7 +88,10 @@ class InternalAuthenticationPlugin(SimpleItem):
     security.declareProtected('Manage users', 'getUser')
     def getUser(self, name, password=None):
         """Return the named user object or None"""
-        return self.data.get(name, None)
+        user = self.data.get(name, None)
+        if user:
+            user = user.__of__(self)
+        return user
 
     #
     # ZMI methods
