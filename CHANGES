@@ -8,6 +8,13 @@ Bug fixes:
 ~~~~~~~~~~
 - Fixed a spelling error
 
+- SimpleGroupsRoles has a bug when calling AcquiredGroups.
+
+- getGroupsForUser returned a list. Some CMF/CPS code assumed it
+  to be a tuple, so I changed that.
+
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
--
+- The magic _v_acl_users is no longer used, instead, Acquisition is
+  used to find the userfolder. This requires all plugins to make sure
+  that the user is properly acquisition wrapped before returning it.
