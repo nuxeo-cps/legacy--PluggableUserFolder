@@ -249,7 +249,8 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
     # change to get GroupIds and set up alias.
     security.declareProtected(Permissions.manage_users, 'setUsersOfGroup')
     def setUsersOfGroup(self, users, group):
-        LOG('PluggableUserFolder', DEBUG, 'setUsersOfGroup')
+        LOG('PluggableUserFolder', DEBUG, 'setUsersOfGroup',
+            'Group: %s\nUsers: %s\n' % (group, str(users)))
         group = self.getGroupById(group)
         group.setUsers(users)
 
