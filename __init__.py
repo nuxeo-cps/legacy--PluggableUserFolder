@@ -16,8 +16,8 @@
 #
 # $Id$
 
-__doc__='''PluggableUserFolder init'''
-__version__='$Revision$'[11:-2]
+__doc__ = '''PluggableUserFolder init'''
+__version__ = '$Revision$'[11:-2]
 
 from zLOG import LOG, DEBUG
 import PluggableUserFolder
@@ -89,7 +89,8 @@ def initialize(context):
             visibility=None,
         )
 
-from AccessControl.Role import RoleManager, _isNotBeingUsedAsAMethod, _isBeingUsedAsAMethod
+from AccessControl.Role import RoleManager, _isNotBeingUsedAsAMethod, \
+    _isBeingUsedAsAMethod
 from Globals import DTMLFile
 
 def registerRolePlugin(plugin):

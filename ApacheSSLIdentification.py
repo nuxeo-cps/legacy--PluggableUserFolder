@@ -16,8 +16,8 @@
 #
 # $Id$
 
-__doc__='''Apache SSL Identification Plugin'''
-__version__='$Revision$'[11:-2]
+__doc__ = '''Apache SSL Identification Plugin'''
+__version__ = '$Revision$'[11:-2]
 
 from Globals import MessageDialog
 from zLOG import LOG, DEBUG, ERROR
@@ -48,7 +48,7 @@ class ApacheSSLIdentificationPlugin(PropertyManager, SimpleItem):
                    )
     ssl_id_source = 'SSL_CLIENT_I_DN_CN'
 
-    manage_options= PropertyManager.manage_options + SimpleItem.manage_options
+    manage_options = PropertyManager.manage_options + SimpleItem.manage_options
 
     def makeAuthenticationString(self, request, auth):
         # Make sure this is an SSL request via Apache
@@ -75,8 +75,9 @@ class ApacheSSLIdentificationPlugin(PropertyManager, SimpleItem):
         return 0
 
     def identify(self, auth):
-        try: name, password=tuple(decodestring(
-                                auth.split(' ')[-1]).split(':', 1))
+        try: 
+            name, password = tuple(decodestring(
+                                   auth.split(' ')[-1]).split(':', 1))
         except:
             raise 'Bad Request', 'Invalid authentication token'
         return name, _no_password_check #password
@@ -93,14 +94,14 @@ class ApacheSSLIdentificationPlugin(PropertyManager, SimpleItem):
 
 def manage_addApacheSSLIdentificationPlugin(self, REQUEST=None):
     """ """
-    ob=ApacheSSLIdentificationPlugin()
-    self=self.this()
+    ob = ApacheSSLIdentificationPlugin()
+    self = self.this()
     if hasattr(aq_base(self), ob.id):
         return MessageDialog(
-            title  ='Item Exists',
-            message='This object already contains an %s' % id.title ,
-            action ='%s/manage_main' % REQUEST['URL1'])
+            title='Item Exists',
+            message='This object already contains an %s' % id.title,
+            action='%s/manage_main' % REQUEST['URL1'])
     self._setObject(ob.id, ob)
     if REQUEST is not None:
-        REQUEST['RESPONSE'].redirect(self.absolute_url()+'/manage_main')
+        REQUEST['RESPONSE'].redirect(self.absolute_url() + '/manage_main')
 
