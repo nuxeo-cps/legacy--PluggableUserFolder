@@ -340,7 +340,7 @@ class SimpleGroupRolesPlugin(Folder):
         roles = []
         for groupid in self.getGroupsOnObject(object):
             groupob = self.getGroup(groupid)
-            if user in groupob.getUsers():
+            if groupob is not None and user in groupob.getUsers():
                 roles.extend(self.getGroupRolesOnObject(groupid, object))
         return roles
 
