@@ -91,7 +91,7 @@ def initialize(context):
 #        constructors = (GroupRoles.manage_addGroupRolesPlugin,),
 #        icon = 'zmi/UserFolder_icon.gif',
 #        visibility = None)
-    registerRolePlugin(GroupRoles.GroupRolesPlugin)
+#    registerRolePlugin(GroupRoles.GroupRolesPlugin)
     context.registerClass(
         instance_class = SimpleGroupRoles.SimpleGroupRolesPlugin,
         permission = add_user_folders,
