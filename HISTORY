@@ -1,4 +1,26 @@
 *******************************************
+** PluggableUserFolder V2.4.1 [R1 build 2004/04/04-17:11 by regebro]
+
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+-
+Bug fixes:
+~~~~~~~~~~
+- With InternalAuthenticationPlugin, you edit users without roles 
+  through the ZMI.
+- There was a bug in the error handling of InternalAuthenticationPlugin
+  when acquisition of acl_users didn't work.
+- A typo in PluggableUser was fixed.
+- user.setProperty should not raise an error when an unknown property
+  is set, it should just be ignored.
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+-
+
+*******************************************
 ** PluggableUserFolder V2.4.0 [R1 build 2004/03/15-13:46 by regebro]
 
 Requires:

@@ -6,13 +6,7 @@ New features:
 -
 Bug fixes:
 ~~~~~~~~~~
-- With InternalAuthenticationPlugin, you edit users without roles 
-  through the ZMI.
-- There was a bug in the error handling of InternalAuthenticationPlugin
-  when acquisition of acl_users didn't work.
-- A typo in PluggableUser was fixed.
-- user.setProperty should not raise an error when an unknown property
-  is set, it should just be ignored.
+-
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -
