@@ -50,21 +50,21 @@ from BasicIdentification import BasicIdentificationPlugin
 
 class ProtectedAuthInfo:
     """An object where the username is not accessible from user code
-    
+
     This object prevents the user name to be accessed or changed from
     anything by protected code. This means that we can always be sure
-    that the username returned from _getUsername() has not been 
+    that the username returned from _getUsername() has not been
     compromised by user code. This means we can store this object in a
     session, to have a session authentication.
     """
-    
+
     def _setAuthInfo(self, authinfo):
         self.__authinfo = authinfo
-    
+
     def _getAuthInfo(self):
         return self.__authinfo
-    
-    
+
+
 # Special marker for identification methods and
 # user storages that check the password as a part of
 # identification and user retrieval
@@ -110,7 +110,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         __implements__ = (IUserFolder,)
     except ImportError:
         pass
-                           
+
     def __init__(self):
         # As default, add the "Internal" plugins.
         ob = InternalAuthenticationPlugin()
@@ -123,7 +123,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             if hasattr(self, '_product_interfaces'):
                 interfaces = self._product_interfaces
             elif hasattr(self, 'aq_acquire'):
-                try: 
+                try:
                     interfaces = self.aq_acquire('_product_interfaces')
                 except:
                     pass    # Bleah generic pass is bad
@@ -630,7 +630,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         plugins = self._get_plugins(IAuthenticationPlugin)
         props = plugins[0].listUserProperties()
         for plugin in plugins[1:]:
-            props = [prop for prop in plugin.listUserProperties() 
+            props = [prop for prop in plugin.listUserProperties()
                           if prop in props]
         return tuple(props)
 
@@ -858,7 +858,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         '''
         if not self.login_page:
             return None
-        
+
         req = self.REQUEST
         resp = req['RESPONSE']
         if self.login_page.startswith('http'):
@@ -894,8 +894,8 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             page = getattr(parent, self.logout_page, None)
             if page is None:
                 return None
-            return page.absoulute_url()        
-        
+            return page.absoulute_url()
+
     security.declarePublic('logout')
     def logout(self):
         plugins = self._get_plugins(IIdentificationPlugin)
@@ -905,7 +905,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         url = self.getLogoutURL()
         if url:
             self.REQUEST.RESPONSE.redirect(url)
-        
+
     # Installation and removal of traversal hooks.
 
     def manage_beforeDelete(self, item, container):
