@@ -7,11 +7,10 @@ if __name__ == '__main__':
     execfile(os.path.join(sys.path[0], 'framework.py'))
 
 #os.environ['STUPID_LOG_FILE'] = os.path.join(os.getcwd(), 'zLOG.log')
-os.environ['STUPID_LOG_SEVERITY'] = '-200'  # DEBUG
+#os.environ['STUPID_LOG_SEVERITY'] = '-200'  # DEBUG
 
-from Testing import ZopeTestCase
-from Testing.ZopeTestCase import _user_name
 from testUserFolder import TestBase
+from Testing.ZopeTestCase import _user_name
 from Products.PluggableUserFolder.PluggableUserFolder import _no_password_check
 from Products.PluggableUserFolder.ApacheSSLIdentification import \
     ApacheSSLIdentificationPlugin, manage_addApacheSSLIdentificationPlugin
