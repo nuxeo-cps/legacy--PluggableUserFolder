@@ -277,6 +277,46 @@ class TestInstallFolder(TestBase):
         manage_addBasicIdentificationPlugin(self.uf)
         self.failUnless(hasattr(self.uf, 'basic_identification'))
 
+class TestSearchAPI(TestBase):
+
+    def testSearchAPI(self):
+        # test_user_1_ is already created. Create some more to test searching.
+        self.uf.internal_authentication._addUser(
+            'test_user_2_','pass','pass',['Owner'])
+        self.uf.internal_authentication._addUser(
+            'test_user_3_','pass','pass',['Manager'])
+        self.uf.internal_authentication._addUser(
+            'never_returned_','pass','pass',['Owner'])
+        # Matching id:
+        self.assert_(self.uf.searchUsers(id='test_user_1_')
+            == ['test_user_1_'])
+        # Partisl id:
+        self.assert_(len(self.uf.searchUsers(id='user')) == 3)
+        # Several ids:
+        self.assert_(len(self.uf.searchUsers(
+            id=['test_user_1_', 'test_user_2_'])) == 2)
+        # Roles:
+        self.assert_(self.uf.searchUsers(roles='Manager') ==
+            ['test_user_3_'])
+        query = { 'id': 'user',
+                  'roles': ['Owner', 'Manager']
+                }
+        self.assert_(self.uf.searchUsers(query=query) ==
+            ['test_user_2_', 'test_user_3_'])
+        # Do a search that returns a properties dict.
+        props=['id', 'roles']
+        result = self.uf.searchUsers(query=query, props=props)
+        self.assert_(len(result) == 2)
+        # Each entry in the result should be a tuple with an id and a dictionary.
+        for id, dict in result:
+            # Make sure each dict has the properties asked for:
+            for prop in props:
+                self.assert_(prop in dict.keys())
+
+        # Unsupported keys should mean nothing gets returned:
+        query['anotherkey'] = 'shouldnotfail'
+        self.assert_(self.uf.searchUsers(query=query) == [])
+
 
 if __name__ == '__main__':
     framework(descriptions=0, verbosity=1)

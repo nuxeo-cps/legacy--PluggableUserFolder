@@ -26,7 +26,12 @@ from Globals import MessageDialog, DTMLFile
 from Acquisition import aq_base, aq_parent
 from OFS.SimpleItem import SimpleItem
 
-from Products.LDAPUserFolder.LDAPUserFolder import LDAPUserFolder
+try:
+    from Products.LDAPUserGroupsFolder.LDAPUserFolder import LDAPUserFolder
+    _ldap_user_groups = 1
+except:
+    from Products.LDAPUserFolder.LDAPUserFolder import LDAPUserFolder
+    _ldap_user_groups = 0
 
 from PluginInterfaces import IAuthenticationPlugin
 from PluggableUser import PluggableUserWrapper
@@ -66,7 +71,18 @@ def manage_addLDAPAuthenticationPlugin(self, id, title, LDAP_server, login_attr
                             , rdn_attr='cn', local_groups=0, use_ssl=0
                             , encryption='SHA', read_only=0, REQUEST=None):
     """ """
-    ob = LDAPAuthenticationPlugin(title, LDAP_server, login_attr, users_base
+    if _ldap_user_groups:
+        usergroups_base = usergroups_scope = ''
+        ob = LDAPAuthenticationPlugin(title, LDAP_server, login_attr, users_base
+                          , users_scope, roles, groups_base, groups_scope
+                          , usergroups_base, usergroups_scope
+                          , binduid, bindpwd, binduid_usage, rdn_attr
+                          , local_groups=local_groups, local_usergroups=1
+                          , use_ssl=not not use_ssl
+                          , encryption=encryption, read_only=read_only
+                          , REQUEST=None)
+    else:
+        ob = LDAPAuthenticationPlugin(title, LDAP_server, login_attr, users_base
                           , users_scope, roles, groups_base, groups_scope
                           , binduid, bindpwd, binduid_usage, rdn_attr
                           , local_groups=local_groups, use_ssl=not not use_ssl

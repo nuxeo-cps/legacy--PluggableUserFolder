@@ -526,6 +526,43 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
 
     allowedRolesAndUsers = _allowedRolesAndUsers
 
+    # Search API
+
+    def listUserProperties(self):
+        """Lists properties settable or searchable on the users."""
+        # Currently I do a union of all props. Maybe an intersection would
+        # be better, so only properties all plugins support are listed?
+        # /Lennart
+        plugs = self._get_plugins(IAuthenticationPlugin)
+        props = ['id', 'roles', 'groups']
+        for plugin in self._sort_plugins(plugs, self.authentication_order):
+            for prop in plugin.listUserProperties():
+                if prop not in props:
+                    props.append(prop)
+        return props
+
+    def searchUsers(self, query={}, props=None, options=None, **kw):
+        """Search for users having certain properties.
+
+        If props is None, returns a list of ids:
+        ['user1', 'user2']
+
+        If props is not None, it must be sequence of property ids. The
+        method will return a list of tuples containing the user id and a
+        dictionary of available properties:
+        [('user1', {'email': 'foo', 'age': 75}), ('user2', {'age': 5})]
+
+        Options is used to specify the search type if possible. XXX
+
+        Special properties are 'id', 'roles', 'groups'.
+        """
+        plugs = self._get_plugins(IAuthenticationPlugin)
+        result = []
+        for plugin in self._sort_plugins(plugs, self.authentication_order):
+            result.extend(plugin.searchUsers(query, props, options, **kw))
+        # XXX: Filter on roles
+        return result
+
     # ----------------------------------
     # Private methods
     # ----------------------------------

@@ -37,10 +37,20 @@ class TestPlugin(TestBase):
                 }
         self.assert_(self.plugin.searchUsers(query=query) ==
             ['test_user_2_', 'test_user_3_'])
+        # Do a search that returns a properties dict.
+        props=['id', 'roles']
+        result = self.plugin.searchUsers(query=query, props=props)
+        self.assert_(len(result) == 2)
+        # Each entry in the result should be a tuple with an id and a dictionary.
+        for id, dict in result:
+            # Make sure each dict has the properties asked for:
+            for prop in props:
+                self.assert_(prop in dict.keys())
+
         # Unsupported keys should mean nothing gets returned:
         query['anotherkey'] = 'shouldnotfail'
         self.assert_(self.plugin.searchUsers(query=query) == [])
-        
+
 
 if __name__ == '__main__':
     framework(descriptions=0, verbosity=1)
