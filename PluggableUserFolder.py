@@ -653,7 +653,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         """Modify an existing user.
 
         Only here for compatibility, just as _doAddUser.
-        """
+        """l
         plugins = self._get_plugins(IAuthenticationPlugin, include_readonly=0)
         plugins = self._sort_plugins(plugins, self.authentication_order)
         if not plugins: # TODO change to object exception
@@ -664,8 +664,6 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         """Delete one or more users.
 
         Only here for compatibility, just as _doAddUser.
-        NB! If one user name exists in several plugins, it will be deleted
-        in ALL plugins!
         """
         plugins = self._get_plugins(IAuthenticationPlugin, include_readonly=0)
         plugins = self._sort_plugins(plugins, self.authentication_order)
@@ -676,7 +674,9 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             for username in names:
                 if plugin.getUser(username):
                     localnames.append(username)
-            plugin._doDelUsers(localnames)
+                    named.remove(username) # Only delete from first plugin.
+            if localnames:
+                plugin._doDelUsers(localnames)
 
     def _createInitialUser(self):
         """

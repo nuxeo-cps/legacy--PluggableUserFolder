@@ -63,7 +63,7 @@ class LDAPAuthenticationPlugin(LDAPUserFolder):
 
     def isReadOnly(self):
         """Returns 1 if you can not add, change or delete users"""
-        return 1
+        return 0
 
     def getUser(self, name, pwd=None):
         """Return the named user object or None"""
