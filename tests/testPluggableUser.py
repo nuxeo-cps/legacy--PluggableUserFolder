@@ -42,7 +42,7 @@ class TestUser(TestBase):
         # If this changes, the user object must implement
         # full property support.
         self.assertEquals(self.uf.listUserProperties(), 
-            ('id', 'roles', 'groups') )
+            ('id', 'roles', ) )
         
 
     
