@@ -1,9 +1,26 @@
 *******************************************
+** PluggableUserFolder V2.1.1 [R1 build 2003/11/05-18:07 by regebro]
+
+Bug fixes:
+~~~~~~~~~~
+- Fixed a spelling error
+
+- SimpleGroupsRoles has a bug when calling AcquiredGroups.
+
+- getGroupsForUser returned a list. Some CMF/CPS code assumed it
+  to be a tuple, so I changed that.
+
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+- The magic _v_acl_users is no longer used, instead, Acquisition is
+  used to find the userfolder. This requires all plugins to make sure
+  that the user is properly acquisition wrapped before returning it.
+
+- Changed the PluggableUserWrapper from a gettattr wrapper to an
+  acquisition wrapper.
+*******************************************
 ** PluggableUserFolder V2.1.0 [R1 build 2003-10/07-16:08 by regebro]
 
-ZODB Requires:
-~~~~~~~~~~~~~~
--
 New features:
 ~~~~~~~~~~~~~
 - The group support API has been generalized to accomodate multiple group
@@ -17,9 +34,6 @@ Bug fixes:
   and has LDAPLogin first in the path fixed.
 - A bug in mergedLocalRoles() when there was no roles plugins solved.
 
-New internal features:
-~~~~~~~~~~~~~~~~~~~~~~
--
 *******************************************
 ** PluggableUserFolder V2.0.0 [R1 build 2003-09/15-16:30 by regebro]
 
@@ -54,18 +68,6 @@ New internal features:
 *******************************************
 ** PluggableUserFolder V1.4.1 [R1 build 2003-08/28-13:03 by regebro]
 
-ZODB Requires:
-~~~~~~~~~~~~~~
--
-New features:
-~~~~~~~~~~~~~
--
-Bug fixes:
-~~~~~~~~~~
--
-New internal features:
-~~~~~~~~~~~~~~~~~~~~~~
--
 *******************************************
 ** PluggableUserFolder V1.4.0 [R1 build 2003-08/28-12:42 by regebro]
 
