@@ -28,13 +28,18 @@ from OFS.SimpleItem import SimpleItem
 
 try:
     from Products.LDAPUserGroupsFolder.LDAPUserFolder import LDAPUserFolder
+    from Products.LDAPUserGroupsFolder.LDAPUser import LDAPUser
     _ldap_user_groups = 1
 except:
     from Products.LDAPUserFolder.LDAPUserFolder import LDAPUserFolder
+    from Products.LDAPUserFolder.LDAPUser import LDAPUser
     _ldap_user_groups = 0
 
 from PluginInterfaces import IAuthenticationPlugin
-from PluggableUser import PluggableUserWrapper
+from PluggableUser import PluggableUserMixin
+
+class PluggableLDAPUser(PluggableUserMixin, LDAPUser):
+    pass
 
 class LDAPAuthenticationPlugin(LDAPUserFolder):
     """This plugin stores the user definitions in the ZODB"""
@@ -54,12 +59,63 @@ class LDAPAuthenticationPlugin(LDAPUserFolder):
         """Returns 1 if you can not add, change or delete users"""
         return 1
 
-    def getUser(self, name, password=None):
-        user = LDAPUserFolder.getUser(self, name, password)
-        if user is not None:
-            user = user.__of__(self)
-            user = user.__of__(PluggableUserWrapper())
-        return user
+    def getUser(self, name, pwd=None):
+        """Return the named user object or None"""
+        # All my clever wrapping efforts have failed. We have to
+        # resort to pure code duplication. Sigh... /lennart
+
+        if pwd is not None:
+            cache_type = 'authenticated'
+            cached_user = self._authenticated_cache.get(name, pwd)
+        else:
+            cache_type = 'anonymous'
+            cached_user = self._anonymous_cache.get(name)
+
+        if cached_user:
+            if self.verbose > 6:
+                msg = 'getUser: "%s" cached in %s cache' % (name, cache_type)
+                self._log.log(7, msg)
+            return cached_user
+
+        user_roles, user_dn, user_attrs, user_groups = self._lookupuser(uid=name, pwd=pwd)
+        if user_dn is None:
+            msg = 'getUser: "%s" not found' % name
+            self.verbose > 3 and self._log.log(4, msg)
+            return None
+
+        if user_attrs is None:
+            msg = 'getUser: "%s" has no properties, bailing' % name
+            self.verbose > 3 and self._log.log(4, msg)
+            return None
+
+        if user_roles is None or user_roles == self._roles:
+            msg = 'getUser: "%s" only has roles %s' % (name, str(user_roles))
+            self.verbose > 8 and self._log.log(9, msg)
+
+        login_name = user_attrs.get(self._login_attr)
+        if self._login_attr != 'dn':
+            login_name = login_name[0]
+
+        user_obj = PluggableLDAPUser( login_name
+                           , pwd or 'undef'
+                           , user_roles or []
+                           , user_groups or []
+                           , []
+                           , user_dn
+                           , user_attrs
+                           , self.getMappedUserAttrs()
+                           , self.getMultivaluedUserAttrs()
+                           )
+
+        if pwd is not None:
+            self._authenticated_cache.set(name, user_obj)
+        else:
+            self._anonymous_cache.set(name, user_obj)
+
+        if user_obj is not None:
+            user_obj = user_obj.__of__(self.aq_parent)
+
+        return user_obj
 
 
 addLDAPAuthenticationPlugin = DTMLFile('zmi/addLDAPAuthenticationPlugin', \
