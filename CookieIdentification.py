@@ -110,7 +110,7 @@ class CookieIdentificationPlugin(PropertyManager, SimpleItem):
         except:
             raise 'Bad Request', 'Invalid authentication token'
         LOG('CookieIdentification', DEBUG, 'Identify',
-            'User: %s\nPass: %s\n' % (name, password))
+            'User: %s\n' % name)
         return name, password
 
     security.declarePublic('logout')
