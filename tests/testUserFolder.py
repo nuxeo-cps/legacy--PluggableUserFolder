@@ -317,10 +317,14 @@ class TestCPSAPI(TestBase):
 
     def testPropertyGetting(self):
         user = self.uf.getUser('test_user_1_')
-        self.assertEqual(user.listProperties(), [])
+        self.assertEqual(user.listProperties(), ['id', 'roles', 'groups'])
         self.assert_(not user.hasProperty('prop'))
-        self.assertRaises(NotImplementedError, user.getProperty, ('',))
-        self.assertRaises(NotImplementedError, user.getProperties, ({},))
+        self.assertEqual(user.getProperty('id'), user.getUserName())
+        self.assertEqual(user.getProperty('roles'),
+                        (_user_role, 'Authenticated'))
+        self.assertEqual(user.getProperties( ('id','roles')),
+                {'id': 'test_user_1_',
+                 'roles': ('test_role_1_', 'Authenticated')} )
 
     def testPropertySetting(self):
         user = self.uf.getUser('test_user_1_')
