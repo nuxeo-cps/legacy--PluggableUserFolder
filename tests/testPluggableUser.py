@@ -9,8 +9,11 @@ if __name__ == '__main__':
 #os.environ['STUPID_LOG_FILE'] = os.path.join(os.getcwd(), 'zLOG.log')
 #os.environ['STUPID_LOG_SEVERITY'] = '-200'  # DEBUG
 
+from Interface.Verify import verifyClass
 from Testing.ZopeTestCase import _user_name, ZopeLite
 from testUserFolder import TestBase
+from Products.PluggableUserFolder.PluggableUser import \
+    PluggableUser
 
 ZopeLite.installProduct('NuxUserGroups')
 ZopeLite.installProduct('CPSDirectory')
@@ -42,6 +45,13 @@ class TestUser(TestBase):
         # full property support.
         self.assertEquals(self.uf.listUserProperties(), ('id', 'roles',))
 
+    def testInterface(self):
+        try:
+            from Products.CPSDirectory.IUserFolder import IUser
+            self.assert_(verifyClass(IUser, PluggableUser))
+        except ImportError:
+            pass
+         
 
 if __name__ == '__main__':
     framework(descriptions=0, verbosity=1)

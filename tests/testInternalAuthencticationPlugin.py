@@ -7,6 +7,11 @@ if __name__ == '__main__':
 #os.environ['STUPID_LOG_SEVERITY'] = '-200'  # DEBUG
 
 from testUserFolder import TestBase
+from Interface.Verify import verifyClass
+from Products.PluggableUserFolder.InternalAuthentication import \
+    InternalAuthenticationPlugin
+from Products.PluggableUserFolder.PluginInterfaces import \
+    IAuthenticationPlugin
 
 class TestPlugin(TestBase):
 
@@ -49,6 +54,10 @@ class TestPlugin(TestBase):
         query['anotherkey'] = 'shouldnotfail'
         self.assertEquals(self.plugin.searchUsers(query=query), [])
 
+    def testInterface(self):
+        self.assert_(verifyClass(IAuthenticationPlugin,
+            InternalAuthenticationPlugin))
+        
 
 if __name__ == '__main__':
     framework(descriptions=0, verbosity=1)

@@ -34,6 +34,12 @@ class PluggableUserMixin:
     """A mixin for user that overrides the methods for getting roles"""
     security = ClassSecurityInfo()
 
+    try:
+        from Products.CPSDirectory.IUserFolder import IUser
+        __implements__ = (IUser,)
+    except ImportError:
+        pass
+    
     def getUserFolder(self):
         try:
             return self.acl_users
@@ -185,6 +191,9 @@ class PluggableUserMixin:
         LOG('PluggableUser', DEBUG, 'getGroups()')
         return self.acl_users.getGroupsForUser(self.getId())
 
+    def getComputedGroups(self):
+        return self.getGroups()
+    
     def listProperties(self):
         """Lists all properties that are set on the user."""
         return ['id', 'roles', 'groups']

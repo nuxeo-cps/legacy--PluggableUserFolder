@@ -286,8 +286,7 @@ class TestCPSAPI(TestBase):
             from Products.CPSDirectory.IUserFolder import IUserFolder
             self.assert_(verifyClass(IUserFolder, PluggableUserFolder))
         except ImportError:
-            pass
-            
+            pass     
 
     def testSearchAPI(self):
         # test_user_1_ is already created. Create some more to test searching.

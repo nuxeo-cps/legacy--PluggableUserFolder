@@ -44,7 +44,7 @@ class IAuthenticationPlugin(Interface.Base):
         the user. Passing the password is therefore typically only
         done from within UserFolder.authenticate()."""
 
-    def getUserOfRole(role):
+    def getUsersOfRole(role):
         """Return all the users that have a particular role"""
         
     def _doAddUser(name, password, roles, domains, **kw):
@@ -163,8 +163,8 @@ class IGroupPlugin(IRolePlugin):
     def getGroupIds():
         """Returns a list of the names of defined groups"""
 
-    def getGroupFromId(id):
-        """Returns the group object"""
+    def getGroupRolesOnObject(id, object):
+        """Returns the groups roles on object"""
 
     def getGroupsForUser(userid):
         """Returns all groups userid is a member of"""

@@ -10,6 +10,11 @@ if __name__ == '__main__':
 #os.environ['STUPID_LOG_SEVERITY'] = '-200'  # DEBUG
 
 from testUserFolder import TestBase
+from Interface.Verify import verifyClass
+from Products.PluggableUserFolder.PluginInterfaces import \
+    IIdentificationPlugin
+from Products.PluggableUserFolder.ApacheSSLIdentification import \
+    ApacheSSLIdentificationPlugin
 from Testing.ZopeTestCase import _user_name
 from Products.PluggableUserFolder.PluggableUserFolder import _no_password_check
 from Products.PluggableUserFolder.ApacheSSLIdentification import \
@@ -52,6 +57,10 @@ class TestPlugin(TestBase):
         # Note: identify() can raise a 'Bad Request' exception, but these
         # are not object exceptions, so we can't test that.
 
+    def testInterface(self):
+        self.assert_(verifyClass(IIdentificationPlugin,
+            ApacheSSLIdentificationPlugin))
+        
 
 if __name__ == '__main__':
     framework(descriptions=0, verbosity=1)
