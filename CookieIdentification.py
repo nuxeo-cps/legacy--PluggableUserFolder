@@ -119,7 +119,8 @@ class CookieIdentificationPlugin(PropertyManager, SimpleItem):
         req = self.REQUEST
         resp = req['RESPONSE']
         resp.expireCookie(self.auth_cookie, path='/')
-        redir = 0
+        # XXX No redirect is done. Check with CookieCrimbler
+
 
     #
     # Internal methods

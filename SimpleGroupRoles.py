@@ -212,7 +212,7 @@ class SimpleGroupRolesPlugin(Folder):
                 manage_tabs_message='Groups added')
 
 
-    def deleteGroupsOnObject(self, delgroups, roles=(), REQUEST=None):
+    def deleteGroupsOnObject(self, delgroups, REQUEST=None):
         """Remove groups from the local roles on self"""
         roledict = getattr(aq_base(self), ROLEATTRIBUTENAME)
         if roledict is None:

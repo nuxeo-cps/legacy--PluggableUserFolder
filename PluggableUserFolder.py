@@ -132,12 +132,14 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
     def _get_first_plugin(self, interface, include_readonly=0):
         if interface == IAuthenticationPlugin:
             order = self.authentication_order
-        if interface == IIdentificationPlugin:
+        elif interface == IIdentificationPlugin:
             order = self.identificatio_order
-        if interface == IRolePlugin:
+        elif interface == IRolePlugin:
             order = self.group_role_order
-        if interface == IGroupPlugin:
+        elif interface == IGroupPlugin:
             order = self.group_role_order
+        else:
+            raise "Incorrect interface specified" #XXX make into object
 
         plugin = None
         for id in order.split(','):
@@ -382,7 +384,6 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             plugin._doDelUsers(localnames)
 
     def _createInitialUser(self):
-        return #TODO: Fix this so it aint bypassed
         """
         If there are no users or only one user in this user folder,
         populates from the 'inituser' file in INSTANCE_HOME.
@@ -392,6 +393,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         abuse of this mechanism.
         Called only by OFS.Application.initialize().
         """
+        return #TODO: Fix this so it aint bypassed
         if len(self.data) <= 1:
             info = readUserAccessFile('inituser')
             if info:

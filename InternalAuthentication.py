@@ -176,7 +176,8 @@ class InternalAuthenticationPlugin(SimpleItem):
             names = REQUEST.get('names')
             return self._delUsers(names,REQUEST)
 
-        return self.manage_main(self, REQUEST)
+        if REQUEST is not None:
+            return self.manage_main(self, REQUEST)
 
     #
     # Internal API
