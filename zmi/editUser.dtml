@@ -4,7 +4,7 @@
            form_title='Change User',
            help_product='OFSP',
            help_topic='User-Folder_Edit-User.stx'
-	   )">
+       )">
 
 <FORM ACTION="manage_users" METHOD="POST">
 <TABLE>
@@ -73,7 +73,7 @@ Roles
 <dtml-if expr="_vars['sequence-item'] != 'Authenticated'">
 <dtml-if expr="_vars['sequence-item'] != 'Anonymous'">
 <dtml-if expr="_vars['sequence-item'] != 'Shared'">
-<dtml-if expr="_vars['sequence-item'] in user.roles">
+<dtml-if expr="user.roles and _vars['sequence-item'] in user.roles">
 <OPTION VALUE="<dtml-var sequence-item html_quote>" selected><dtml-var 
  sequence-item>
 <dtml-else>
