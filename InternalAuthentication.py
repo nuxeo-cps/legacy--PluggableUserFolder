@@ -90,7 +90,7 @@ class InternalAuthenticationPlugin(SimpleItem):
         """Return the named user object or None"""
         user = self.data.get(name, None)
         if user:
-            user = user.__of__(self)
+            user = user.__of__(self.aq_parent)
         return user
 
     #
