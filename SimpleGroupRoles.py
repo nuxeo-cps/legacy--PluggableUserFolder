@@ -378,9 +378,9 @@ class SimpleGroupRolesPlugin(Folder):
         groups = self.getGroupsOnObject(object)
         for each in self.getAcquiredGroups(object):
             for group in each['groups']:
-                groups += group
+                groups += (group,)
         for group in groups:
-            for userid in group.getUsers():
+            for userid in self.getGroup(group).getUsers():
                 users[userid] = 1
         return users.keys()
 
