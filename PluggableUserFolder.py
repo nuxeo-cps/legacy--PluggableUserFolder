@@ -653,7 +653,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         """Modify an existing user.
 
         Only here for compatibility, just as _doAddUser.
-        """l
+        """
         plugins = self._get_plugins(IAuthenticationPlugin, include_readonly=0)
         plugins = self._sort_plugins(plugins, self.authentication_order)
         if not plugins: # TODO change to object exception
