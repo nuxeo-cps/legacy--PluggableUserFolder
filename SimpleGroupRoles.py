@@ -62,7 +62,7 @@ class SimpleGroup(SimpleItem):
         return self.title
 
     def getMembers(self):
-        return self.members
+        return tuple(self.members)
 
     getUsers = getMembers
 
