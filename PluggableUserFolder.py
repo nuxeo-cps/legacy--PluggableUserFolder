@@ -861,7 +861,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
 
         req = self.REQUEST
         resp = req['RESPONSE']
-        if self.login_page.startswith('http'):
+        if self.login_page.startswith('http://'):
             plugins = self._get_plugins(IIdentificationPlugin)
             plugins = self._sort_plugins(plugins, self.identification_order)
             params = {}
@@ -872,8 +872,9 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         else:
             iself = getattr(self, 'aq_inner', self)
             parent = getattr(iself, 'aq_parent', None)
-            page = getattr(parent, self.login_page, None)
-            if page is None:
+            try:
+                page = parent.unrestrictedTraverse(self.login_page)
+            except KeyError:
                 return None
             came_from = req.get('came_from', None)
             if came_from is None:
@@ -886,15 +887,16 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
     def getLogoutURL(self):
         if not self.logout_page:
             return None
-        if self.logout_page.startswith('http'):
+        if self.logout_page.startswith('http://'):
             return self.logout_page
         else:
             iself = getattr(self, 'aq_inner', self)
             parent = getattr(iself, 'aq_parent', None)
-            page = getattr(parent, self.logout_page, None)
-            if page is None:
+            try:
+                page = parent.unrestrictedTraverse(self.logout_page)
+            except KeyError:
                 return None
-            return page.absoulute_url()
+            return page.absolute_url()
 
     security.declarePublic('logout')
     def logout(self):

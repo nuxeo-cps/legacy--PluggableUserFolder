@@ -14,7 +14,8 @@ from Testing import ZopeTestCase
 from Testing.ZopeTestCase import _user_name, _user_role, _folder_name, \
     _standard_permissions, ZopeLite
 from AccessControl import Unauthorized
-
+from OFS.DTMLMethod import DTMLMethod
+from OFS.Folder import Folder
 
 from Products.PluggableUserFolder.PluggableUserFolder import \
     manage_addPluggableUserFolder, PluggableUserFolder
@@ -162,6 +163,57 @@ class TestUserFolder(TestBase):
         user = self.uf.getUser(_user_name)
         assert user.authenticate('secret', self.app.REQUEST)
 
+    def testGetLoginURL1(self):
+        self.uf.login_page = 'http://www.somehereelse.com/foo'
+        url = self.uf.getLoginURL()
+        # There are no params because no plugin that has params is
+        # created (that should be tested per plugin)
+        self.failUnlessEqual(url, 'http://www.somehereelse.com/foo?')
+
+    def testGetLoginURL2(self):
+        ob = DTMLMethod('', __name__='login_page')
+        self.folder._setObject('login_page', ob)
+        self.uf.login_page = 'login_page'
+        url = self.uf.getLoginURL()
+        self.failUnlessEqual(url, 'http://nohost/test_folder_1_/login_page?' \
+            'came_from=http%3A//nohost&retry=&disable_cookie_login__=1')
+
+        ob = Folder('folder2')
+        self.folder._setObject('folder2', ob)
+        ob = DTMLMethod('', __name__='login_page')
+        self.folder.folder2._setObject('login_page', ob)
+        self.uf.login_page = 'folder2/login_page'
+        url = self.uf.getLoginURL()
+        self.failUnlessEqual(url,
+            'http://nohost/test_folder_1_/folder2/login_page?' \
+            'came_from=http%3A//nohost&retry=&disable_cookie_login__=1')
+
+        self.uf.login_page = 'nologin_page'
+        self.failIf(self.uf.getLoginURL())
+
+    def testGetLogoutURL1(self):
+        self.uf.logout_page = 'http://www.somehereelse.com/foo'
+        self.failUnlessEqual(self.uf.getLogoutURL(),
+            'http://www.somehereelse.com/foo')
+
+    def testGetLogoutURL2(self):
+        ob = DTMLMethod('', __name__='logout_page')
+        self.folder._setObject('logout_page', ob)
+        self.uf.logout_page = 'logout_page'
+        url = self.uf.getLogoutURL()
+        self.failUnlessEqual(url, 'http://nohost/test_folder_1_/logout_page')
+
+        ob = Folder('folder2')
+        self.folder._setObject('folder2', ob)
+        ob = DTMLMethod('', __name__='logout_page')
+        self.folder.folder2._setObject('logout_page', ob)
+        self.uf.logout_page = 'folder2/logout_page'
+        url = self.uf.getLogoutURL()
+        self.failUnlessEqual(url,
+            'http://nohost/test_folder_1_/folder2/logout_page')
+
+        self.uf.logout_page = 'nologout_page'
+        self.failIf(self.uf.getLogoutURL())
 
 class TestAccess(TestBase):
     '''Test UF is protecting access'''
@@ -280,13 +332,13 @@ class TestInstallFolder(TestBase):
         self.assert_(hasattr(self.uf, 'basic_identification'))
 
 class TestCPSAPI(TestBase):
-        
+
     def testInterface(self):
         try:
             from Products.CPSDirectory.IUserFolder import IUserFolder
             self.assert_(verifyClass(IUserFolder, PluggableUserFolder))
         except ImportError:
-            pass     
+            pass
 
     def testSearchAPI(self):
         # test_user_1_ is already created. Create some more to test searching.
