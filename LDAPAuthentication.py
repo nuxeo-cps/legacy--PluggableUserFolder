@@ -21,7 +21,7 @@ __version__='$Revision$'[11:-2]
 
 from zLOG import LOG, DEBUG, ERROR
 
-from Globals import MessageDialog
+from Globals import MessageDialog, DTMLFile
 from Acquisition import aq_base
 from OFS.SimpleItem import SimpleItem
 
@@ -31,7 +31,6 @@ from Products.LDAPUserFolder.LDAPUserFolder import LDAPUserFolder
 class LDAPAuthenticationPlugin(LDAPUserFolder):
     """This plugin stores the user definitions in the ZODB"""
     meta_type = 'LDAP Authentication'
-    id = 'ldap_authentication'
     title = 'LDAP Authentication'
     isPrincipiaFolderish=0
     isAUserFolder=0
@@ -48,18 +47,28 @@ class LDAPAuthenticationPlugin(LDAPUserFolder):
         return 1
 
 
+addLDAPAuthenticationPlugin = DTMLFile('zmi/addLDAPAuthenticationPlugin', globals())
 
-def manage_addLDAPAuthenticationPlugin(self, REQUEST=None):
+def manage_addLDAPAuthenticationPlugin(self, id, title, LDAP_server, login_attr
+                            , users_base, users_scope, roles, groups_base
+                            , groups_scope, binduid, bindpwd, binduid_usage=1
+                            , rdn_attr='cn', local_groups=0, use_ssl=0
+                            , encryption='SHA', read_only=0, REQUEST=None
+                            ):
     """ """
-    ob=LDAPAuthenticationPlugin('LDAP Authentication', 'localhost', '', ''
-                , '', [], '', '', '', '', '', '')
+    ob=LDAPAuthenticationPlugin(title, LDAP_server, login_attr, users_base, users_scope
+                          , roles, groups_base, groups_scope, binduid, bindpwd
+                          , binduid_usage, rdn_attr, local_groups=local_groups
+                          , use_ssl=not not use_ssl, encryption=encryption
+                          , read_only=read_only, REQUEST=None)
+    ob.id = id
     self=self.this()
-    if hasattr(aq_base(self), ob.id):
+    if hasattr(aq_base(self), id):
         return MessageDialog(
             title  ='Item Exists',
-            message='This object already contains an %s' % id.title ,
+            message='This object already contains an item called %s' % id,
             action ='%s/manage_main' % REQUEST['URL1'])
-    self._setObject(ob.id, ob)
+    self._setObject(id, ob)
     if REQUEST is not None:
         REQUEST['RESPONSE'].redirect(self.absolute_url()+'/manage_main')
 

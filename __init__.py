@@ -73,7 +73,8 @@ def initialize(context):
         context.registerClass(
             instance_class=LDAPAuthentication.LDAPAuthenticationPlugin,
             permission=add_user_folders,
-            constructors=(LDAPAuthentication.manage_addLDAPAuthenticationPlugin,),
+            constructors=(LDAPAuthentication.addLDAPAuthenticationPlugin,
+                          LDAPAuthentication.manage_addLDAPAuthenticationPlugin,),
             icon='zmi/UserFolder_icon.gif',
             visibility=None,
         )
