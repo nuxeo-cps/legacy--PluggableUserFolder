@@ -59,6 +59,9 @@ class LDAPLoginPlugin(LDAPUserFolder):
         return []
 
     def getUser(self, name, password=None):
+        # XXX There is a bug in here somehere, that makes this plugin
+        # Return users that are not defined in the user folder, but in
+        # Higher level user folders. 
         if password is None:
             return None
         elif self.acl_users.getUser(name) is None:
