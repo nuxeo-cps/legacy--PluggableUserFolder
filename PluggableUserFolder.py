@@ -211,18 +211,14 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
 
 
     def identify(self, auth):
-        LOG('identify', ERROR, "#%s@" % auth)
         plugins = self._get_plugins(IIdentificationPlugin)
-        LOG('validate', ERROR, str(plugins))
         for plugin in plugins:
             if plugin.canIdentify(auth):
                 return plugin.identify(auth)
         return None, None
 
     def validate(self, request, auth='', roles=_noroles):
-        LOG('validate', ERROR, str( (request, auth, roles)))
         plugins = self._get_plugins(IIdentificationPlugin)
-        LOG('validate', ERROR, str(plugins))
         for plugin in plugins:
             auth = plugin.makeAuthenticationString(request, auth)
             if auth is not None:
