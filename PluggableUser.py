@@ -40,6 +40,9 @@ class PluggableUserMixin:
         """Return the list of roles assigned to a user."""
         LOG('PluggableUser', DEBUG, 'getRoles',
             'User: %s\n' % self.getId())
+        LOG('========================================', DEBUG, type(self))
+        from Acquisition import aq_base
+        LOG('========================================', DEBUG, type(aq_base(self)))
         plugins = self.acl_users._get_plugins(IRolePlugin)
         # plugins = self._sort_plugins(plugins, self.role_order)
         roles = self.roles[:] # Make sure it's a copy, and not the original
@@ -184,17 +187,5 @@ class PluggableUser(PluggableUserMixin, User):
     pass
 
 
-class PluggableUserWrapper(PluggableUserMixin):
-
-    def __init__(self, userobject):
-        self.__user_object = userobject
-
-    def __of__(self, parent):
-        return Acquisition.ImplicitAcquisitionWrapper(self, parent)
-
-    def __getattr__(self, name):
-        if hasattr(self.__user_object, name):
-            LOG('PluggableUserWrapper', -300, 'Wrap for ' + str(name))
-            return getattr(self.__user_object, name)
-        raise AttributeError('%s has no attribute %s' % \
-            (str(self.__user_object), str(name)))
+class PluggableUserWrapper(PluggableUserMixin, Acquisition.Implicit):
+    pass
