@@ -24,6 +24,7 @@ __version__ = '$Revision$'[11:-2]
 # so don't remove them even though they are unused.
 from zLOG import LOG, DEBUG, BLATHER, INFO, PROBLEM, WARNING, ERROR
 import os
+from urllib import quote, unquote
 if os.environ.get("ZOPE_PLUGGABLE_LOGGING", None) == "OFF":
     def LOG(*args, **kw):
         pass
@@ -34,6 +35,8 @@ from AccessControl import ClassSecurityInfo, Permissions
 from AccessControl.User import BasicUserFolder, _noroles
 from AccessControl.Role import RoleManager, DEFAULTMAXLISTUSERS
 from AccessControl.PermissionRole import rolesForPermissionOn
+from ZPublisher import BeforeTraverse
+from ZPublisher.HTTPRequest import HTTPRequest
 
 from OFS.ObjectManager import ObjectManager
 from OFS.SimpleItem import Item
@@ -67,7 +70,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
     identification_order = 'basic_identification'
     authentication_order = 'internal_authentication'
     group_role_order = ''
-
+    login_page = ''
     encrypt_passwords = 0
 
     manage_options = (
@@ -198,6 +201,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
                                        identification_order='',
                                        authentication_order='',
                                        group_role_order='',
+                                       login_page=None,
                                        REQUEST=None):
         """
         Sets the properties of the user folder.
@@ -237,6 +241,9 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             self.maxlistusers = maxlistusers
             message = message + 'Saved Changes.\n'
 
+        if self.login_page is not None:
+            self.login_page=login_page
+        
         if REQUEST is not None:
             return self.manage_userFolderProperties(
                 REQUEST, manage_tabs_message=message)
@@ -764,6 +771,100 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
                 'User %s NOT validated\n' % name)
             return None
 
+    #
+    # Login page forwarding support
+    #
+    def __call__(self, container, req):
+        '''The __before_publishing_traverse__ hook.'''
+        #import pdb;pdb.set_trace()
+        resp = self.REQUEST['RESPONSE']
+        if req.__class__ is not HTTPRequest:
+            return
+        if not req[ 'REQUEST_METHOD' ] in ( 'HEAD', 'GET', 'PUT', 'POST' ):
+            return
+        if req.environ.has_key( 'WEBDAV_SOURCE_PORT' ):
+            return
+        if req.get('disable_login_page__', 0):
+            return
+        # Modify the "unauthorized" response.
+        req._hold(ResponseCleanup(resp))
+        resp.unauthorized = self.unauthorized
+        resp._unauthorized = self._unauthorized
+
+    def _cleanupResponse(self):
+        resp = self.REQUEST['RESPONSE']
+        # No errors of any sort may propagate, and we don't care *what*
+        # they are, even to log them.
+        try: del resp.unauthorized
+        except: pass
+        try: del resp._unauthorized
+        except: pass
+        return resp
+
+    security.declarePrivate('unauthorized')
+    def unauthorized(self):
+        resp = self._cleanupResponse()
+        # Redirect if desired.
+        url = self.getLoginURL()
+        if url is not None:
+            raise 'Redirect', url
+        # Fall through to the standard unauthorized() call.
+        resp.unauthorized()
+
+    def _unauthorized(self):
+        resp = self._cleanupResponse()
+        # If we set the auth cookie before, delete it now.
+        # Redirect if desired.
+        url = self.getLoginURL()
+        if url is not None:
+            resp.redirect(url, lock=1)
+            # We don't need to raise an exception.
+            return
+        # Fall through to the standard _unauthorized() call.
+        resp._unauthorized()
+
+    security.declarePublic('getLoginURL')
+    def getLoginURL(self):
+        '''
+        Redirects to the login page.
+        '''
+        if self.login_page:
+            req = self.REQUEST
+            resp = req['RESPONSE']
+            iself = getattr(self, 'aq_inner', self)
+            parent = getattr(iself, 'aq_parent', None)
+            page = getattr(parent, self.login_page, None)
+            if page is not None:
+                retry = getattr(resp, '_auth', 0) and '1' or ''
+                came_from = req.get('came_from', None)
+                if came_from is None:
+                    came_from = req['URL']
+                url = '%s?came_from=%s&retry=%s&disable_cookie_login__=1' % (
+                    page.absolute_url(), quote(came_from), retry)
+                return url
+        return None
+
+    # Installation and removal of traversal hooks.
+
+    def manage_beforeDelete(self, item, container):
+        if item is self:
+            handle = self.meta_type + '/' + self.getId()
+            BeforeTraverse.unregisterBeforeTraverse(container, handle)
+
+    def manage_afterAdd(self, item, container):
+        if item is self:
+            handle = self.meta_type + '/' + self.getId()
+            container = container.this()
+            nc = BeforeTraverse.NameCaller(self.getId())
+            BeforeTraverse.registerBeforeTraverse(container, nc, handle)
+    
+    security.declareProtected(Permissions.manage_users, 'manage_registerTraverseHook')
+    def manage_registerTraverseHook(self, REQUEST):
+        """Registers the traverse hook for login page redirection."""
+        self.manage_afterAdd(self, self.aq_parent)
+        if REQUEST is not None:
+            return "TraverseHook Registered"
+
 
 def manage_addPluggableUserFolder(self, REQUEST=None):
     """ """
@@ -779,3 +880,19 @@ def manage_addPluggableUserFolder(self, REQUEST=None):
 
     if REQUEST is not None:
         REQUEST['RESPONSE'].redirect(self.absolute_url()+'/manage_main')
+
+class ResponseCleanup:
+    def __init__(self, resp):
+        self.resp = resp
+
+    def __del__(self):
+        # Free the references.
+        #
+        # No errors of any sort may propagate, and we don't care *what*
+        # they are, even to log them.
+        try: del self.resp.unauthorized
+        except: pass
+        try: del self.resp._unauthorized
+        except: pass
+        try: del self.resp
+        except: pass
