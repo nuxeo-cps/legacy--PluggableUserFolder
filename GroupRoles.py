@@ -131,10 +131,14 @@ class GroupRolesPlugin(Folder):
                              'label':'Local Groups',
                              'type': 'form',
                              'action':'manage_localGroupsForm'},
-                             {'id':'LocalGroupsChange',
-                             'label':'Local Groups Change',
+                             {'id':'ApplyGroups',
+                             'label':'Apply Groups',
                              'type': 'method',
-                             'action':'manage_localGroupsChange'},
+                             'action':'applyGroups'},
+                             {'id':'UnapplyGroups',
+                             'label':'Unapply Groups',
+                             'type': 'method',
+                             'action':'unapplyGroups'},
                              {'id':'SetGroups',
                              'label':'SetGroups',
                              'type': 'method',
@@ -145,7 +149,7 @@ class GroupRolesPlugin(Folder):
                              'action':'getGroupsOnObject'},
                            )
     #
-    # ZMI
+    # ZMI methods for the GroupPlugin
     #
 
     manage_groupsForm = DTMLFile('zmi/groupRolesGroups', globals())
@@ -171,11 +175,29 @@ class GroupRolesPlugin(Folder):
         if REQUEST is not None:
             REQUEST['RESPONSE'].redirect(self.absolute_url()+'/manage_workspace')
 
-    def manage_localGroupsChange(self, applied_groups=[], REQUEST=None):
+    #
+    # ZMI methods patched into RoleManager
+    #
+
+    def applyGroups(self, apply_groups=[], REQUEST=None):
         """Sets which groups should be applied locally"""
-        self.manage_groupRolesSetGroups(applied_groups)
+        groups = self.manage_groupRolesGetGroups()
+        for group in apply_groups:
+            if group not in groups:
+                groups.append(group)
+        self.manage_groupRolesSetGroups(groups)
         if REQUEST is not None:
-            return self.manage_groupRolesLocalGroups(mabage_tabs_message='Settings changed.')
+            return self.manage_groupRolesLocalGroups(manage_tabs_message='Groups Applied.')
+
+    def unapplyGroups(self, unapply_groups=[], REQUEST=None):
+        """Sets which groups should be applied locally"""
+        groups = self.manage_groupRolesGetGroups()
+        for group in unapply_groups:
+            if group in groups:
+                groups.remove(group)
+        self.manage_groupRolesSetGroups(groups)
+        if REQUEST is not None:
+            return self.manage_groupRolesLocalGroups(manage_tabs_message='Groups removed.')
 
     def getGroupsOnObject(self, object=None):
         if object is None:
@@ -201,10 +223,10 @@ class GroupRolesPlugin(Folder):
                 result.append( {'obj': inner_obj, 'groups': groups})
         return result
 
-
     #
     # API
     #
+    
     def getGroupIds(self):
         return self.objectIds('Group')
 
