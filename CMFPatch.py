@@ -102,14 +102,7 @@ if not _cmf_localroles_patch:
             return result
 
         def _listAllowedRolesAndUsers(self, user):
-            aclu = self.acl_users
-            if hasattr(aclu, '_getAllowedRolesAndUsers'):
-                return aclu._getAllowedRolesAndUsers(user)
-            return CatalogTool.old_listAllowedRolesAndUsers(self, user)
-
-        if not hasattr(CatalogTool, 'old_listAllowedRolesAndUsers'):
-            CatalogTool.old_listAllowedRolesAndUsers = CatalogTool._listAllowedRolesAndUsers
-
+            return _getAllowedRolesAndUsers(user)
         CatalogTool._listAllowedRolesAndUsers = _listAllowedRolesAndUsers
 
     except ImportError:
