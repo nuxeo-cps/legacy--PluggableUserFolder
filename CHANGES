@@ -10,7 +10,7 @@ Bug fixes:
 ~~~~~~~~~~
 - SimpleGroupsRoles has some bugs in the getUsersWithRoles method.
 
-- PluggableUser now assd the 'user:' prefix in the right
+- PluggableUser now adds the 'user:' prefix in the right
   places to be compatible with CMF/CPS.
 
 New internal features:
