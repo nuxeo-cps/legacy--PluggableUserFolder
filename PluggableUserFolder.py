@@ -152,7 +152,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             if not plugins:
                 # TODO: make into a more specific object
                 raise Exception("There are no %s plugins" % str(interface))
-            pligin = plugins[0]
+            plugin = plugins[0]
         return plugin
 
     # ----------------------------------
