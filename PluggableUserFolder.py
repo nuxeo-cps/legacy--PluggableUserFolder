@@ -387,6 +387,11 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         portal = self.aq_inner.aq_parent
         portal._addRole(role)
 
+    def userFolderDelRoles(self, rolenames):
+        """Delete roles"""
+        portal = self.aq_inner.aq_parent
+        portal._delRoles(rolenames, None)
+
     def getRoleManagementOptions(self, types=['form']):
         options = []
         for plugin in self._get_plugins(IRolePlugin):

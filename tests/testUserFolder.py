@@ -335,6 +335,7 @@ class TestCPSAPI(TestBase):
         self.uf.userFolderAddRole(_user_role2)
         self.uf.setRolesOfUser((_user_role, _user_role2), _user_name)
         self.uf.setUsersOfRole((_user_name, _user_name2), _user_role)
+        self.assert_(_user_role2 in self.folder.userdefined_roles())
         roles = list(self.uf.getUser(_user_name).getRoles())
         roles.sort()
         self.assertEquals(roles, ['Authenticated', _user_role, _user_role2])
@@ -343,6 +344,8 @@ class TestCPSAPI(TestBase):
         self.assertEquals(owners, [_user_name, _user_name2])
         f = self.uf.getUsersOfRole(_user_role2)
         self.assertEquals(f, [_user_name])
+        self.uf.userFolderDelRoles((_user_role2,))
+        self.assert_(_user_role2 not in self.folder.userdefined_roles())
 
 
     def testCPSGroupAPI(self):
