@@ -203,12 +203,12 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
     # We need an interface for group objects, for example
     # and role plugins must tell us if they are group plugins.
     # change to get GroupIds and set up alias.
-    security.declareProtected(ManageUsers, 'userFolderAddGroup')
+    security.declareProtected(Permissions.manage_users, 'userFolderAddGroup')
     def userFolderAddGroup(self, groupname, **kw):
         """Creates a group"""
         pass
 
-    security.declareProtected(ManageUsers, 'userFolderDelGroups')
+    security.declareProtected(Permissions.manage_users, 'userFolderDelGroups')
     def userFolderDelGroups(self, groupnames):
         """Deletes groups"""
         pass
@@ -323,7 +323,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         NB! If one user name exists in several plugins, it will be deleted
         in ALL plugins!
         """
-        plugins = self._get_plugins(IAuthenticationPlugin)
+        plugins = self._get_plugins(IAuthenticationPlugin, include_readonly=0)
         plugins = self._sort_plugins(plugins, self.authentication_order)
         if not plugins: # TODO change to object exception
             raise 'Can not delete user(s). All Authentication plugins are read-only.'
