@@ -1,0 +1,58 @@
+#
+#    Translators, if you are not familiar with the PO format, gettext
+#    documentation is worth reading, especially sections dedicated to
+#    this format, e.g. by running:
+#         info -n '(gettext)PO Files'
+#         info -n '(gettext)Header Entry'
+#    Some information specific to po-debconf are available at
+#            /usr/share/doc/po-debconf/README-trans
+#         or http://www.debian.org/intl/l10n/po-debconf/README-trans#
+#    Developers do not need to manually edit POT or PO files.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: zope-pluggableuserfolder-2.3.1-1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2003-06-27 15:22+0200\n"
+"PO-Revision-Date: 2003-07-01 10:58+0200\n"
+"Last-Translator: Michel Grentzinger <mic.grentz@online.fr>\n"
+"Language-Team: French <debian-l10n-french@lists.debian.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-15\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Choices
+#: ../templates:3
+msgid "configuring, end, manually"
+msgstr "lors de la configuration, à la fin, manuellement"
+
+#. Description
+#: ../templates:5
+msgid "When do you like to restart Zope?"
+msgstr "Quand souhaitez-vous redémarrer Zope ?"
+
+#. Description
+#: ../templates:5
+msgid ""
+"Zope has an extensible, object oriented structure that allows you to easily "
+"add extra components (products) or features. Each product or feature can "
+"usually be found in packages whose name starts with `zope-' prefix. "
+"Unfortunately, Zope needs to restart to use any new add-on. Here you can "
+"choose a common way to restart Zope:\n"
+" * configuring: each product will restart Zope while configuring.\n"
+" * end: Zope will restart only once at the end of the whole\n"
+"        installation/upgrading process.\n"
+" * manually: You will have to restart Zope."
+msgstr ""
+"Zope comporte une structure extensible orientée objet qui vous permet "
+"d'ajouter facilement des parties (produits) ou des fonctionnalités "
+"supplémentaires. Chacune d'entre elles peut généralement être fournie dans "
+"des paquets dont le nom commence par le préfixe « zope- ». Malheureusement, "
+"Zope a besoin d'être redémarré afin d'utiliser ces nouveaux ajouts. Vous "
+"pouvez choisir ici la manière de redémarrer Zope :\n"
+" - lors de la configuration : chaque produit redémarrera Zope lors de\n"
+"                              sa configuration ;\n"
+" - à la fin                 : Zope redémarrera uniquement lorsque le \n"
+"                              processus d'installation ou de mise à niveau\n"
+"                              sera terminé ;\n"
+" - manuellement             : vous devrez redémarrer Zope vous-même."

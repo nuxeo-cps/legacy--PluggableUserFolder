@@ -1,0 +1,23 @@
+Source: zope-pluggableuserfolder
+Section: web
+Priority: extra
+Maintainer: Encolpe DEGOUTE <encolpe@colpi.info>
+Build-Depends: debhelper (>= 4.0.0)
+Standards-Version: 3.6.0
+
+Package: zope-pluggableuserfolder
+Architecture: all
+Depends: debconf, zope
+Suggests: zope-cmfcps
+Description: A Zope UserFolder with authentication plugins
+ PluggableUserFolder is a Zope user folder that is designed to be
+ extensible in all ways. It supports extending via "plugins"to add
+ support both for ways of identifying the users, such as using
+ cookies instead of Basic HTTP Authentication, and adding new
+ sources of users, such as LDAP or SQL sources, and also extending
+ the role management, such as group support and black lists.
+ .
+ It also supports using all of these simultaneously. You can have users
+ defined in Zope, in an SQL database and via LDAP, all at once. You can
+ have groups and blacklists at the same time. You can support cookies
+ and SSL Certificates without problems.

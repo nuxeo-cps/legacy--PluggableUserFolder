@@ -1,0 +1,49 @@
+#
+#    Translators, if you are not familiar with the PO format, gettext
+#    documentation is worth reading, especially sections dedicated to
+#    this format, e.g. by running:
+#         info -n '(gettext)PO Files'
+#         info -n '(gettext)Header Entry'
+#
+#    Some information specific to po-debconf are available at
+#            /usr/share/doc/po-debconf/README-trans
+#         or http://www.debian.org/intl/l10n/po-debconf/README-trans
+#
+#    Developers do not need to manually edit POT or PO files.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2003-06-27 15:22+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Choices
+#: ../templates:3
+msgid "configuring, end, manually"
+msgstr ""
+
+#. Description
+#: ../templates:5
+msgid "When do you like to restart Zope?"
+msgstr ""
+
+#. Description
+#: ../templates:5
+msgid ""
+"Zope has an extensible, object oriented structure that allows you to easily "
+"add extra components (products) or features. Each product or feature can "
+"usually be found in packages whose name starts with `zope-' prefix. "
+"Unfortunately, Zope needs to restart to use any new add-on. Here you can "
+"choose a common way to restart Zope:\n"
+" * configuring: each product will restart Zope while configuring.\n"
+" * end: Zope will restart only once at the end of the whole\n"
+"        installation/upgrading process.\n"
+" * manually: You will have to restart Zope."
+msgstr ""

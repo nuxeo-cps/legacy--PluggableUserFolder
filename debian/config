@@ -1,0 +1,14 @@
+#!/bin/sh -e
+
+pkg=$(basename $0 | sed 's/\.config//')
+
+. /usr/share/debconf/confmodule
+
+db_version 2.0
+db_capb backup
+
+db_input low "${pkg}/postinst" || true
+db_go
+
+db_stop
+exit 0

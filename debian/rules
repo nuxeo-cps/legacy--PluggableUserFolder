@@ -1,0 +1,54 @@
+#!/usr/bin/make -f
+# Sample debian/rules that uses debhelper.
+# GNU copyright 1997 to 1999 by Joey Hess.
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+# This is the debhelper compatability version to use.
+PACKAGE = zope-pluggableuserfolder
+PRODUCT = PluggableUserFolder
+debian = debian/$(PACKAGE)
+INSTDIR = $(debian)/usr/share/zope/Products
+DOCDIR = $(debian)/usr/share/doc/$(PACKAGE)
+
+build: build-stamp
+build-stamp:
+	dh_testdir
+	touch build-stamp
+
+clean:
+	dh_testdir
+	rm -f build-stamp configure-stamp
+	dh_clean
+
+install: build
+	dh_testdir
+	dh_clean -k
+	dh_installdirs
+	rm -f build-stamp configure-stamp
+
+	find . -type f -not \( \
+		-path './debian/*' -or\
+		-path '*/CVS/*' \
+		\) -exec install -D -m 644 {} $(INSTDIR)/{} \;
+
+	touch build-stamp configure-stamp
+
+binary-indep: build install
+	dh_testdir
+	dh_testroot
+	dh_installdebconf
+	dh_installdocs -A doc/* -XCVS 
+	dh_installexamples
+	dh_installchangelogs HISTORY
+	dh_link
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep
+.PHONY: build clean binary-indep binary install

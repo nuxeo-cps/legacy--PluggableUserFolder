@@ -1,0 +1,14 @@
+Template: shared/zope/restart
+Type: select
+_Choices: configuring, end, manually
+Default: end
+_Description: When do you like to restart Zope?
+ Zope has an extensible, object oriented structure that allows you to
+ easily add extra components (products) or features. Each product or
+ feature can usually be found in packages whose name starts with `zope-'
+ prefix. Unfortunately, Zope needs to restart to use any new add-on. Here
+ you can choose a common way to restart Zope:
+  * configuring: each product will restart Zope while configuring.
+  * end: Zope will restart only once at the end of the whole
+         installation/upgrading process.
+  * manually: You will have to restart Zope.
