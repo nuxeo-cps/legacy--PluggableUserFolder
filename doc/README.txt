@@ -39,14 +39,14 @@ PluggableUserFolder: A Zope UserFolder with authentication plugins
 
     Zope out of the box also supports only Basic HTTP Authentication. CMF adds
     identification through Cookies with the CookieCrumbler product. It's using
-    a rather ugly, but well-working method of faking a Basic HTTP Authentication
-    header in the REQUEST object. It's possible to add new Identification methods
-    in a similar way, if needed. However, the BasicUserFolder of Zope has an
-    interface to let UserFolders handle identifications without this kind of
-    REQUEST header, and it would therefore be possible to as a later stage add
-    plugins for identification as well, thereby letting site administrators mix
-    several types of identification schemes as needed, in an easy and predictable
-    way.
+    a rather ugly, but well-working method of faking a Basic HTTP
+    Authentication header in the REQUEST object. It's possible to add new
+    Identification methods in a similar way, if needed. However, the
+    BasicUserFolder of Zope has an interface to let UserFolders handle
+    identifications without this kind of REQUEST header, and it would therefore
+    be possible to as a later stage add plugins for identification as well,
+    thereby letting site administrators mix several types of identification
+    schemes as needed, in an easy and predictable way.
 
 
 
