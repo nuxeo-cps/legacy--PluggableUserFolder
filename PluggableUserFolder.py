@@ -142,7 +142,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         if interface == IAuthenticationPlugin:
             order = self.authentication_order
         elif interface == IIdentificationPlugin:
-            order = self.identificatio_order
+            order = self.identification_order
         elif interface == IRolePlugin:
             order = self.group_role_order
         elif interface == IGroupPlugin:
