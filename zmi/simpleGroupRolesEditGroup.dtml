@@ -1,0 +1,81 @@
+<dtml-var manage_page_header>
+<dtml-var manage_tabs>
+<p>
+
+<form action="&dtml-URL1;" method="post">
+<table cellspacing="0" cellpadding="2" border="0">
+
+<tr>
+  <td valign="center" class="form-label">
+    Title
+  </td>
+  <td valign="center" class="form-element">
+    <input type="text" name="title" value="&dtml-title;">
+  </td>
+</tr>
+<tr>
+  <td>&nbsp;</td>
+  <td class="form-element" colspan="5">
+    <input class="form-element" type="submit" name="manage_editSettings:method"
+        value="Change properties" />
+  </td>
+</tr>
+</table>
+</form>
+<p>&nbsp;</p>
+
+<form action="&dtml-URL1;" method="post">
+<table cellspacing="0" cellpadding="2" border="0">
+<tr>
+  <td>&nbsp;</td>
+  <td class="form-label">userid</td>
+</tr>
+<dtml-in getMembers prefix="user">
+  <tr <dtml-if sequence-odd>bgcolor="#CCCCCC"</dtml-if>>
+    <td>
+       <input type="checkbox" name="selected:list" value="&dtml-user_item;">
+    </td>
+    <td>
+       <dtml-var user_item>
+    </td>
+  </tr>
+</dtml-in>
+<tr>
+  <td>&nbsp;</td>
+  <td class="form-element" colspan="5">
+    <input class="form-element" type="submit" name="manage_deleteUsers:method"
+        value="Delete user" />
+  </td>
+</tr>
+</table>
+<p>&nbsp;</p>
+
+<table cellspacing="0" cellpadding="2" border="0">
+<tr>
+  <td class="form-label">New user</td>
+  <td class="form-element">
+    <select multiple name="userids:list">
+      <dtml-in "acl_users.getUserNames()" prefix="user">
+        <dtml-if "user_item not in getMembers()">
+          <option value="&dtml-user_item;"><dtml-var user_item></option>
+        </dtml-if>
+      </dtml-in>
+    </select>
+  </td>
+</tr>
+
+<tr>
+  <td>&nbsp;</td>
+  <td class="form-element">
+    <input class="form-element" type="submit" name="manage_addUser:method"
+        value="Add User" />
+  </td>
+</tr>
+
+</table>
+
+
+</form>
+
+<dtml-var manage_page_footer>
+

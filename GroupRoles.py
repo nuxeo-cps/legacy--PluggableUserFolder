@@ -139,7 +139,7 @@ class GroupRolesPlugin(Folder):
     __implements__ = (IGroupPlugin,IRolePlugin)
 
     meta_type = 'Group Roles Plugin'
-    id = 'group_roles'
+    id = 'groups'
     title = 'Group Roles'
     plugin_id = 'groupRoles'
 

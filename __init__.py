@@ -26,6 +26,7 @@ import BasicIdentification
 import ApacheSSLIdentification
 import CookieIdentification
 import GroupRoles
+import SimpleGroupRoles
 
 try:
     import LDAPAuthentication
@@ -86,6 +87,14 @@ def initialize(context):
         visibility=None,
     )
     registerRolePlugin(GroupRoles.GroupRolesPlugin)
+    context.registerClass(
+        instance_class=SimpleGroupRoles.SimpleGroupRolesPlugin,
+        permission=add_user_folders,
+        constructors=(SimpleGroupRoles.manage_addSimpleGroupRolesPlugin,),
+        icon='zmi/UserFolder_icon.gif',
+        visibility=None,
+    )
+    registerRolePlugin(SimpleGroupRoles.SimpleGroupRolesPlugin)
 
     if LdapSupport:
         context.registerClass(
