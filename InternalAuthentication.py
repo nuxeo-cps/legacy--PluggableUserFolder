@@ -20,6 +20,7 @@
 __doc__ = '''Internal Authentication Plugin'''
 __version__ = '$Revision$'[11:-2]
 
+from PluggableUser import LOG, DEBUG
 from types import StringType
 from Globals import DTMLFile, MessageDialog
 from Acquisition import aq_base, aq_parent
@@ -131,6 +132,8 @@ class InternalAuthenticationPlugin(SimpleItem):
                     continue
                 if not entry.has_key(key):
                     return 0
+                if value == '*':
+                    return 1
                 searched = entry[key]
                 if searched is None:
                     return 0
@@ -171,6 +174,7 @@ class InternalAuthenticationPlugin(SimpleItem):
                     if entry.has_key(key):
                         d[key] = entry[key]
                 res.append((id, d))
+
         return res
 
     #

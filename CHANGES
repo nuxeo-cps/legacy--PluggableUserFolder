@@ -6,7 +6,8 @@ New features:
 -
 Bug fixes:
 ~~~~~~~~~~
--
+- Compatibility with LDAPUserGroupsFolder was buggy.
+- InternalAuthentication search did not handle '*' searches
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -
