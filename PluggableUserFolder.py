@@ -900,10 +900,11 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
 
     security.declarePublic('logout')
     def logout(self):
+        """Log out"""
         plugins = self._get_plugins(IIdentificationPlugin)
         for each in plugins:
             each._logout()
-            self.REQUEST.RESPONSE.redirect(self.logout_page)
+
         url = self.getLogoutURL()
         if url:
             self.REQUEST.RESPONSE.redirect(url)
