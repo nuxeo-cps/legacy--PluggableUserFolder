@@ -1,3 +1,20 @@
+zope-pluggableuserfolder (2.4.0) unstable; urgency=low
+
+  * New features:
+    - PluggableUser now implements property handling (needed for CPS3)
+    - The LDAPAuthenticationPlugin is now read/write.
+  * Bug fixes:
+    - Compatibility with LDAPUserGroupsFolder was buggy.
+    - InternalAuthentication search did not handle '*' searches.
+    - Group plugins can now delete groups!
+    - Doing a CPSDirectory search on members now work again.
+    - Searching in roles now work again.
+    - Role oplugins are no longer required to take care of inheritance
+      themselves. This is probably inefficient, but makes for neater code.
+
+
+ -- Encolpe DEGOUTE <encolpe@colpi.info>  Mon, 15 Mar 2004 15:33:27 +0100
+
 zope-pluggableuserfolder (2.3.1-1) unstable; urgency=low
 
   * Initial Release.
