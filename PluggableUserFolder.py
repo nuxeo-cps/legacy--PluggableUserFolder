@@ -479,7 +479,6 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             # There are only readonly authentication plugins.
             # Create an internal authetication plugin
             try:
-                from InternalAuthentication import InternalAuthenticationPlugin
                 iaplug = InternalAuthenticationPlugin()
                 self._setObject(iaplug.getId(), iaplug)
             except ImportError:
