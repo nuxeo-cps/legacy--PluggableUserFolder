@@ -1,4 +1,35 @@
 *******************************************
+** PluggableUserFolder V2.0.0 [R1 build 2003-09/15-16:30 by regebro]
+
+ZODB Requires:
+~~~~~~~~~~~~~~
+- Having NuxUserGroups / UserFolderWithGroups installed together
+  with PluggableUserFolder is no longer supported.
+
+New features:
+~~~~~~~~~~~~~
+- Full group plugins support.
+- A SimpleGroups plugin that works as most Zope groups.
+- CPS support for Simple Groups, giving PluggableUserFolder equal CPS
+  functionality as UserFolderWithGroups
+
+Bug fixes:
+~~~~~~~~~~
+- Fix copyright attribution
+
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+- All modules now take their logging imports from PluggableUserFolder.
+  If you set the environment variable ZOPE_PLUGGABLE_LOGGING to OFF it
+  will in turn replace the LOG() method with a method of it's own that
+  simply passes on everything, so no logging happens.
+  This way, you can use PluggableUserFolder and have the log level
+  set to debug without PluggableUserFolder drowning out your DEBUG
+  messages.
+- A new object PluggableUserWrapper is created. This is used when you want
+  to wrap an existing UserFolder that uses it's own user classes, like
+  LDAPUserFolder. 
+*******************************************
 ** PluggableUserFolder V1.4.1 [R1 build 2003-08/28-13:03 by regebro]
 
 ZODB Requires:
