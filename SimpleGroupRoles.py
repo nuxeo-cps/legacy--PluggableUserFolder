@@ -316,6 +316,17 @@ class SimpleGroupRolesPlugin(Folder):
             (user, role, str(self.userHasLocalRole(user, object, role))))
         return self.userHasLocalRole(user, object, role)
 
+    def getUsersWithRoles(self, object=None):
+        if object is None:
+            object = self
+        users = {}
+        groups = self.getGroupsOnObject(object) + \
+                 tuple(self.getAcquiredGroups(object))
+        for group in groups:
+            for userid in group.getMembers():
+                users[userid] = 1
+        return users.keys()
+
 
 def manage_addSimpleGroupRolesPlugin(self, REQUEST=None):
     """ """

@@ -349,7 +349,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             str(options) + '\n')
         return options
 
-    def mergedLocalRoles(object):
+    def mergedLocalRoles(self, object):
         """Returns all local roles valid for an object"""
         LOG('PluggableUserFolder', 0, 'mergedLocalRoles()')
         merged = {}
@@ -360,8 +360,9 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
                 if callable(dict): dict = dict()
                 for user, roles in dict.items():
                     if not merged.has_key(user):
-                        merged[user] = []
-                    merged[user].extend(list(roles))
+                        merged[user] = {}
+                    for role in roles:
+                        merged[user][role] = 1
 
             inner = getattr(innerobject, 'aq_inner', innerobject)
             parent = getattr(inner, 'aq_parent', None)
@@ -375,11 +376,17 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             break
 
         # deal with groups
-        for user, roles in merged.items():
-            merged[user] = modifyLocalRoles(user, object, roles)
+        plugins = self._get_plugins(IRolePlugin)
+        for plugin in plugins:
+            for user in plugin.getUsersWithRoles():
+                if user not in merged.keys():
+                    merged[user] = {}
 
+        for plugin in plugins:
+            for user, roles in merged.items():
+                merged[user] = plugin.modifyLocalRoles(user, object,
+                                    roles.keys())
         return merged
-
 
     # ----------------------------------
     # Private methods

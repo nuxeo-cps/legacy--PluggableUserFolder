@@ -41,8 +41,15 @@ try:
         When called with withgroups=1, the keys are
         of the form user:foo and group:bar."""
 
-        # withgroups are currently ignored
-        return object.acl_users.mergedLocalRoles(object)
+        merged = object.acl_users.mergedLocalRoles(object)
+        if withgroups:
+            result = {}
+            for user, roles in merged.items():
+                result['user:'+user] = roles
+            merged = result
+        return merged
+
+    utils._mergedLocalRoles = mergedLocalRoles
     utils.mergedLocalRoles = mergedLocalRoles
 
 
