@@ -1,4 +1,3 @@
 
   o Add form for LDAP plugin to be able to have several LDAP plugins
-  o Decide plugin order with properties
   o Group support

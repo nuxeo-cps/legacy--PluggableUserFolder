@@ -1,4 +1,19 @@
 *******************************************
+** PluggableUserFolder V1.2.0 [R1 build 2003-06/13-14:21 by regebro]
+
+ZODB Requires:
+~~~~~~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+-
+Bug fixes:
+~~~~~~~~~~
+-
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+-
+*******************************************
 ** PluggableUserFolder V1.1.0 [R1 build 2003-06/13-12:19 by regebro]
 
 ZODB Requires:

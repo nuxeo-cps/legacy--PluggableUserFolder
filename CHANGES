@@ -3,7 +3,7 @@ ZODB Requires:
 -
 New features:
 ~~~~~~~~~~~~~
--
+- Support for setting the call order of plugins
 Bug fixes:
 ~~~~~~~~~~
 -
