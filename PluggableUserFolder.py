@@ -23,7 +23,7 @@ from zLOG import LOG, DEBUG, ERROR
 
 from Globals import DTMLFile, MessageDialog
 from Acquisition import aq_base, aq_parent
-from AccessControl import ClassSecurityInfo
+from AccessControl import ClassSecurityInfo, Permissions
 from AccessControl.User import BasicUserFolder, _noroles
 from AccessControl.Role import RoleManager, DEFAULTMAXLISTUSERS
 from OFS.ObjectManager import ObjectManager
@@ -37,6 +37,7 @@ from BasicIdentification import BasicIdentificationPlugin
 # user storages that check the password as a part of
 # identification and user retrieval
 _no_password_check=[]
+_marker = []
 
 class PluggableUserFolder(ObjectManager, BasicUserFolder):
     """A user folder with plugins
@@ -93,15 +94,21 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         return ()
 
     def _get_plugins(self, interface=None, include_readonly=1):
+        if not include_readonly:
+            LOG('PluggableUserFolder', DEBUG, '_get_plugins',
+                'Interface: %s\nRO: %s\n' % (str(interface), include_readonly))
         result = []
         for plugin in self.objectValues():
-            if not include_readonly and hasattr(plugin, 'isReadOnly') and \
-                plugin.isReadOnly():
-                continue
             if interface:
                 implements = getattr(plugin, '__implements__', () )
                 if not interface in implements:
                     continue
+            if not include_readonly and hasattr(plugin, 'isReadOnly') and \
+                plugin.isReadOnly():
+                continue
+            if not include_readonly:
+                LOG('PluggableUserFolder', DEBUG, 'found plugin',
+                    str(plugin) + '\n')
             result.append(plugin)
 
         return result
@@ -124,7 +131,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
     # ZMI interfaces
     # ----------------------------------
 
-    security.declareProtected('Manage users', 'manage_userFolderProperties')
+    security.declareProtected(Permissions.manage_users, 'manage_userFolderProperties')
     manage_userFolderProperties = DTMLFile('zmi/userFolderProps', globals())
 
     def manage_setUserFolderProperties(self, maxlistusers=DEFAULTMAXLISTUSERS,
@@ -190,7 +197,29 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
     # Public UserFolder object interface
     # ----------------------------------
 
-    security.declareProtected('Manage users', 'getUserNames')
+    # XXX the group support here must be rewritten.
+    # We need an interface for group objects, for example
+    # and role plugins must tell us if they are group plugins.
+    security.declareProtected(Permissions.manage_users, 'getGroupNames')
+    def getGroupNames(self):
+        return []
+
+    security.declareProtected(Permissions.manage_users, 'getGroupById')
+    def getGroupById(self, groupname, default=_marker):
+        """Returns the given group"""
+        if groupname.startswith('role:'):
+            from GroupRoles import Group
+            return Group(groupname, title=groupname)
+
+        groups = {}
+        try:
+            group = groups[groupname]
+        except KeyError:
+            if default is _marker: raise
+            return default
+        return group
+
+    security.declareProtected(Permissions.manage_users, 'getUserNames')
     def getUserNames(self):
         """Return a list of usernames"""
         result = []
@@ -201,7 +230,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
                     result.append(username)
         return result
 
-    security.declareProtected('Manage users', 'getUsers')
+    security.declareProtected(Permissions.manage_users, 'getUsers')
     def getUsers(self):
         """Return a list of user objects"""
         usernames = []
@@ -214,7 +243,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
                     result.append(user)
         return result
 
-    security.declareProtected('Manage users', 'getUser')
+    security.declareProtected(Permissions.manage_users, 'getUser')
     def getUser(self, name, password=None):
         """Return the named user object or None"""
         plugs = self._get_plugins(IAuthenticationPlugin)
@@ -252,10 +281,11 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
          It's better to call the plugin directly, so you have
          control over where the user is stored.
          """
-        plugins = self._get_plugins(IAuthenticationPlugin)
+        plugins = self._get_plugins(IAuthenticationPlugin, include_readonly=0)
         plugins = self._sort_plugins(plugins, self.authentication_order)
         if not plugins: # TODO change to object exception
             raise 'Can not create user. All Authentication plugins are read-only.'
+        LOG('PluggableUserFolder', DEBUG, str(plugins))
         return plugins[0]._doAddUser(name, password, roles, domains, **kw)
 
     def _doChangeUser(self, name, password, roles, domains, **kw):
@@ -263,7 +293,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
 
         Only here for compatibility, just as _doAddUser.
         """
-        plugins = self._get_plugins(IAuthenticationPlugin)
+        plugins = self._get_plugins(IAuthenticationPlugin, include_readonly=0)
         plugins = self._sort_plugins(plugins, self.authentication_order)
         if not plugins: # TODO change to object exception
             raise 'Can not change user. All Authentication plugins are read-only.'

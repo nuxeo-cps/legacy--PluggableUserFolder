@@ -66,6 +66,11 @@ class Group(SimpleItem):
     def getMembers(self):
         return self.members.keys()
 
+    # Temporary CPS hacks
+    getUsers = getMembers
+    def Title(self):
+        return self.title
+
     def getMemberRoles(self, userid):
         if userid in self.members.keys():
             return self.members[userid]
