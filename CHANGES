@@ -1,4 +1,12 @@
+ZODB Requires:
+~~~~~~~~~~~~~~
+-
 New features:
 ~~~~~~~~~~~~~
-- You can now set and ID when creating LDAP plugins, to have several separate
-  LDAP plugins.
+-
+Bug fixes:
+~~~~~~~~~~
+-
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+-
