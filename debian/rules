@@ -9,7 +9,7 @@
 PACKAGE = zope-pluggableuserfolder
 PRODUCT = PluggableUserFolder
 debian = debian/$(PACKAGE)
-INSTDIR = $(debian)/usr/share/zope/Products
+INSTDIR = $(debian)/usr/share/zope/Products/$(PRODUCT)
 DOCDIR = $(debian)/usr/share/doc/$(PACKAGE)
 
 build: build-stamp
