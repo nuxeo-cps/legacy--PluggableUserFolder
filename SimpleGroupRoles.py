@@ -347,6 +347,11 @@ class SimpleGroupRolesPlugin(Folder):
     def userHasLocalRole(self, user, object, role):
         for groupid in self.getGroupsOnObject(object):
             if role in self.getGroupRolesOnObject(groupid, object):
+                if groupid == 'role:Anonymous':
+                    return 1
+                if groupid == 'role:Authenticated' and \
+                    user and user != 'Anonymous':
+                    return 1
                 groupob = self.getGroup(groupid)
                 if user in groupob.getUsers():
                     return 1
