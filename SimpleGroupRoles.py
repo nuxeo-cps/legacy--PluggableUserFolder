@@ -178,7 +178,7 @@ class SimpleGroup(SimpleItem):
                 index = self.groups.index(groupid)
                 del self.groups[index]
 
-
+                
 class SimpleGroupRolesPlugin(Folder):
     """This plugin stores the user definitions in the ZODB"""
     security = ClassSecurityInfo()
