@@ -44,3 +44,15 @@ PluggableUserFolder: A Zope UserFolder with authentication plugins
       - Make a built-in, always existing 'EmergencyIdentification' plugin,
         or somehow otherwise always allow Basic identification together with
         the emergency user?
+
+  More information
+
+    There is now a "cps-devel Mailing
+    list":http://lists.nuxeo.com/mailman/listinfo/cps-devel for CPS3 (and CPS2)
+    developers, as well for other products developped by Nuxeo. 
+    
+    CPS users lists ("cps-users
+    (english)":http://lists.nuxeo.com/mailman/listinfo/cps-users and
+    "cps-users-fr
+    (french)":ttp://lists.nuxeo.com/mailman/listinfo/cps-users-fr) are also
+    available.
