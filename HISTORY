@@ -1,4 +1,22 @@
 *******************************************
+** PluggableUserFolder V2.4.2 [R1 build 2004/07/07-17:12 by madarche]
+
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+-
+Bug fixes:
+~~~~~~~~~~
+- In SimpleGroupRoles there were several calls to getGroup() that did not
+  check if a group was returned.
+- Added hasLocalRolesBlocking() for compatibility with CPS 3.1.
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+-
+
+*******************************************
 ** PluggableUserFolder V2.4.1 [R1 build 2004/04/04-17:11 by regebro]
 
 Requires:

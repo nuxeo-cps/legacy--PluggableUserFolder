@@ -6,9 +6,7 @@ New features:
 -
 Bug fixes:
 ~~~~~~~~~~
-- In SimpleGroupRoles there were several calls to getGroup() that did not
-  check if a group was returned.
-- Added hasLocalRolesBlocking() for compatibility with CPS 3.1.
+-
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -
