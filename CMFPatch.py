@@ -29,8 +29,7 @@ from zLOG import LOG, INFO
 from AccessControl.PermissionRole import rolesForPermissionOn
 
 try:
-    from Products.CMFCore.CatalogTool import IndexableObjectWrapper, \
-         CatalogTool
+    from Products.CMFCore.CatalogTool import CatalogTool
 
     LOG('PluggableUserFolder', INFO, 'Patching CMF')
 
@@ -65,12 +64,12 @@ try:
                             merged[k] = v
             # end groups
             if hasattr(object, 'aq_parent'):
-                object=object.aq_parent
-                object=getattr(object, 'aq_inner', object)
+                object = object.aq_parent
+                object = getattr(object, 'aq_inner', object)
                 continue
             if hasattr(object, 'im_self'):
-                object=object.im_self
-                object=getattr(object, 'aq_inner', object)
+                object = object.im_self
+                object = getattr(object, 'aq_inner', object)
                 continue
             break
         return merged
