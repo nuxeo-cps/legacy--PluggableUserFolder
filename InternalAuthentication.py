@@ -82,7 +82,7 @@ class InternalAuthenticationPlugin(SimpleItem):
         users = []
         f = users.append
         for n in names:
-            f(data[n].__of__(self))
+            f(data[n].__of__(self)) # The user object must be acquisition wrapped.
         return users
 
     security.declareProtected('Manage users', 'getUser')
