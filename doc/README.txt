@@ -1,69 +1,26 @@
 PluggableUserFolder: A Zope UserFolder with authentication plugins
 
-  AccessControl consists of several separate steps.
+  PluggableUserFolder is a Zope user folder that is designed to be
+  extensible in all ways. It supports extending via "plugins"to add
+  support both for ways of identifying the users, such as using
+  cookies instead of Basic HTTP Authentication, and adding new
+  sources of users, such as LDAP or SQL sources, and also extending
+  the role management, such as group support and black lists.
 
-   * Identification: The way the client tells the server who the
-     user is. When it comes to web, this is typically methods like
-     Basic HTTP Authentication, Cookies or SSL Certificates.
+  It also supports using all of these simoultenously. You can have users
+  defined in Zope, in an SQL database and via LDAP, all at once. You can
+  have groups and blacklists at the same time. You can support cookies
+  and SSL Certificates without problems.
 
-   * Authentication: Making sure the user is who he/she is. This typically
-     involves looking up the user in a user database and validating the users
-     password.
+  Installation
 
-   * Authorization: Making sure the authenticated user is authorized to do
-     what the user is trying to do.
+    All you need is to expand the tgz file into a diretory and
+    place it into the zope Products folder, and restart Zope.
 
-  In Zope these three steps are together known as Validation.
-
-  Zope only supports one way of Authenticating users, namely mathching them
-  against an internal user database. Being able to use external user
-  databases is one of the most common requirements, and this has been
-  accomodated by several different third-party user folders, who instead
-  of storing the user data in the ZODB, make external calls to external user
-  directories such as LDAP servers, Microsoft NT servers, or lookups in an
-  SQL database. This works well, until you want to have several different
-  sources of users. It also has the drawback that adding new features and
-  extentions like Groups, or new high-level interfaces, only works with the
-  default user folder, and not to the external user folders.
-
-  The PluggableUserFolder is an attempt to fix these problems, by having a
-  user folder that uses plugins for Authentication. This makes it possible
-  to have several plugins to use several sources of users (typically both
-  an LDAP source and an ZODB source). It also simplifies the implementation
-  of new sources by letting you only implement the basic methods to get data
-  from a data source, instead of implementing a complete user folder. Any
-  features added to the user folder can then also directly be enjoyed by
-  anybody using an external data source.
-
-  Zope out of the box also supports only Basic HTTP Authentication. CMF adds
-  identification through Cookies with the CookieCrumbler product. It's using
-  a rather ugly, but well-working method of faking a Basic HTTP
-  Authentication header in the REQUEST object. It's possible to add new
-  Identification methods in a similar way, if needed. However, the
-  BasicUserFolder of Zope has an interface to let UserFolders handle
-  identifications without this kind of REQUEST header, and it would therefore
-  be possible to as a later stage add plugins for identification as well,
-  thereby letting site administrators mix several types of identification
-  schemes as needed, in an easy and predictable way.
-
-  Future development
-
-    Zope by default has no group support. Loads of people want this, and
-    several group supports have been developed. These group supports to
-    typically work by giving users additional roles depending on group
-    membership.
-
-    Another feature not supported by pure Zope is blocking out roles
-    further down a hierarchy. Support for this has been created by
-    Torped, but it does seldom work with any other access control products.
-
-    By having plugins that allow modifications of the assigned roles to a user
-    both the group and the blacklist use case can be met, and they can even be
-    met independantly. It also allows you to select between different groups
-    support, like a simple groups support like the one for CPS2, a 'recursive'
-    group support (where groups can be member of other groups), a hierarchical
-    group tree, or the Workgroups support proposed in my AccessControlProposal
-    (http://www.zope.org//Wikis/DevSite/Projects/ComponentArchitecture/AccessControlProposal).
+    Please note that the Pluggable User Folder may conflict with other
+    products that patch RoleManager. Typically it will clash with
+    any products that provide group support or in any other way
+    modify the role management.
 
   Bugs
 
