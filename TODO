@@ -1,6 +1,9 @@
 
   o Group support
+    x Advanced "Departmental" group support
+      o Roles applied in the group should be valid also for the group object
+    o Simple Group plugin to "emulate" userFolderWithGroups
 
   o A search method on each plugin would enable plugins to make efficient
     searches instead of returning all users.
-    
+
