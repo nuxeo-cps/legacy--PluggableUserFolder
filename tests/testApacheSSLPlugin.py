@@ -21,12 +21,11 @@ class TestPlugin(TestBase):
         TestBase.afterSetUp(self)
         manage_addApacheSSLIdentificationPlugin(self.folder.acl_users)
         self.plugin = self.folder.acl_users.apache_ssl_identification
-        self.app.other = { 'SERVER_URL': 'https://path.to.a.server/index.html' }
-        self.app.environ = { self.plugin.ssl_id_source: _user_name }
+        self.app.REQUEST.other['SERVER_URL'] = 'https://path.to.a.server/index.html'
+        self.app.REQUEST.environ[self.plugin.ssl_id_source] = _user_name
 
     def testMakeAuthString(self):
-        request = self.app
-        authstr = self.plugin.makeAuthenticationString(self.app, None)
+        authstr = self.plugin.makeAuthenticationString(self.app.REQUEST, None)
         self.failUnless(authstr)
         self.failUnless(self.plugin.canIdentify(authstr))
         name, pwd = self.plugin.identify(authstr)
@@ -34,20 +33,18 @@ class TestPlugin(TestBase):
         self.failUnless(pwd is _no_password_check)
 
     def testSSLRequired(self):
-        request = self.app
-        request.other = {'SERVER_URL': 'http://path.to.a.server/index.html'}
-        authstr = self.plugin.makeAuthenticationString(self.app, None)
+        self.app.REQUEST.other['SERVER_URL'] = 'http://path.to.a.server/index.html'
+        authstr = self.plugin.makeAuthenticationString(self.app.REQUEST, None)
         self.failUnless(authstr is None)
 
     def testNotRegisteredUser(self):
-        request = self.app
-        self.app.environ = { self.plugin.ssl_id_source: 'NotAUser' }
-        authstr = self.plugin.makeAuthenticationString(self.app, None)
+        self.app.REQUEST.environ[self.plugin.ssl_id_source] = 'notauser'
+        authstr = self.plugin.makeAuthenticationString(self.app.REQUEST, None)
         self.failUnless(authstr is None)
 
     def testNoCertificate(self):
-        self.app.environ = {}
-        authstr = self.plugin.makeAuthenticationString(self.app, None)
+        self.app.REQUEST.environ = {}
+        authstr = self.plugin.makeAuthenticationString(self.app.REQUEST, None)
         self.failUnless(authstr is None)
 
     def testNotApacheAuth(self):
