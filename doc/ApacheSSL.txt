@@ -1,0 +1,77 @@
+Apache SSL Identification
+
+  Apache SSL identification is an Identification plugin that uses Apaches
+  SSL functionality to identify and authorize the user via SSL certificates.
+  It lets Apache identify and Authenticate the user.
+
+  The Authentication method of today requires a cleartext password, that is
+  then send to the User object (which is retrieved from an Authentication
+  plugin). Today this is solved by getting the celartext password from the
+  User object, but that means that the Authentication plugin must store the
+  password in cleartext. This will surely not work together with LDAP, so
+  it will need to be fixed.
+
+  Setting it up
+
+    Basically you first need an Apache that works anonymously with Zope via
+    PCGI. To do this you need to compile Apache with CGI and Rewrite.
+    You don't actually need to use Zopes PCGI2, since that is a hack of PCGI
+    to allow authentication headers. In this case standard Apache CGI works
+    fine, since we don't need Apache to pass basic authentication headers
+    anyway. If you want both Certificates AND Basic HTTP Authentication to
+    work, you will need PCGI2, but then you can defeat the Certificates by
+    knowing the password...
+
+    Setting up Zope + CGI is described in DOCS/WEBSERVER.txt.
+    You probably need to add something like this to httpd.conf:
+
+    RewriteEngine on
+    ProxyVia on
+    RewriteRule ^(.*) \
+    /usr/local/apache2/cgi-bin/Zope.cgi/VirtualHostBase/\
+    http/bird.in.nuxeo.com:80/dicod/VirtualHostRoot/$1 \
+    [L,t=application/x-httpd-cgi]
+
+    Of course, '/usr/local/apache2/cgi-bin/Zope.cgi' need to be changed to
+    where ever the Zope.cgi script is located. Also 'bird.in.nuxeo.com'
+    should be changed to the name of the server.
+
+    Then you need to set up SSL. Standard Apache SSL setup work fine. The
+    default Apache 2.0 setup uses Virtual hosting to configure SSL and has
+    all SSL configuration in a VirtualHost part, like so:
+
+    <VirtualHost _default_:443>
+    SSLLoadsOfSSLConfigurationOptions
+    </VirtualHost>
+
+    Make sure this works with accessing Apache before making any Zope
+    specific changes. First make sure https://path to theserver.com/ gives
+    you a server certificate.
+
+    Add:
+    SSLVerifyClient require
+    SSLVerifyDepth  10
+
+    Inside the VirtualHost configuration to make sure Apache requests a
+    Certificate from the browser when you use https.
+
+    Then all you need to do is to get the rewrite to Zope into the SSL
+    virtual host config:
+
+    RewriteEngine on
+    ProxyVia on
+    RewriteCond %{HTTP:Authorization}  ^(.*) #Not sure this is needed
+    RewriteRule ^(.*) \
+    /usr/local/apache2/cgi-bin/Zope.cgi/VirtualHostBase/\
+    https/bird.in.nuxeo.com:443/dicod/VirtualHostRoot/$1 \
+    [L,t=application/x-httpd-cgi]
+
+
+    Of course, '/usr/local/apache2/cgi-bin/Zope.cgi' need to be changed to
+    where ever the Zope.cgi script is located. Also 'bird.in.nuxeo.com'
+    should be changed to the name of the server.
+
+    Replace the standard CookieCrumbler with the DICOD Cookie Crumbler
+    (in the ZMI replace /dicod/cookie_authentication)
+
+

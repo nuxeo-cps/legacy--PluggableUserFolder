@@ -100,16 +100,6 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
 
         return result
 
-    def identify(self, auth):
-        if auth and auth.lower().startswith('basic '):
-            try: name, password=tuple(decodestring(
-                                      auth.split(' ')[-1]).split(':', 1))
-            except:
-                raise 'Bad Request', 'Invalid authentication token'
-            return name, password
-        else:
-            return None, None
-
     # ----------------------------------
     # ZMI interfaces
     # ----------------------------------
@@ -184,7 +174,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         for plugin in plugins:
             localnames = []
             for username in names:
-                if plugin.getUser(name):
+                if plugin.getUser(username):
                     localnames.append(username)
             plugin._doDelUsers(localnames)
 

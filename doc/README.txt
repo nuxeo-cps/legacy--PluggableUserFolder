@@ -8,7 +8,7 @@ PluggableUserFolder: A Zope UserFolder with authentication plugins
 
    * Authentication: Making sure the user is who he/she is. This typically
      involves looking up the user in a user database and validating the users
-     password. There are several
+     password.
 
    * Authorization: Making sure the authenticated user is authorized to do
      what the user is trying to do.

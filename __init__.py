@@ -22,6 +22,7 @@ __version__='$Revision$'[11:-2]
 import PluggableUserFolder
 import InternalAuthentication
 import BasicIdentification
+import ApacheSSLIdentification
 from AccessControl.Permissions import add_user_folders
 
 def initialize(context):
@@ -45,6 +46,14 @@ def initialize(context):
         icon='zmi/UserFolder_icon.gif',
         visibility=None,
     )
+    context.registerClass(
+        instance_class=ApacheSSLIdentification.ApacheSSLIdentificationPlugin,
+        permission=add_user_folders,
+        constructors=(ApacheSSLIdentification.manage_addApacheSSLIdentificationPlugin,),
+        icon='zmi/UserFolder_icon.gif',
+        visibility=None,
+    )
+
 
 # TODO: Make help
 #    context.registerHelp()
