@@ -7,16 +7,16 @@
 
 <tr>
   <td>&nbsp;</td>
-  <td valign="center" class="form-label">
+  <td valign="middle" class="form-label">
    Group Name
   </td>
 </tr>
 <dtml-in getGroups>
   <tr>
-    <td valign="center" class="form-element">
+    <td valign="middle" class="form-element">
       <input type="checkbox" name="selected:list" value="&dtml-id;">
     </td>
-    <td valign="center" class="form-element">
+    <td valign="middle" class="form-element">
         <a href="&dtml-id;/manage_workspace" alt="Manage group &dtml-id">
           <dtml-var id> (<dtml-var title>)
         </a>

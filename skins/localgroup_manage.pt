@@ -16,12 +16,12 @@
     <tr tal:repeat="group python:here.acl_users.group_roles.getAcquiredGroups(here)">
       <td>&nbsp;</td>
 
-      <td valign="center" class="form-label"
+      <td valign="middle" class="form-label"
           tal:repeat="role group/groups"
           tal:content="role">
         Role
       </td>
-      <td valign="center" class="form-item">
+      <td valign="middle" class="form-item">
         <a tal:attributes="href python:group['obj'].absolute_url() + '/localgroup_manage'"
            tal:content="group/obj/title_or_id">
           link
@@ -47,7 +47,7 @@
 <table>
   <tr>
     <td>&nbsp;</td>
-    <td valign="center" class="form-element">
+    <td valign="middle" class="form-element">
       <select name="apply_groups:list" multiple="true">
         <tal:block repeat="group here/acl_users/group_roles/getGroupIds"
                    define="appliedgroups here/manage_groupRolesGetGroups">

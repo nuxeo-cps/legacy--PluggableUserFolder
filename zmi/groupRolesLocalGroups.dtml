@@ -9,10 +9,10 @@
   <dtml-in "acl_users.group_roles.getAcquiredGroups(this)" prefix="map">
     <tr>
       <td>&nbsp;</td>
-      <td valign="center" class="form-label">
+      <td valign="middle" class="form-label">
         <dtml-in "map_item['groups']"><dtml-var sequence-item>&nbsp;</dtml-in>
       </td>
-      <td valign="center" class="form-item">
+      <td valign="middle" class="form-item">
         <a href="<dtml-var "map_item['obj'].absolute_url()">/manage_groupRolesLocalGroups">
             <dtml-var "map_item['obj'].title_or_id()">
       </td>
@@ -43,7 +43,7 @@
   </tr>
   <tr>
     <td>&nbsp;</td>
-    <td valign="center" class="form-element">
+    <td valign="middle" class="form-element">
       <select name="apply_groups:list" multiple="true">
         <dtml-in "acl_users.group_roles.getGroupIds()" prefix="group">
           <dtml-if "group_item not in manage_groupRolesGetGroups()">

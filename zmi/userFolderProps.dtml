@@ -6,10 +6,10 @@
 <table cellspacing="0" cellpadding="2" border="0">
 
 <tr>
- <td align="left" valign="center" class="form-label">
+ <td align="left" valign="middle" class="form-label">
   Role assignment presents search dialog when more users than N (-1 is always, 0 is never).
  </td>
- <td align="left" valign="center" class="form-element">
+ <td align="left" valign="middle" class="form-element">
  <input type=text name="maxlistusers" value="&dtml.missing-maxlistusers;" size=3>
  </td>
 </tr>
@@ -19,46 +19,46 @@
 <table cellspacing="0" cellpadding="2" border="0">
 
 <tr>
- <td align="left" valign="center" class="form-label">
+ <td align="left" valign="middle" class="form-label">
   Call order of Identification Plugins
  </td>
- <td align="left" valign="center" class="form-element" >
+ <td align="left" valign="middle" class="form-element" >
  <input type=text name="identification_order" value="&dtml.missing-identification_order;" size=50>
  </td>
 </tr>
 
 <tr>
- <td align="left" valign="center" class="form-label">
+ <td align="left" valign="middle" class="form-label">
   Call order of Authentication Plugins
  </td>
- <td align="left" valign="center" class="form-element" >
+ <td align="left" valign="middle" class="form-element" >
  <input type=text name="authentication_order" value="&dtml.missing-authentication_order;" size=50>
  </td>
 </tr>
 
 <tr>
- <td align="left" valign="center" class="form-label">
+ <td align="left" valign="middle" class="form-label">
   Call order of Group and Role Plugins
  </td>
- <td align="left" valign="center" class="form-element" >
+ <td align="left" valign="middle" class="form-element" >
  <input type=text name="group_role_order" value="&dtml.missing-group_role_order;" size=50>
  </td>
 </tr>
 
 <tr>
- <td align="left" valign="center" class="form-label">
+ <td align="left" valign="middle" class="form-label">
   Login-page
  </td>
- <td align="left" valign="center" class="form-element" >
+ <td align="left" valign="middle" class="form-element" >
  <input type=text name="login_page" value="&dtml.missing-login_page;" size=50>
  </td>
 </tr>
 
 <tr>
- <td align="left" valign="center" class="form-label">
+ <td align="left" valign="middle" class="form-label">
   Logout-page
  </td>
- <td align="left" valign="center" class="form-element" >
+ <td align="left" valign="middle" class="form-element" >
  <input type=text name="logout_page" value="&dtml.missing-logout_page;" size=50>
  </td>
 </tr>

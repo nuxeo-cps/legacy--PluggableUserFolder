@@ -6,10 +6,10 @@
 <table cellspacing="0" cellpadding="2" border="0">
 
 <tr>
-  <td valign="center" class="form-label">
+  <td valign="middle" class="form-label">
     Title
   </td>
-  <td valign="center" class="form-element">
+  <td valign="middle" class="form-element">
     <input type="text" name="title" value="&dtml-title;">
   </td>
 </tr>
