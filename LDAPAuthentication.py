@@ -23,7 +23,7 @@ __version__ = ' $Revision$'[11:-2]
 from zLOG import LOG, DEBUG, ERROR
 
 from Globals import MessageDialog, DTMLFile
-from Acquisition import aq_base
+from Acquisition import aq_base, aq_parent
 from OFS.SimpleItem import SimpleItem
 
 from Products.LDAPUserFolder.LDAPUserFolder import LDAPUserFolder
@@ -52,7 +52,8 @@ class LDAPAuthenticationPlugin(LDAPUserFolder):
     def getUser(self, name, password=None):
         user = LDAPUserFolder.getUser(self, name, password)
         if user is not None:
-            user = PluggableUserWrapper(user)
+            user = user.__of__(self)
+            user = user.__of__(PluggableUserWrapper())
         return user
 
 
