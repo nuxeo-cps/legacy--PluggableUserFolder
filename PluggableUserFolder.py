@@ -649,6 +649,8 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
     # ----------------------------------
 
     def identify(self, auth):
+        LOG('PluggableUserFolder', DEBUG, 'identify()',
+        'Auth %s\n' % auth)
         plugins = self._get_plugins(IIdentificationPlugin)
         plugins = self._sort_plugins(plugins, self.identification_order)
         for plugin in plugins:
@@ -680,7 +682,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
 
     def authenticate(self, name, password, request):
         LOG('PluggableUserFolder', DEBUG, 'authenticate()',
-            'Username: %s\nPassword %s\n' % (name, password))
+            'Username: %s\n' % name)
         super = self._emergency_user
         if name is None:
             return None
