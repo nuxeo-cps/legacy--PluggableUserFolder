@@ -158,7 +158,11 @@ PluggableUserFolder: A Zope UserFolder with authentication plugins
     in management methods on the RoleManager object. This means that
     all objects that subclass RoleManager will get these management
     methods and screens. The main management screen is also replaced
-    with one that will list all available management screens.
+    with one that will list all available management screens. The list
+    of management methods is stored in the local_manage_methods property
+    of the plugin. It's a list of dictionaries, in the tradition of
+    _properties and manage_options.
+    
 
   Future development
 
