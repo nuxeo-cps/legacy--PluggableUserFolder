@@ -112,9 +112,6 @@ class LDAPAuthenticationPlugin(LDAPUserFolder):
         else:
             self._anonymous_cache.set(name, user_obj)
 
-        if user_obj is not None:
-            user_obj = user_obj.__of__(self.aq_parent)
-
         return user_obj
 
 

@@ -276,7 +276,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         for plugin in self._sort_plugins(plugs, self.authentication_order):
             user = plugin.getUser(name, password)
             if user:
-                return user
+                return user.__of__(self)
         LOG('PluggableUserFolder', DEBUG, 'getUser',
             'Could not find user %s\n' % name)
         return None

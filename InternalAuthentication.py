@@ -88,10 +88,7 @@ class InternalAuthenticationPlugin(SimpleItem):
     security.declareProtected('Manage users', 'getUser')
     def getUser(self, name, password=None):
         """Return the named user object or None"""
-        user = self.data.get(name, None)
-        if user:
-            user = user.__of__(self.aq_parent)
-        return user
+        return = self.data.get(name, None)
 
     def listUserProperties(self):
         """Lists properties settable or searchable on the users."""
