@@ -16,18 +16,15 @@
 #
 # $Id$
 
-__doc__='''Internal Authentication Plugin'''
-__version__='$Revision$'[11:-2]
+__doc__ = '''Internal Authentication Plugin'''
+__version__ = '$Revision$'[11:-2]
 
 from zLOG import LOG, DEBUG
 from Globals import DTMLFile, MessageDialog
-from Acquisition import aq_base, aq_parent
-from AccessControl import AuthEncoding, ClassSecurityInfo
-from AccessControl.User import User, _remote_user_mode
-from AccessControl.Role import DEFAULTMAXLISTUSERS
+from Acquisition import aq_base
+from AccessControl import ClassSecurityInfo
 from OFS.SimpleItem import SimpleItem
 from OFS.Folder import Folder
-from OFS.PropertyManager import PropertyManager
 from OFS.ObjectManager import checkValidId
 from ZODB.PersistentMapping import PersistentMapping
 
@@ -39,14 +36,15 @@ class Group(SimpleItem):
 
     meta_type = 'Group'
     global_roles = []
-    manage_options=({'label':'Group', 'action':'manage_groupForm'},) + \
-                    SimpleItem.manage_options
-    _properties=({'id':'title', 'type': 'string', 'mode': 'w', 'label':'Title'},
-                 {'id':'members', 'type': 'multiple selection', 'mode': 'w',
-                    'select_variable': 'getAllUsers','label':'Members'},
-                 {'id':'global_roles', 'type': 'multiple selection', 'mode': 'w',
-                    'select_variable': 'valid_roles','label':'Global Roles'},
-                )
+    manage_options = ({'label':'Group', 'action':'manage_groupForm'},) + \
+                     SimpleItem.manage_options
+    _properties = (
+        {'id':'title', 'type': 'string', 'mode': 'w', 'label':'Title'},
+        {'id':'members', 'type': 'multiple selection', 'mode': 'w',
+            'select_variable': 'getAllUsers','label':'Members'},
+        {'id':'global_roles', 'type': 'multiple selection', 'mode': 'w',
+            'select_variable': 'valid_roles','label':'Global Roles'},
+    )
     manage_groupForm = DTMLFile('zmi/groupRolesEditGroup', globals())
     manage_main = manage_groupForm
 
@@ -66,7 +64,7 @@ class Group(SimpleItem):
     def getMembers(self):
         return self.members.keys()
 
-    # Temporary CPS hacks
+    # XXX: Temporary CPS hacks
     getUsers = getMembers
     def Title(self):
         return self.title
@@ -83,7 +81,7 @@ class Group(SimpleItem):
         return self.members.has_key(user) and role in self.members[user]
 
     def manage_editSettings(self, title=None, REQUEST=None):
-        """Changes the settings of the group"""
+        """Change the settings of the group"""
         if title is not None:
             self.title = title
 
@@ -91,7 +89,7 @@ class Group(SimpleItem):
             return self.manage_groupForm(manage_tabs_message='Settings changed')
 
     def manage_editRoles(self, role={}, REQUEST=None):
-        """Changes the role mappings of the group"""
+        """Change the role mappings of the group"""
         for user, roles in role.items():
             self.setMemberRoles(user, roles)
 
@@ -100,10 +98,11 @@ class Group(SimpleItem):
                 self.setMemberRoles(userid, [])
 
         if REQUEST is not None:
-            return self.manage_groupForm(manage_tabs_message='Role mappings changed')
+            return self.manage_groupForm(
+                manage_tabs_message='Role mappings changed')
 
     def manage_addUser(self, userids, REQUEST=None):
-        """Adds a user to the members of the group"""
+        """Add a user to the members of the group"""
         # XXX check that user exists
         for userid in userids:
             if not userid in self.members.keys():
@@ -129,8 +128,8 @@ class GroupRolesPlugin(Folder):
     title = 'Group Roles'
     plugin_id = 'groupRoles'
 
-    manage_options=({'label':'Groups', 'action':'manage_groupsForm'},) + \
-                    SimpleItem.manage_options
+    manage_options = ({'label':'Groups', 'action':'manage_groupsForm'},) + \
+                     SimpleItem.manage_options
 
     local_manage_methods = ({'id':'LocalGroups',
                              'label':'Local Groups',
@@ -170,39 +169,43 @@ class GroupRolesPlugin(Folder):
         """Adds a new group to the list of groups"""
         self._setObject(id,Group(id, title))
         if REQUEST is not None:
-            REQUEST['RESPONSE'].redirect(self.absolute_url()+'/manage_workspace')
+            REQUEST['RESPONSE'].redirect(
+                self.absolute_url() + '/manage_workspace')
 
     def manage_delGroups(self, selected, REQUEST):
-        """Deletes the groups whos id is in the list 'selected'"""
+        """Delete the groups whos id is in the list 'selected'"""
         for id in selected:
             if hasattr(aq_base(self), id):
                 self._delObject(id)
         if REQUEST is not None:
-            REQUEST['RESPONSE'].redirect(self.absolute_url()+'/manage_workspace')
+            REQUEST['RESPONSE'].redirect(
+                self.absolute_url() + '/manage_workspace')
 
     #
     # ZMI methods patched into RoleManager
     #
 
     def applyGroups(self, apply_groups=[], REQUEST=None):
-        """Sets which groups should be applied locally"""
+        """Set which groups should be applied locally"""
         groups = self.manage_groupRolesGetGroups()
         for group in apply_groups:
             if group not in groups:
                 groups.append(group)
         self.manage_groupRolesSetGroups(groups)
         if REQUEST is not None:
-            return self.manage_groupRolesLocalGroups(manage_tabs_message='Groups Applied.')
+            return self.manage_groupRolesLocalGroups(
+                manage_tabs_message='Groups Applied.')
 
     def unapplyGroups(self, unapply_groups=[], REQUEST=None):
-        """Sets which groups should be applied locally"""
+        """Set which groups should be applied locally"""
         groups = self.manage_groupRolesGetGroups()
         for group in unapply_groups:
             if group in groups:
                 groups.remove(group)
         self.manage_groupRolesSetGroups(groups)
         if REQUEST is not None:
-            return self.manage_groupRolesLocalGroups(manage_tabs_message='Groups removed.')
+            return self.manage_groupRolesLocalGroups(
+                manage_tabs_message='Groups removed.')
 
     def getGroupsOnObject(self, object=None):
         if object is None:
@@ -217,7 +220,7 @@ class GroupRolesPlugin(Folder):
         inner_obj = object
         while 1:
             if hasattr(inner_obj, 'im_self'):
-                inner_obj=inner_obj.im_self
+                inner_obj = inner_obj.im_self
             inner = getattr(inner_obj, 'aq_inner', inner_obj)
             parent = getattr(inner, 'aq_parent', None)
             if parent is None:
@@ -225,7 +228,7 @@ class GroupRolesPlugin(Folder):
             inner_obj = parent
             groups = self.getGroupsOnObject(inner_obj)
             if groups:
-                result.append( {'obj': inner_obj, 'groups': groups})
+                result.append({'obj': inner_obj, 'groups': groups})
         return result
 
     #
@@ -277,14 +280,14 @@ class GroupRolesPlugin(Folder):
 
 def manage_addGroupRolesPlugin(self, REQUEST=None):
     """ """
-    ob=GroupRolesPlugin()
-    self=self.this()
+    ob = GroupRolesPlugin()
+    self = self.this()
     if hasattr(aq_base(self), ob.id):
         return MessageDialog(
-            title  ='Item Exists',
-            message='This object already contains an %s' % id.title ,
-            action ='%s/manage_main' % REQUEST['URL1'])
+            title='Item Exists',
+            message='This object already contains an %s' % id.title,
+            action='%s/manage_main' % REQUEST['URL1'])
     self._setObject(ob.id, ob)
     if REQUEST is not None:
-        REQUEST['RESPONSE'].redirect(self.absolute_url()+'/manage_main')
+        REQUEST['RESPONSE'].redirect(self.absolute_url() + '/manage_main')
 
