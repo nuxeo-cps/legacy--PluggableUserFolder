@@ -78,7 +78,7 @@ class SimpleGroup(SimpleItem):
                     if user not in users:
                         users.append(user)
                 groups.append(group)
-        LOG('SimpleGroupRoles', -199, str(users))
+        LOG('SimpleGroupRoles', DEBUG, str(users))
         return tuple(users)
 
     def getGroups(self):
