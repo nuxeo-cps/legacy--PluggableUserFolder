@@ -26,8 +26,10 @@ from Globals import MessageDialog, DTMLFile
 from Acquisition import aq_base
 from OFS.SimpleItem import SimpleItem
 
-from PluginInterfaces import IAuthenticationPlugin
 from Products.LDAPUserFolder.LDAPUserFolder import LDAPUserFolder
+
+from PluginInterfaces import IAuthenticationPlugin
+from PluggableUser import PluggableUserWrapper
 
 class LDAPAuthenticationPlugin(LDAPUserFolder):
     """This plugin stores the user definitions in the ZODB"""
