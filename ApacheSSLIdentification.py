@@ -19,6 +19,7 @@
 __doc__='''Apache SSL Identification Plugin'''
 __version__='$Revision$'[11:-2]
 
+from Globals import MessageDialog
 from zLOG import LOG, DEBUG, ERROR
 from base64 import decodestring, encodestring
 from Acquisition import aq_base
