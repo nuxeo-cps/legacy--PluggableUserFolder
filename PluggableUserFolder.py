@@ -539,19 +539,19 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
 
     def validate(self, request, auth='', roles=_noroles):
         LOG('PluggableUserFolder', DEBUG, 'validate()',
-        'Roles: %s\n' % str(roles))
+        'Roles: %s\nAuth %s\n' % (str(roles), auth))
         plugins = self._get_plugins(IIdentificationPlugin)
         plugins = self._sort_plugins(plugins, self.identification_order)
         for plugin in plugins:
-            auth = plugin.makeAuthenticationString(request, auth)
-            if auth is not None:
+            plugauth = plugin.makeAuthenticationString(request, auth)
+            if plugauth is not None:
                 break
         # What to do if none of the plugins could make a string?
         # Currently just continue with auth=None. Might not be a good
         # idea, I'm not sure.
         LOG('PluggableUserFolder', DEBUG, 'validate()',
             'Call BasicUserFolder\n')
-        u = BasicUserFolder.validate(self, request, auth, roles)
+        u = BasicUserFolder.validate(self, request, plugauth, roles)
         LOG('PluggableUserFolder', DEBUG, 'validate()',
             'Validated User: %s\n' % str(u))
         return u
