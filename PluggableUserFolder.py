@@ -33,6 +33,8 @@ from Acquisition import aq_base
 from AccessControl import ClassSecurityInfo, Permissions
 from AccessControl.User import BasicUserFolder, _noroles
 from AccessControl.Role import RoleManager, DEFAULTMAXLISTUSERS
+from AccessControl.PermissionRole import rolesForPermissionOn
+
 from OFS.ObjectManager import ObjectManager
 from OFS.SimpleItem import Item
 
@@ -349,9 +351,11 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             str(options) + '\n')
         return options
 
-    def mergedLocalRoles(self, object):
+    def mergedLocalRoles(self, object, withgroups=0):
         """Returns all local roles valid for an object"""
-        LOG('PluggableUserFolder', 0, 'mergedLocalRoles()')
+        # withgroups is there fore CPS compatibility reasons
+        # It's currently ignored
+        LOG('PluggableUserFolder', -199, 'mergedLocalRoles()')
         merged = {}
         innerobject = getattr(object, 'aq_inner', object)
         while 1:
@@ -387,6 +391,23 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
                 merged[user] = plugin.modifyLocalRoles(user, object,
                                     roles.keys())
         return merged
+
+    def _allowedRolesAndUsers(self, ob):
+        """
+        Return a list of roles, users and groups with View permission.
+        Used by PortalCatalog to filter out items you're not allowed to see.
+        """
+        allowed = {}
+        for r in rolesForPermissionOn('View', ob):
+            allowed[r] = 1
+        localroles = self.mergedLocalRoles(ob, withgroups=1) # groups
+        for user_or_group, roles in localroles.items():
+            for role in roles:
+                if allowed.has_key(role):
+                    allowed[user_or_group] = 1
+        if allowed.has_key('Owner'):
+            del allowed['Owner']
+        return list(allowed.keys())
 
     # ----------------------------------
     # Private methods
