@@ -163,6 +163,17 @@ class SimpleGroup(SimpleItem):
                 index = self.groups.index(groupid)
                 del self.groups[index]
 
+    def setGroups(self, groupids):
+        for groupid in groupids:
+            if not groupid in self.groups:
+                self.groups.append(groupid)
+        # Make sure it's a copy we iterate over and not the original
+        # list, since we modify the list during the iteration.
+        for groupid in self.groups[:]:
+            if not groupid in groupids:
+                index = self.groups.index(groupid)
+                del self.groups[index]
+
 
 class SimpleGroupRolesPlugin(Folder):
     """This plugin stores the user definitions in the ZODB"""
