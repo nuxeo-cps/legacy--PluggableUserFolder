@@ -383,7 +383,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         plugins = self._get_plugins(IRolePlugin)
         for plugin in plugins:
             for user in plugin.getUsersWithRoles():
-                if user not in merged.keys():
+                if not merged.has_key(user):
                     merged[user] = {}
 
         for user, roles in merged.items():
