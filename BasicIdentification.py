@@ -20,6 +20,8 @@ __doc__='''Basic Identification Plugin'''
 __version__='$Revision$'[11:-2]
 
 from base64 import decodestring
+
+from Globals import MessageDialog
 from Acquisition import aq_base
 from OFS.SimpleItem import SimpleItem
 

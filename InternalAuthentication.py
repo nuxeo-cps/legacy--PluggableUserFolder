@@ -20,7 +20,7 @@ __doc__='''Internal Authentication Plugin'''
 __version__='$Revision$'[11:-2]
 
 #from AccessControl.User import UserFolder
-from Globals import DTMLFile
+from Globals import DTMLFile, MessageDialog
 from Acquisition import aq_base
 from AccessControl import AuthEncoding, ClassSecurityInfo
 from AccessControl.User import User

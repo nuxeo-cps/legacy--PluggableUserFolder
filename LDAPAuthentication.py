@@ -21,6 +21,7 @@ __version__='$Revision$'[11:-2]
 
 from zLOG import LOG, DEBUG, ERROR
 
+from Globals import MessageDialog
 from Acquisition import aq_base
 from OFS.SimpleItem import SimpleItem
 
