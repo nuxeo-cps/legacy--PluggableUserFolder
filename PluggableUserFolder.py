@@ -336,7 +336,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
     security.declareProtected(Permissions.manage_users, 'getGroupsForUser')
     def getGroupsForUser(self, userid):
         ismemberof = []
-        for plugin in self._get_plugins(IRolePlugin):
+        for plugin in self._get_plugins(IGroupPlugin):
             ismemberof.extend(plugin.getGroupsForUser(userid))
         LOG('PluggableUserFolder', DEBUG, 'getGroupsForUser',
             str(ismemberof)+'\n')
