@@ -203,8 +203,12 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
     # We need an interface for group objects, for example
     # and role plugins must tell us if they are group plugins.
     # change to get GroupIds and set up alias.
+    security.declareProtected(Permissions.manage_users, 'setUsersOfGroup')
+    def setUsersOfGroup(self, users, group):
+        pass
+
     security.declareProtected(Permissions.manage_users, 'userFolderAddGroup')
-    def userFolderAddGroup(self, groupname, **kw):
+    def userFolderAddGroup(self, groupname, title='', **kw):
         """Creates a group"""
         pass
 
