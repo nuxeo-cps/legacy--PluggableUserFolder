@@ -865,6 +865,12 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         if REQUEST is not None:
             return "TraverseHook Registered"
 
+    security.declarePublic('hasLocalRolesBlocking')
+    def hasLocalRolesBlocking(self):
+        """Test if local roles blocking is implemented in this user
+           folder."""
+        return 0 # Nope, it ain't.
+
 
 def manage_addPluggableUserFolder(self, REQUEST=None):
     """ """
