@@ -1,4 +1,7 @@
+.PHONY: clean
+
 clean:
-	find . -name "*.pyc" | xargs rm
-	find . -name "*,cover" | xargs rm
+	find . -name '*~' | xargs rm -f
+	find . -name '*pyc' | xargs rm -f
+	cd tests ; make clean
 
