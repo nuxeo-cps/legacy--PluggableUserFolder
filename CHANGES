@@ -1,15 +1,11 @@
-ZODB Requires:
-~~~~~~~~~~~~~~
--
-
-New features:
-~~~~~~~~~~~~~
--
-
 Bug fixes:
 ~~~~~~~~~~
--
+- InternalAuthentication.py: Fix bug found by unit test: add
+  acquisition wrapper to user returned by getUser().
+- PluggableUserFolder.py: Fixed a serious bug that made
+  SimpleIdentification fail unless it was first in line.
+- SimpleGroupRoles.py: If the role attrubute was set to None, this
+  plugin failed. Now it handles any kind of "emptyness", like None,
+  '', or {} equally.
+- InternalAuthentication.py: getUsers must also wrap the users.
 
-New internal features:
-~~~~~~~~~~~~~~~~~~~~~~
--
