@@ -1,2 +1,6 @@
 
   o Group support
+
+  o A search method on each plugin would enable plugins to make efficient
+    searches instead of returning all users.
+    
