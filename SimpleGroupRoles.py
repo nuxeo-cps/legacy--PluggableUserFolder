@@ -1,4 +1,4 @@
-# (c) 2003 Nuxeo SARL <http://nuxeo.com>
+# Copyright (c) 2003 Nuxeo SARL <http://nuxeo.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as published
@@ -118,7 +118,7 @@ class SimpleGroup(SimpleItem):
                 del self.members[index]
 
     def setTitle(self, title):
-        self.title=title
+        self.title = title
 
 class SimpleGroupRolesPlugin(Folder):
     """This plugin stores the user definitions in the ZODB"""
@@ -207,7 +207,7 @@ class SimpleGroupRolesPlugin(Folder):
                 roledict[groupid] = roles
         setattr(self, ROLEATTRIBUTENAME, roledict)
         if REQUEST is not None:
-            return self.manage_simpleGroupRolesLocalGroups( \
+            return self.manage_simpleGroupRolesLocalGroups(
                 manage_tabs_message='Groups added')
 
 
@@ -222,7 +222,7 @@ class SimpleGroupRolesPlugin(Folder):
                 del roledict[groupid]
         setattr(self, ROLEATTRIBUTENAME, roledict)
         if REQUEST is not None:
-            return self.manage_simpleGroupRolesLocalGroups( \
+            return self.manage_simpleGroupRolesLocalGroups(
                 manage_tabs_message='Groups added')
 
     def getGroupRolesOnObject(self, group, object=None):
