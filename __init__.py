@@ -19,11 +19,13 @@
 __doc__='''PluggableUserFolder init'''
 __version__='$Revision$'[11:-2]
 
+from zLOG import LOG, DEBUG
 import PluggableUserFolder
 import InternalAuthentication
 import BasicIdentification
 import ApacheSSLIdentification
 import CookieIdentification
+import GroupRoles
 
 try:
     import LDAPAuthentication
@@ -68,6 +70,14 @@ def initialize(context):
         icon='zmi/UserFolder_icon.gif',
         visibility=None,
     )
+    context.registerClass(
+        instance_class=GroupRoles.GroupRolesPlugin,
+        permission=add_user_folders,
+        constructors=(GroupRoles.manage_addGroupRolesPlugin,),
+        icon='zmi/UserFolder_icon.gif',
+        visibility=None,
+    )
+    registerRolePlugin(GroupRoles.GroupRolesPlugin)
 
     if LdapSupport:
         context.registerClass(
@@ -78,6 +88,23 @@ def initialize(context):
             icon='zmi/UserFolder_icon.gif',
             visibility=None,
         )
+
+from AccessControl.Role import RoleManager, _isNotBeingUsedAsAMethod, _isBeingUsedAsAMethod
+from Globals import DTMLFile
+
+def registerRolePlugin(plugin):
+    for method in plugin.local_manage_methods:
+        uid = 'manage_' + plugin.plugin_id + method['id']
+        action = getattr(plugin, method['action'])
+        LOG('PluggableFolder', DEBUG, 'Add method on RoleManager',
+            'Name: %s \nMethod: <%s>.%s\n' % (uid, plugin.meta_type,
+            method['action']))
+        setattr(RoleManager, uid, action)
+
+if not hasattr(RoleManager, 'manage_permissions'):
+    RoleManager.manage_permissions = RoleManager.manage_access
+
+RoleManager.manage_access = DTMLFile('zmi/security', globals())
 
 
 # TODO: Make help

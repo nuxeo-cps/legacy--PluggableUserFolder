@@ -28,6 +28,7 @@ from AccessControl.Role import DEFAULTMAXLISTUSERS
 from OFS.SimpleItem import SimpleItem
 from ZODB.PersistentMapping import PersistentMapping
 
+from PluggableUser import PluggableUser
 from PluginInterfaces import IAuthenticationPlugin
 
 class InternalAuthenticationPlugin(SimpleItem):
@@ -190,7 +191,7 @@ class InternalAuthenticationPlugin(SimpleItem):
         """Create a new user"""
         if password is not None and self.encrypt_passwords:
             password = self._encryptPassword(password)
-        self.data[name]=User(name,password,roles,domains)
+        self.data[name]=PluggableUser(name,password,roles,domains)
 
     def _doChangeUser(self, name, password, roles, domains, **kw):
         user=self.data[name]

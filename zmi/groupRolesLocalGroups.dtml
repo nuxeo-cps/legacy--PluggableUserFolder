@@ -1,0 +1,35 @@
+<dtml-var manage_page_header>
+<dtml-with "_(management_view='Security')">
+<dtml-var manage_tabs>
+</dtml-with>
+<p>
+<form action="manage_groupRolesLocalGroupsChange" method="post">
+<table cellspacing="0" cellpadding="2" border="0">
+  <tr>
+    <td valign="center" class="form-label">
+      Groups applied here
+    </td>
+    <td valign="center" class="form-element">
+      <select name="applied_groups:list" multiple="true">
+        <dtml-in "acl_users.group_roles.getGroupIds()" prefix="group">
+          <option value="&dtml-group_item;"
+            <dtml-if "group_item in manage_groupRolesGetGroups()">selected</dtml-if>>
+          <dtml-var group_item></option>
+        </dtml-in>
+       </select>
+    </td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td class="form-element">
+      <input class="form-element" type="submit" name="change"
+        value="Change" />
+    </td>
+  </tr>
+</table>
+
+
+</form>
+
+<dtml-var manage_page_footer>
+

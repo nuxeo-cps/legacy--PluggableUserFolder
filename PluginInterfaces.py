@@ -99,3 +99,37 @@ class IIdentificationPlugin(Interface.Base):
     def identify(self, auth):
         """Returns a username and a password from the authentication string"""
 
+
+class IRolePlugin(Interface.Base):
+
+    # These plugins change the assignment of roles to a user.
+    # They do that by getting a user, a list of roles and a
+    # context is the case of local roles, and modify that list
+    # of roles. The list is then sent to the next plugin. This
+    # way you can have several plugins that modify roles
+    # independently of each other.
+
+    def modifyGlobalRoles(self, user, roles):
+        """Returns a updated list of roles"""
+
+    def modifyLocalRoles(self, user, object, roles):
+        """Modifies a list of local roles
+
+        This is 
+        """
+
+    def isUserAllowed(self, user, object, object_roles, previous):
+        """Checks local roles for just one role
+
+        This method is called from User.allowed(), and allows for several
+        shortcuts for the plugin. Firstly, it only cares about one role,
+        the 'object_roles' role (called this because that's what
+        User.allowed() calles it) so a plugin can "bail out" without having
+        to traverse to the root if the status of a role is determined.
+        Secondly, the "previous" parameter will send in the returned value
+        from the previous plugin. A plugin that never blocks roles can
+        therefore simply return 1 immediately if previous is set to one,
+        and a plugin that never adds roles can return 0 immediately if
+        previous is 0, in both cases needing no traversal at all.
+        """
+

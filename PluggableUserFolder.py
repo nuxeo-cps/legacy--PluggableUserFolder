@@ -22,14 +22,14 @@ __version__='$Revision$'[11:-2]
 from zLOG import LOG, DEBUG, ERROR
 
 from Globals import DTMLFile, MessageDialog
-from Acquisition import aq_base
+from Acquisition import aq_base, aq_parent
 from AccessControl import ClassSecurityInfo
 from AccessControl.User import BasicUserFolder, _noroles
 from AccessControl.Role import RoleManager, DEFAULTMAXLISTUSERS
 from OFS.ObjectManager import ObjectManager
 from OFS.SimpleItem import Item
 
-from PluginInterfaces import IAuthenticationPlugin, IIdentificationPlugin
+from PluginInterfaces import IAuthenticationPlugin, IIdentificationPlugin, IRolePlugin
 from InternalAuthentication import InternalAuthenticationPlugin
 from BasicIdentification import BasicIdentificationPlugin
 
@@ -69,7 +69,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         +Item.manage_options
         )
 
-    _product_interfaces = (IAuthenticationPlugin, IIdentificationPlugin)
+    _product_interfaces = (IAuthenticationPlugin, IIdentificationPlugin, IRolePlugin)
 
     def __init__(self):
         # As default, add the "Internal" plugins.
@@ -221,10 +221,28 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         for plugin in self._sort_plugins(plugs, self.authentication_order):
             user = plugin.getUser(name, password)
             if user:
+                # To get to the role plugins, we need to make sure the
+                # user knows where the user folder is:
+                user._v_acl_users = self
                 return user
         LOG('PluggableUserFolder', DEBUG, 'getUser',
             'Could not find user %s\n' % name)
         return None
+
+    def getRoleManagementOptions(self, types=['form']):
+        options = []
+        for plugin in self._get_plugins(IRolePlugin):
+            for option in plugin.local_manage_methods:
+                if not option['type'] in types:
+                    continue
+                o = option.copy()
+                o['plugin_action'] = 'manage_' + plugin.plugin_id + option['id']
+                options.append(o)
+        return options
+
+    # ----------------------------------
+    # Private methods
+    # ----------------------------------
 
     def _doAddUser(self, name, password, roles, domains, **kw):
         """Create a new user.
