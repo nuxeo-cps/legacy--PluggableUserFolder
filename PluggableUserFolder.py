@@ -20,7 +20,11 @@
 __doc__ = '''Pluggable User Folder'''
 __version__ = '$Revision$'[11:-2]
 
-from zLOG import LOG, DEBUG, ERROR
+from zLOG import LOG, DEBUG, BLATHER, PROBLEM, WARNING, ERROR
+import os
+if os.environ.get("ZOPE_PLUGGABLE_LOGGING", None) == "OFF":
+    def LOG(*args, **kw):
+        pass
 
 from Globals import DTMLFile, MessageDialog
 from Acquisition import aq_base
@@ -323,6 +327,14 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             'Could not find user %s\n' % name)
         return None
 
+    def getGroupsForUser(self, userid):
+        ismemberof = []
+        for plugin in self._get_plugins(IRolePlugin):
+            ismemberof.extend(plugin.getGroupsForUser(userid))
+        LOG('PluggableUserFolder', DEBUG, 'getGroupsForUser',
+            str(ismemberof)+'\n')
+        return ismemberof
+
     def getRoleManagementOptions(self, types=['form']):
         options = []
         for plugin in self._get_plugins(IRolePlugin):
@@ -420,6 +432,8 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         return None, None
 
     def validate(self, request, auth='', roles=_noroles):
+        LOG('PluggableUseFolder', DEBUG, 'validate()',
+        'Roles: %s\n' % str(roles))
         plugins = self._get_plugins(IIdentificationPlugin)
         plugins = self._sort_plugins(plugins, self.identification_order)
         for plugin in plugins:
@@ -429,11 +443,15 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         # What to do if none of the plugins could make a string?
         # Currently just continue with auth=None. Might not be a good
         # idea, I'm not sure.
+        LOG('PluggableUseFolder', DEBUG, 'validate()',
+        'Call BasicUserFolder\n')
         u = BasicUserFolder.validate(self, request, auth, roles)
+        LOG('PluggableUseFolder', DEBUG, 'validate()',
+        'Validated User: %s\n' % str(u))
         return u
 
     def authenticate(self, name, password, request):
-        LOG('PluggableUserFolder', DEBUG, 'Authenticate',
+        LOG('PluggableUserFolder', DEBUG, 'authenticate()',
             'Username: %s\nPassword %s\n' % (name, password))
         super = self._emergency_user
         if name is None:
@@ -451,10 +469,12 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         if user is not None and \
             (password is _no_password_check or \
              user.authenticate(password, request)):
-            LOG('PluggableUserFolder', DEBUG, 'User %s validated' % name)
+            LOG('PluggableUserFolder', DEBUG, 'authenticate()',
+            'User %s validated\n' % name)
             return user
         else:
-            LOG('PluggableUserFolder', DEBUG, 'User %s NOT validated' % name)
+            LOG('PluggableUserFolder', DEBUG, 'authenticate()',
+            'User %s NOT validated\n' % name)
             return None
 
 

@@ -20,7 +20,7 @@
 __doc__ = '''Internal Authentication Plugin'''
 __version__ = '$Revision$'[11:-2]
 
-from zLOG import LOG, DEBUG
+from PluggableUserFolder import LOG, DEBUG
 from Globals import DTMLFile, MessageDialog
 from Acquisition import aq_base, aq_inner
 from AccessControl import ClassSecurityInfo
@@ -120,6 +120,7 @@ class SimpleGroup(SimpleItem):
 
     def setTitle(self, title):
         self.title = title
+
 
 class SimpleGroupRolesPlugin(Folder):
     """This plugin stores the user definitions in the ZODB"""
@@ -259,6 +260,13 @@ class SimpleGroupRolesPlugin(Folder):
     #
     # API
     #
+    def getGroupsForUser(self, userid):
+        userismemberof = []
+        for group in self.getGroups():
+            if userid in group.getMembers():
+                userismemberof.append(group.getId())
+        return userismemberof
+
     def addGroup(self, id, title):
         self._setObject(id,SimpleGroup(id, title))
 
@@ -266,7 +274,7 @@ class SimpleGroupRolesPlugin(Folder):
         return self.objectIds('Simple Group')
 
     def getGroups(self):
-        return self.objectItems('Simple Group')
+        return self.objectValues('Simple Group')
 
     def getGroup(self, id):
         return getattr(self, id, None)

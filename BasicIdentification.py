@@ -20,7 +20,7 @@
 __doc__ = '''Basic Identification Plugin'''
 __version__ = '$Revision$'[11:-2]
 
-from zLOG import LOG, DEBUG, ERROR
+from PluggableUserFolder import LOG, DEBUG, ERROR
 from base64 import decodestring
 
 from Globals import MessageDialog

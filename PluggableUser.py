@@ -20,20 +20,27 @@
 __doc__ = '''Pluggable User'''
 __version__ = '$Revision$'[11:-2]
 
-from zLOG import LOG, DEBUG, ERROR
+from PluggableUserFolder import LOG, DEBUG, ERROR
 
+from ExtensionClass import Base
+import Acquisition
 from AccessControl import ClassSecurityInfo
 from AccessControl.User import User
 from AccessControl.PermissionRole import _what_not_even_god_should_do
 
 from PluginInterfaces import IRolePlugin
 
-class PluggableUserMixin:
+class PluggableUserMixin(Base):
     """A mixin for user that overrides the methods for getting roles"""
     security = ClassSecurityInfo()
 
+    def getUserName(self):
+        return str(self.name)
+
     def getRoles(self):
         """Return the list of roles assigned to a user."""
+        LOG('PluggableUser', DEBUG, 'getRoles',
+            'User: %s\n' % self.getId())
         plugins = self._v_acl_users._get_plugins(IRolePlugin)
         # plugins = self._sort_plugins(plugins, self.role_order)
         roles = self.roles[:] # Make sure it's a copy, and not the original
@@ -49,7 +56,10 @@ class PluggableUserMixin:
            including local roles assigned in context of
            the passed in object."""
 
-        # XXX should call the plugins modifyLocalRoles
+        LOG('PluggableUser', DEBUG, 'getRolesInContext',
+            'Roles: %s\nUser: %s\nObject: %s\n' % \
+            (object_roles, self.getId(), str(object)))
+
         userid = self.getId()
         roles = self.getRoles()
         local = {}
@@ -73,11 +83,23 @@ class PluggableUserMixin:
                 continue
             break
         roles = list(roles) + local.keys()
+
+        plugins = self._v_acl_users._get_plugins(IRolePlugin)
+        LOG('PluggableUser', DEBUG, 'allowed',
+            'Roles: %s\nUser: %s\nPlugins: %s\n' % \
+            (object_roles, userid, str(plugins)))
+        for plugin in plugins:
+            roles = plugin.modifyLocalRoles(userid, inner_obj, roles)
+
         return roles
 
     def allowed(self, object, object_roles=None):
         """Check whether the user has access to object. The user must
            have one of the roles in object_roles to allow access."""
+        LOG('PluggableUser', DEBUG, 'allowed',
+            'Roles: %s\nUser: %s\nObject: %s\n' % \
+            (object_roles, self.getId(), str(object)))
+
         if object_roles is _what_not_even_god_should_do: return 0
 
         # Short-circuit the common case of anonymous access.
@@ -155,6 +177,26 @@ class PluggableUserMixin:
             break
         return None
 
+    def getGroups(self):
+        LOG('PluggableUser', DEBUG, 'getGroups()')
+        return self._v_acl_users.getGroupsForUser(self.getId())
+
 
 class PluggableUser(PluggableUserMixin, User):
     pass
+
+
+class PluggableUserWrapper(PluggableUserMixin):
+
+    def __init__(self, userobject):
+        self.__user_object = userobject
+
+    def __of__(self, parent):
+        return Acquisition.ImplicitAcquisitionWrapper(self, parent)
+
+    def __getattr__(self, name):
+        if hasattr(self.__user_object, name):
+            LOG('PluggableUserWrapper', -300, 'Wrap for ' + str(name))
+            return getattr(self.__user_object, name)
+        raise AttributeError('%s has no attribute %s' % \
+            (str(self.__user_object), str(name)))

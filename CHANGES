@@ -15,4 +15,13 @@ Bug fixes:
 
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
--
+- All modules now take their logging imports from PluggableUserFolder.
+  If you set the environment variable ZOPE_PLUGGABLE_LOGGING to OFF it
+  will in turn replace the LOG() method with a method of it's own that
+  simply passes on everything, so no logging happens.
+  This way, you can use PluggableUserFolder and have the log level
+  set to debug without PluggableUserFolder drowning out your DEBUG
+  messages.
+- A new object PluggableUserWrapper is created. This is used when you want
+  to wrap an existing UserFolder that uses it's own user classes, like
+  LDAPUserFolder. 

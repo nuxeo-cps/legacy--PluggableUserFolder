@@ -21,6 +21,8 @@ __doc__ = '''PluggableUserFolder init'''
 __version__ = '$Revision$'[11:-2]
 import ZODB
 from zLOG import LOG, DEBUG
+import CMFPatch
+
 import PluggableUserFolder
 import InternalAuthentication
 import BasicIdentification

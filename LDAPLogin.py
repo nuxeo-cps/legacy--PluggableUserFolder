@@ -20,7 +20,7 @@
 __doc__ = '''LDAP Login Plugin'''
 __version__ = '$Revision$'[11:-2]
 
-from zLOG import LOG, DEBUG, ERROR
+from PluggableUserFolder import LOG, DEBUG, ERROR
 
 from Globals import MessageDialog, DTMLFile
 from Acquisition import aq_base
@@ -28,6 +28,8 @@ from OFS.SimpleItem import SimpleItem
 
 from PluginInterfaces import IAuthenticationPlugin
 from Products.LDAPUserFolder.LDAPUserFolder import LDAPUserFolder
+
+from PluggableUser import PluggableUserWrapper
 
 class LDAPLoginPlugin(LDAPUserFolder):
     """This plugin stores the user definitions in the ZODB"""
@@ -51,20 +53,25 @@ class LDAPLoginPlugin(LDAPUserFolder):
         return []
 
     def getUsers(self, authenticated=None):
+        LOG('LDAPLogin', DEBUG, 'getUsers()')
         if authenticated==1:
             return LDAPUserFolder.getUsers(self,authenticated)
         return []
 
     def getUser(self, name, password=None):
-        LOG('LDAP Login', DEBUG, 'getUser',
-            'Username: %s\nPassword: %s\n' % (name, password))
         if password is None:
             return None
         elif self.acl_users.getUser(name) is None:
             # This user is  not defined anywhere in the UserFolder
             return None
         else:
-            return LDAPUserFolder.getUser(self, name, password)
+            LOG('LDAP Login', DEBUG, 'getUser',
+                'Username: %s\nPassword: %s\n' % (name, password))
+            user = PluggableUserWrapper(
+                LDAPUserFolder.getUser(self, name, password))
+            LOG('LDAP Login', DEBUG, 'getUser',
+            'returning user object %s\n' % str(type(user)))
+            return user
 
 
 addLDAPLoginPlugin = DTMLFile('zmi/addLDAPLoginPlugin', globals())
