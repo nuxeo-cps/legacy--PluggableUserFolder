@@ -45,14 +45,16 @@ if not _cmf_localroles_patch:
 
         LOG('PluggableUserFolder', INFO, 'Patching CMF')
 
-        def mergedLocalRoles(object, withgroups=0):
+        def mergedLocalRoles(object, withgroups=0, withpath=0):
             aclu = object.acl_users
             if hasattr(aclu, 'mergedLocalRoles'):
-                return aclu.mergedLocalRoles(object, withgroups)
-            return utils._mergedLocalRoles(object)
+                return aclu.mergedLocalRoles(object, withgroups, withpath)
+            return utils.old_mergedLocalRoles(object)
 
-        #Patch this into CPSCore.utils
+        if not hasattr(utils, 'old_mergedLocalRoles'):
+            utils.old_mergedLocalRoles = utils._mergedLocalRoles
         utils.mergedLocalRoles = mergedLocalRoles
+        utils._mergedLocalRoles = mergedLocalRoles
 
         def _allowedRolesAndUsers(ob):
             aclu = object.acl_users
