@@ -470,6 +470,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         if len(self.getUserNames()) >= 1:
             # Don't do this if more than one user
             return
+        # FIXME: where does this function come ?
         info = readUserAccessFile('inituser')
         if not info:
             return # No inituser to create
@@ -488,7 +489,6 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         self._doDelUsers(self.getUserNames())
         self._doAddUser(name, password, ('Manager',), domains)
         try:
-            import os
             os.remove(os.path.join(INSTANCE_HOME, 'inituser'))
         except:
             pass
