@@ -1,3 +1,18 @@
 *******************************************
+** PluggableUserFolder V1.1.0 [R1 build 2003-06/13-12:19 by regebro]
+
+ZODB Requires:
+~~~~~~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+- Added support for Cookie Crumbler.
+Bug fixes:
+~~~~~~~~~~
+-
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+-
+*******************************************
 ** PluggableUserFolder V1.1.0 [R1 build 2003-06/13-12:15 by regebro]
 

@@ -3,7 +3,7 @@ ZODB Requires:
 -
 New features:
 ~~~~~~~~~~~~~
-- Added support for Cookie Crumbler.
+-
 Bug fixes:
 ~~~~~~~~~~
 -
