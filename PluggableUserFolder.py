@@ -351,10 +351,10 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             str(options) + '\n')
         return options
 
-    def mergedLocalRoles(self, object, withgroups=0):
+    def mergedLocalRoles(self, object, withgroups=0, withpath=0):
         """Returns all local roles valid for an object"""
-        # withgroups is there fore CPS compatibility reasons
-        # It's currently ignored
+        # withgroups and widthpath is there fore CPS compatibility reasons
+        # they are currently ignored
         LOG('PluggableUserFolder', -199, 'mergedLocalRoles()')
         merged = {}
         innerobject = getattr(object, 'aq_inner', object)
