@@ -1,4 +1,27 @@
 *******************************************
+** PluggableUserFolder V2.5.0 [R1 build 2004/08/27-14:42 by regebro]
+
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+- Added a CASIdentification plugin for the CAS single-sign-on solution
+  (see http://www.yale.edu/tp/cas/)
+- The login page can now be external to the Zope site.
+- IdentificationPlugins now can tell you what parameters 
+  (like came_from) it wants to pass to the login-page.
+- A logout page setting added. The logout.py skin should now only
+  call context.logout() when using PUF.
+- A ProtectedAuthInfo class is created that can be used to store
+  authentification information in sessions.
+Bug fixes:
+~~~~~~~~~~
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+- _logout() is now a required attribute of plugins.
+
+*******************************************
 ** PluggableUserFolder V2.4.2 [R1 build 2004/07/07-17:12 by madarche]
 
 Requires:
