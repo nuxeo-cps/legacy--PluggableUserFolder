@@ -1,4 +1,15 @@
 *******************************************
+** PluggableUserFolder V1.4.0 [R1 build 2003-08/28-12:42 by regebro]
+
+New features:
+~~~~~~~~~~~~~
+- A new plugin LDAP Login, will authenticate users over LDAP,
+  but not list users.
+
+Bug fixes:
+~~~~~~~~~~
+- Deleting users called read only plugins.
+*******************************************
 ** PluggableUserFolder V1.3.1 [R1 build 2003-08/21-10:42 by regebro]
 
 Bug fixes:
