@@ -192,7 +192,11 @@ class PluggableUserMixin:
         return self.acl_users.getGroupsForUser(self.getId())
 
     def getComputedGroups(self):
-        return self.getGroups()
+        groups = self.getGroups()
+        for role in ('role:Authenticated', 'role:Anonymous'):
+            if role not in groups:
+                groups += (role,)
+        return groups
     
     def listProperties(self):
         """Lists all properties that are set on the user."""

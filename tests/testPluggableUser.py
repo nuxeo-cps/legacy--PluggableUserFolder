@@ -51,6 +51,15 @@ class TestUser(TestBase):
             self.assert_(verifyClass(IUser, PluggableUser))
         except ImportError:
             pass
+    
+    def testCPSCompliance(self):
+        # Add tests here if the user stops working
+        # with CPS.
+        groups = self._user.getComputedGroups()
+        self.assert_('role:Anonymous' in groups, 
+            'role:Anonymous not in PluggableUsers groups')
+        self.assert_('role:Authenticated' in groups,
+            'role:Authenticated not in PluggableUsers groups')
          
 
 if __name__ == '__main__':
