@@ -179,7 +179,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         else:
             self.identification_order = ', '.join(iplugs)
             self.authentication_order = ', '.join(aplugs)
-            self.maxlistusers = DEFAULTMAXLISTUSERS
+            self.maxlistusers = maxlistusers
             message= message + 'Saved Changes.\n'
 
         if REQUEST is not None:
