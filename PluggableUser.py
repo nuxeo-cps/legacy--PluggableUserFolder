@@ -71,13 +71,22 @@ class PluggableUserMixin:
         roles = self.getRoles()
         local = {}
         inner_object = getattr(object, 'aq_inner', object)
+        plugins = self.acl_users._get_plugins(IRolePlugin)
+        LOG('PluggableUser', DEBUG, 'getRolesInContext',
+            'User: %s\nPlugins: %s\n' % \
+            (userid, str(plugins)))
         while 1:
             local_roles = getattr(inner_object, '__ac_local_roles__', None)
             dict = local_roles or {}
             if callable(dict):
                 dict = dict()
-            for r in dict.get(userid, []):
-                local[r] = 1
+            user_roles = dict.get(userid, [])
+            #get roles on inner_object for each plugin
+            for plugin in plugins:
+                user_roles = plugin.modifyLocalRoles(userid,
+                                inner_object, user_roles)
+            for r in user_roles:
+                local[r] = 1 #Using mappings is a neat way of doing unions.
             inner = getattr(inner_object, 'aq_inner', inner_object)
             parent = getattr(inner, 'aq_parent', None)
             if parent is not None:
@@ -89,13 +98,6 @@ class PluggableUserMixin:
                 continue
             break
         roles = list(roles) + local.keys()
-
-        plugins = self.acl_users._get_plugins(IRolePlugin)
-        LOG('PluggableUser', DEBUG, 'getRolesInContext',
-            'User: %s\nPlugins: %s\n' % \
-            (userid, str(plugins)))
-        for plugin in plugins:
-            roles = plugin.modifyLocalRoles(userid, object, roles)
 
         return roles
 
