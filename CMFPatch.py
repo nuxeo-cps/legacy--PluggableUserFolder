@@ -82,14 +82,22 @@ if not _cmf_localroles_patch:
             return _allowedRolesAndUsers(ob)
         IndexableObjectWrapper.allowedRolesAndUsers = allowedRolesAndUsers
 
-        def _getAllowedRolesAndUsers(self, user):
-            aclu = object.acl_users
-            if hasattr(aclu, '_getAllowedRolesAndUsers'):
-                return aclu._getAllowedRolesAndUsers(ob) # FIXME: this is a bug. What is "ob" ?
-            # The userfolder does not have CPS group support
+        def _getAllowedRolesAndUsers(user):
+            """Returns a list with all roles this user has + the username"""
+            LOG('CPSCore utils', DEBUG, '_getAllowedRolesAndUsers()')
+            
             result = list(user.getRoles())
             result.append('Anonymous')
             result.append('user:%s' % user.getUserName())
+            # deal with groups
+            getGroups = getattr(user, 'getGroups', None)
+            if getGroups is not None:
+                groups = tuple(user.getGroups()) + ('role:Anonymous',)
+                if 'Authenticated' in result:
+                    groups = groups + ('role:Authenticated',)
+                for group in groups:
+                    result.append('group:%s' % group)
+            # end groups
             return result
 
         def _listAllowedRolesAndUsers(self, user):
