@@ -445,10 +445,10 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         # What to do if none of the plugins could make a string?
         # Currently just continue with auth=None. Might not be a good
         # idea, I'm not sure.
-        LOG('PluggableUseFolder', DEBUG, 'validate()',
+        LOG('PluggableUserFolder', DEBUG, 'validate()',
         'Call BasicUserFolder\n')
         u = BasicUserFolder.validate(self, request, auth, roles)
-        LOG('PluggableUseFolder', DEBUG, 'validate()',
+        LOG('PluggableUserFolder', DEBUG, 'validate()',
         'Validated User: %s\n' % str(u))
         return u
 
@@ -478,7 +478,6 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             LOG('PluggableUserFolder', DEBUG, 'authenticate()',
             'User %s NOT validated\n' % name)
             return None
-
 
 
 def manage_addPluggableUserFolder(self, REQUEST=None):
