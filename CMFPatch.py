@@ -24,7 +24,7 @@
 
 __version__ = '$Revision$'[11:-2]
 
-from PluggableUserFolder import LOG, INFO, DEBUG, PluggableUserFolder
+from PluggableUserFolder import LOG, INFO, DEBUG
 from AccessControl.PermissionRole import rolesForPermissionOn
 
 # These CMF patches is also done by CPS3, so if it is already done, skip it.
@@ -76,7 +76,8 @@ if not _cmf_localroles_patch:
         def allowedRolesAndUsers(self):
             """
             Return a list of roles, users and groups with View permission.
-            Used by PortalCatalog to filter out items you're not allowed to see.
+            Used by PortalCatalog to filter out items you're not allowed to
+            see.
             """
             ob = self._IndexableObjectWrapper__ob # Eeek, manual name mangling
             return _allowedRolesAndUsers(ob)

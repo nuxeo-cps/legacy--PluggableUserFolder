@@ -22,7 +22,6 @@ __version__ = '$Revision$'[11:-2]
 
 from PluggableUserFolder import LOG, DEBUG, ERROR
 
-from ExtensionClass import Base
 import Acquisition
 from AccessControl import ClassSecurityInfo
 from AccessControl.User import User
