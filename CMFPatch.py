@@ -101,7 +101,7 @@ try:
 
 
     def _listAllowedRolesAndUsers(self, user):
-        LOG('PluggableUserFolder', DEBUG, 'Patched allowedRolesAndUsers()')
+        LOG('PluggableUserFolder', DEBUG, 'Patched _listAllowedRolesAndUsers()')
         result = list(user.getRoles())
         result.append('Anonymous')
         result.append('user:%s' % user.getUserName())
