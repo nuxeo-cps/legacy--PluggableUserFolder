@@ -1,14 +1,6 @@
 *******************************************
 ** PluggableUserFolder V2.3.0 [R1 build 2004-01/06-15:04 by anguenot]
 
-ZODB Requires:
-~~~~~~~~~~~~~~
--
-
-New features:
-~~~~~~~~~~~~~
-- 
-
 Bug fixes:
 ~~~~~~~~~~
 - CMFPatch wasn't checking nicely the CPSCore patch of CPS3

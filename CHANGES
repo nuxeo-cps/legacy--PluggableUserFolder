@@ -6,7 +6,10 @@ New features:
 -
 Bug fixes:
 ~~~~~~~~~~
--
+- The clever Acquisition wrapping of LDAP users did not work. This prevented
+  LDAP users from getting roles from groups. 
+
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
--
+- The wrapping of the user in the user folder is now done by the user folder,
+  and not by the plugin.
