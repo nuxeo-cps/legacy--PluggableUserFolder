@@ -176,8 +176,16 @@ class IGroupPlugin(IRolePlugin):
 class IGroupObject(Interface.Base):
 
     def getUsers(self):
-        """Returns the names of the members of the group"""
-        
+        """Returns the names of the members of the group
+
+        This is used by managemet interfaces to get direct members."""
+
+    def getComputedUsers(self):
+        """Returns the names of the members of the group
+
+        This is used by the security system to get all users that should
+        be affected by a groups permissions."""
+
     def addUsers(self, userids):
         """Adds the users with userids to the group"""
 

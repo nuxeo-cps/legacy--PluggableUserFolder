@@ -59,10 +59,8 @@ class Group(SimpleItem):
     # API
     #
 
-    def getMembers(self):
+    def getUsers(self):
         return self.members.keys()
-
-    getUsers = getMembers
 
     def Title(self):
         return self.title
@@ -105,7 +103,7 @@ class Group(SimpleItem):
         for user, roles in role.items():
             self.setMemberRoles(user, roles)
 
-        for userid in self.getMembers():
+        for userid in self.getUsers():
             if userid not in role.keys():
                 self.setMemberRoles(userid, [])
 
@@ -123,7 +121,7 @@ class Group(SimpleItem):
     def manage_deleteUsers(self, selected, REQUEST=None):
         """Delete the users in the "selected" list of userids"""
         for userid in selected:
-            if userid in self.getMembers():
+            if userid in self.getUsers():
                 del self.members[userid]
         if REQUEST is not None:
             return self.manage_groupForm(manage_tabs_message='Users deleted')

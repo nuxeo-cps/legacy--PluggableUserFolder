@@ -62,19 +62,19 @@ class SimpleGroup(SimpleItem):
     def Title(self):
         return self.title
 
-    def getMembers(self):
+    def getUsers(self):
         """Returns the members of this group"""
         return tuple(self.members)
 
-    def getUsers(self):
+    def getComputedUsers(self):
         """Returns all users that are members of this group or subgroup"""
-        users = list(self.getMembers())
+        users = list(self.getUsers())
         groups = []
         for group in self.getGroups():
             if group not in groups:
                 plugin = aq_parent(self)
                 groupob = plugin.getGroup(group)
-                for user in groupob.getMembers():
+                for user in groupob.getUsers():
                     if user not in users:
                         users.append(user)
                 groups.append(group)
@@ -340,7 +340,7 @@ class SimpleGroupRolesPlugin(Folder):
         roles = []
         for groupid in self.getGroupsOnObject(object):
             groupob = self.getGroup(groupid)
-            if groupob is not None and user in groupob.getUsers():
+            if groupob is not None and user in groupob.getComputedUsers():
                 roles.extend(self.getGroupRolesOnObject(groupid, object))
         return roles
 
@@ -353,7 +353,7 @@ class SimpleGroupRolesPlugin(Folder):
                     user and user != 'Anonymous':
                     return 1
                 groupob = self.getGroup(groupid)
-                if user in groupob.getUsers():
+                if user in groupob.getComputedUsers():
                     return 1
         return 0
 
@@ -379,7 +379,7 @@ class SimpleGroupRolesPlugin(Folder):
     def getUsersWithRoles(self, object):
         users = {}
         for group in self.getLocalGroups(object):
-            for userid in self.getGroup(group).getUsers():
+            for userid in self.getGroup(group).getComputedUsers():
                 users[userid] = 1
         return users.keys()
 
