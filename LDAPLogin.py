@@ -49,13 +49,18 @@ class LDAPLoginPlugin(LDAPUserFolder):
     def getUserNames(self):
         return []
 
-    def getUsers(self):
+    def getUsers(self, authenticated=None):
+        if authenticated==1:
+            return LDAPUserFolder.getUsers(self,authenticated)
         return []
 
     def getUser(self, name, password=None):
         LOG('LDAP Login', DEBUG, 'getUser',
             'Username: %s\nPassword: %s\n' % (name, password))
         if password is None:
+            return None
+        elif self.acl_users.getUser(name) is None:
+            # This user is  not defined anywhere in the UserFolder
             return None
         else:
             return LDAPUserFolder.getUser(self, name, password)
