@@ -11,6 +11,8 @@ Bug fixes:
 - Group plugins can now delete groups!
 - Doing a CPSDirectory search on members now work again.
 - Searching in roles now work again.
+- Role oplugins are no longer required to take care of inheritance
+  themselves. This is probably inefficient, but makes for neater code.
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -
