@@ -1,6 +1,7 @@
 ZODB Requires:
 ~~~~~~~~~~~~~~
--
+- Having NuxUserGroups / UserFolderWithGroups installed together
+  with PluggableUserFolder is no longer supported.
 
 New features:
 ~~~~~~~~~~~~~

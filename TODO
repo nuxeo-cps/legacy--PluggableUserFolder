@@ -1,9 +1,13 @@
 
-  o Group support
+  x Group support
     x Advanced "Departmental" group support
       o Roles applied in the group should be valid also for the group object
-    o Simple Group plugin to "emulate" userFolderWithGroups
+    x Simple Group plugin to "emulate" userFolderWithGroups
+      o Groups in groups
 
   o A search method on each plugin would enable plugins to make efficient
     searches instead of returning all users.
 
+  o A method of transferring users and groups from UserFolderWithGroups
+    to PLuggableUserFolder will probably be needed.
+    
