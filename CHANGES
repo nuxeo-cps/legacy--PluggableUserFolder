@@ -8,6 +8,8 @@ New features:
 - The login page can now be external to the Zope site.
 - IdentificationPlugins now can tell you what parameters 
   (like came_from) it wants to pass to the login-page.
+- A logout page setting added. The logout.py skin should now only
+  call context.logout() when using PUF.
 Bug fixes:
 ~~~~~~~~~~
 New internal features:

@@ -42,11 +42,7 @@ class CASIdentificationPlugin(PropertyManager, SimpleItem):
 
     __implements__ = (IIdentificationPlugin,)
 
-    _properties = ( {'id': 'login_url',
-                     'type': 'string',
-                     'label': 'Login page URL',
-                     'mode': 'rw',
-                    },
+    _properties = (
                     {'id': 'validate_url',
                      'type': 'string',
                      'label': 'Ticket validation URL',
@@ -58,7 +54,6 @@ class CASIdentificationPlugin(PropertyManager, SimpleItem):
                      'mode': 'rw',
                     },                    
                    )
-    login_url = ''
     validate_url = ''
     session_var = '__ac_cas_username'
 

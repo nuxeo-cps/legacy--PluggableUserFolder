@@ -72,6 +72,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
     authentication_order = 'internal_authentication'
     group_role_order = ''
     login_page = ''
+    logout_page = ''
     encrypt_passwords = 0
 
     manage_options = (
@@ -201,6 +202,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
                                        authentication_order='',
                                        group_role_order='',
                                        login_page=None,
+                                       logout_page=None,
                                        REQUEST=None):
         """
         Sets the properties of the user folder.
@@ -241,6 +243,9 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
 
         if self.login_page is not None:
             self.login_page = login_page
+
+        if self.logout_page is not None:
+            self.logout_page = logout_page
 
         if REQUEST is not None:
             return self.manage_userFolderProperties(
@@ -827,36 +832,55 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         '''
         Redirects to the login page.
         '''
-        if self.login_page:
-            req = self.REQUEST
-            resp = req['RESPONSE']
-            if self.login_page.startswith('http'):
-                plugins = self._get_plugins(IIdentificationPlugin)
-                plugins = self._sort_plugins(plugins, self.identification_order)
-                params = {}
-                for each in plugins:
-                    if hasattr(each, 'getLoginURLParams'):
-                        params.update(each.getLoginURLParams(req))
-                return '%s?%s' % (self.login_page, urlencode(params))
-            else:
-                iself = getattr(self, 'aq_inner', self)
-                parent = getattr(iself, 'aq_parent', None)
-                page = getattr(parent, self.login_page, None)
-                if page is not None:
-                    came_from = req.get('came_from', None)
-                    if came_from is None:
-                        came_from = req['URL']
-                    retry = getattr(resp, '_auth', 0) and '1' or ''
-                    url = '%s?came_from=%s&retry=%s&disable_cookie_login__=1' % (
-                        page.absolute_url(), quote(came_from), retry)
-                    return url
-        return None
-    
+        if not self.login_page:
+            return None
+        
+        req = self.REQUEST
+        resp = req['RESPONSE']
+        if self.login_page.startswith('http'):
+            plugins = self._get_plugins(IIdentificationPlugin)
+            plugins = self._sort_plugins(plugins, self.identification_order)
+            params = {}
+            for each in plugins:
+                if hasattr(each, 'getLoginURLParams'):
+                    params.update(each.getLoginURLParams(req))
+            return '%s?%s' % (self.login_page, urlencode(params))
+        else:
+            iself = getattr(self, 'aq_inner', self)
+            parent = getattr(iself, 'aq_parent', None)
+            page = getattr(parent, self.login_page, None)
+            if page is None:
+                return None
+            came_from = req.get('came_from', None)
+            if came_from is None:
+                came_from = req['URL']
+            retry = getattr(resp, '_auth', 0) and '1' or ''
+            url = '%s?came_from=%s&retry=%s&disable_cookie_login__=1' % (
+                page.absolute_url(), quote(came_from), retry)
+            return url
+
+    def getLogoutURL(self):
+        if not self.logout_page:
+            return None
+        if self.logout_page.startswith('http'):
+            return self.logout_page
+        else:
+            iself = getattr(self, 'aq_inner', self)
+            parent = getattr(iself, 'aq_parent', None)
+            page = getattr(parent, self.logout_page, None)
+            if page is None:
+                return None
+            return page.absoulute_url()        
+        
     security.declarePublic('logout')
     def logout(self):
         plugins = self._get_plugins(IIdentificationPlugin)
         for each in plugins:
             each._logout()
+            self.REQUEST.RESPONSE.redirect(self.logout_page)
+        url = self.getLogoutURL()
+        if url:
+            self.REQUEST.RESPONSE.redirect(url)
         
     # Installation and removal of traversal hooks.
 

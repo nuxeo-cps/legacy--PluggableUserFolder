@@ -54,6 +54,15 @@
  </td>
 </tr>
 
+<tr>
+ <td align="left" valign="center" class="form-label">
+  Logout-page
+ </td>
+ <td align="left" valign="center" class="form-element" >
+ <input type=text name="logout_page" value="&dtml.missing-logout_page;" size=50>
+ </td>
+</tr>
+
 </table>
 
 <p>
