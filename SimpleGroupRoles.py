@@ -180,10 +180,11 @@ class SimpleGroupRolesPlugin(Folder):
     def getGroupsOnObject(self, object=None):
         if object is None:
             object = self
-        return getattr(object, '_applied_groups', [])
+        roledict = getattr(object, ROLEATTRIBUTENAME, {})
+        return roledict.keys()
 
     def addGroupsOnObject(self, groups):
-        return setattr(self, '_applied_groups', groups)
+        pass
 
     def deleteGroupsOnObject(self, groups):
         pass
@@ -241,10 +242,11 @@ class SimpleGroupRolesPlugin(Folder):
         return roles
 
     def userHasLocalRole(self, user, object, role):
-        for group in self.getGroupsOnObject(object):
-            groupob = self.getGroup(group)
-            if groupob.userHasRole(user, role):
-                return 1
+        for groupid in self.getGroupsOnObject(object):
+            if role in self.getGroupRolesOnObject(groupid, object):
+                groupob = self.getGroup(group)
+                if user in groupob.getMembers():
+                    return 1
         return 0
 
     def modifyGlobalRoles(self, user, roles):
