@@ -183,7 +183,7 @@ class GroupRolesPlugin(Folder):
 
     def manage_addGroup(self, id, title, REQUEST=None):
         """Adds a new group to the list of groups"""
-        self.addgroup(id, title)
+        self.addGroup(id, title)
         if REQUEST is not None:
             REQUEST['RESPONSE'].redirect(
                 self.absolute_url() + '/manage_workspace')
