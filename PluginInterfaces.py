@@ -24,16 +24,16 @@ import Interface
 
 class IAuthenticationPlugin(Interface.Base):
 
-    def isReadOnly(self):
+    def isReadOnly():
         """Return 1 if you can not add, change or delete users"""
 
-    def getUserNames(self):
+    def getUserNames():
         """Return a list of usernames"""
 
-    def getUsers(self):
+    def getUsers():
         """Return a list of user objects"""
 
-    def getUser(self, name, password=None):
+    def getUser(name, password=None):
         """Return the named user object or None
 
         password should be passed when the user is retrieved for
@@ -44,10 +44,10 @@ class IAuthenticationPlugin(Interface.Base):
         the user. Passing the password is therefore typically only
         done from within UserFolder.authenticate()."""
 
-    def getUserOfRole(self, role):
+    def getUserOfRole(role):
         """Return all the users that have a particular role"""
         
-    def _doAddUser(self, name, password, roles, domains, **kw):
+    def _doAddUser(name, password, roles, domains, **kw):
         """Create a new user
         
         This should be implemented by subclasses to do the actual adding of a
@@ -55,7 +55,7 @@ class IAuthenticationPlugin(Interface.Base):
         The implementation of this method is responsible for performing any
         needed encryption."""
 
-    def _doChangeUser(self, name, password, roles, domains, **kw):
+    def _doChangeUser(name, password, roles, domains, **kw):
         """Modify an existing user
         
         This should be implemented by subclasses to make the actual changes to
@@ -63,7 +63,7 @@ class IAuthenticationPlugin(Interface.Base):
         unencrypted. The implementation of this method is responsible for
         performing any needed encryption."""
 
-    def _doDelUsers(self, names):
+    def _doDelUsers(names):
         """Delete one or more users
         
         This should be implemented by subclasses to do the actual deleting of
@@ -90,9 +90,9 @@ class IIdentificationPlugin(Interface.Base):
     # that would mean that the code would be exactly duplicated except the
     # call to identify().
     # A future version of this interface my instead have only one method:
-    # def identify(self, auth, request):
+    # def identify(auth, request):
 
-    def makeAuthenticationString(self, request, auth):
+    def makeAuthenticationString(request, auth):
         """Return an authentication string
 
         This string starts with the authentication type and then a space.
@@ -103,13 +103,13 @@ class IIdentificationPlugin(Interface.Base):
         Returns None if identification could not be made.
         """
 
-    def canIdentify(self, auth):
+    def canIdentify(auth):
         """Return true if the plugin knows how to identify this string"""
 
-    def identify(self, auth):
+    def identify(auth):
         """Return a username and a password from the authentication string"""
 
-    def _logout(self):
+    def _logout():
         """Destroys the identification information (if applicable)"""
 
 class IRolePlugin(Interface.Base):
@@ -121,16 +121,16 @@ class IRolePlugin(Interface.Base):
     # way you can have several plugins that modify roles
     # independently of each other.
 
-    def modifyGlobalRoles(self, user, roles):
+    def modifyGlobalRoles(user, roles):
         """Return a updated list of roles"""
 
-    def modifyLocalRoles(self, user, object, roles):
+    def modifyLocalRoles(user, object, roles):
         """Modify a list of local roles
 
         This is  XXX
         """
 
-    def isUserAllowed(self, user, object, object_roles, previous):
+    def isUserAllowed(user, object, object_roles, previous):
         """Check local roles for just one role
 
         This method is called from User.allowed(), and allows for several
@@ -145,7 +145,7 @@ class IRolePlugin(Interface.Base):
         previous is 0, in both cases needing no traversal at all.
         """
 
-    def getUsersWithRoles(self, object):
+    def getUsersWithRoles(object):
         """Returns a list of users that might have their roles modified."""
 
 class IGroupPlugin(IRolePlugin):
@@ -160,41 +160,41 @@ class IGroupPlugin(IRolePlugin):
     #
     # Group objects must in turn implement the IGroupObject interface.
 
-    def getGroupIds(self):
+    def getGroupIds():
         """Returns a list of the names of defined groups"""
 
-    def getGroupFromId(self, id):
+    def getGroupFromId(id):
         """Returns the group object"""
 
-    def getGroupsForUser(self, userid):
+    def getGroupsForUser(userid):
         """Returns all groups userid is a member of"""
 
-    def addGroup(self, id, title):
+    def addGroup(id, title):
         """Creates a new empty group"""
 
-    def getGroup(self, id):
+    def getGroup(id):
         """Returns the grop object for the named group"""
 
-    def getLocalGroups(self, object):
+    def getLocalGroups(object):
         """Returns a list of groups that are 'active' on this object"""
 
 class IGroupObject(Interface.Base):
 
-    def getUsers(self):
+    def getUsers():
         """Returns the names of the members of the group
 
         This is used by managemet interfaces to get direct members."""
 
-    def getComputedUsers(self):
+    def getComputedUsers():
         """Returns the names of the members of the group
 
         This is used by the security system to get all users that should
         be affected by a groups permissions."""
 
-    def addUsers(self, userids):
+    def addUsers(userids):
         """Adds the users with userids to the group"""
 
-    def removeUsers(self, userids):
+    def removeUsers(userids):
         """Removes the users with userids from the group"""
 
 

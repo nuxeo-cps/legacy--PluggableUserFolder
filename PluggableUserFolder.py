@@ -105,6 +105,12 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
     _product_interfaces = (IAuthenticationPlugin, IIdentificationPlugin,
                            IRolePlugin, IGroupPlugin)
 
+    try:
+        from Products.CPSDirectory.IUserFolder import IUserFolder
+        __implements__ = (IUserFolder,)
+    except ImportError:
+        pass
+                           
     def __init__(self):
         # As default, add the "Internal" plugins.
         ob = InternalAuthenticationPlugin()

@@ -9,6 +9,7 @@ if __name__ == '__main__':
 #os.environ['STUPID_LOG_FILE'] = os.path.join(os.getcwd(), 'zLOG.log')
 #os.environ['STUPID_LOG_SEVERITY'] = '-200'  # DEBUG
 
+from Interface.Verify import verifyClass
 from Testing import ZopeTestCase
 from Testing.ZopeTestCase import _user_name, _user_role, _folder_name, \
     _standard_permissions, ZopeLite
@@ -16,7 +17,7 @@ from AccessControl import Unauthorized
 
 
 from Products.PluggableUserFolder.PluggableUserFolder import \
-    manage_addPluggableUserFolder
+    manage_addPluggableUserFolder, PluggableUserFolder
 from Products.PluggableUserFolder.InternalAuthentication import \
     InternalAuthenticationPlugin
 from Products.PluggableUserFolder.PluginInterfaces import \
@@ -33,6 +34,8 @@ ZopeLite.installProduct('ZCatalog', 1)
 ZopeLite.installProduct('PageTemplates', 1)
 
 _pm = 'ThePublishedMethod'
+
+verifyClass
 
 class ReadonlyAuthenticationPlugin(InternalAuthenticationPlugin):
     """This plugin isn't really read only. It only said it is"""
@@ -277,6 +280,14 @@ class TestInstallFolder(TestBase):
         self.assert_(hasattr(self.uf, 'basic_identification'))
 
 class TestCPSAPI(TestBase):
+        
+    def testInterface(self):
+        try:
+            from Products.CPSDirectory.IUserFolder import IUserFolder
+            self.assert_(verifyClass(IUserFolder, PluggableUserFolder))
+        except ImportError:
+            pass
+            
 
     def testSearchAPI(self):
         # test_user_1_ is already created. Create some more to test searching.
