@@ -1,0 +1,18 @@
+From: <rmccain@3dex.com>
+>> I have installed PluggableUserFolder for my Zope installation, but have no
+>> idea how to make it read from a sql database. The Readme says that it is
+>> possible but I cannot find any documentation or comments or posts or
+>> anything anywhere about how to do it. Jeeezz. Somebody please
+>> HEEELLPPPP!!!!!!!
+
+Yeah, as you noticed, there is no documentation on how to write plugins yet.
+Sorry about that.
+
+However, it should be quite easy to make an SQL Plugin. I would try to make
+a plugin that has a set of Z SQL Methods. One for getting user data, one for
+changing user data, one for adding a user and one for deleting a user.
+
+Then take a look at how InternalAuthentication plugin works, and every time
+it looks in it's dictionary of user objects, you would instead call the
+proper Z SQL Method.
+
