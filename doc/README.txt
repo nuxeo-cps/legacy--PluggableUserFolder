@@ -7,7 +7,7 @@ PluggableUserFolder: A Zope UserFolder with authentication plugins
   sources of users, such as LDAP or SQL sources, and also extending
   the role management, such as group support and black lists.
 
-  It also supports using all of these simoultenously. You can have users
+  It also supports using all of these simultaneously. You can have users
   defined in Zope, in an SQL database and via LDAP, all at once. You can
   have groups and blacklists at the same time. You can support cookies
   and SSL Certificates without problems.
