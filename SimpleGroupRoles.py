@@ -113,7 +113,9 @@ class SimpleGroup(SimpleItem):
         for userid in userids:
             if not userid in self.members:
                 self.members.append(userid)
-        for userid in self.members:
+        # Make sure it's a copy we iterate over and not the original
+        # list, since we modify the list during the iteration.
+        for userid in self.members[:]:
             if not userid in userids:
                 index = self.members.index(userid)
                 del self.members[index]
