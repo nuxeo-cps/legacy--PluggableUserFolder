@@ -19,7 +19,7 @@
 __doc__='''Apache SSL Identification Plugin'''
 __version__='$Revision$'[11:-2]
 
-from zLOG import LOG, ERROR
+from zLOG import LOG, DEBUG, ERROR
 from base64 import decodestring, encodestring
 from Acquisition import aq_base
 from OFS.PropertyManager import PropertyManager
@@ -38,10 +38,10 @@ class ApacheSSLIdentificationPlugin(PropertyManager, SimpleItem):
 
     _properties = ( {'id': 'ssl_id_source',
                      'type': 'string',
-                     'label': 'SSL Id Source field: SSL_CLIENT_',
+                     'label': 'SSL Id Source field',
                     },
                    )
-    ssl_id_source = 'I_DN_CN'
+    ssl_id_source = 'SSL_CLIENT_I_DN_CN'
 
     manage_options= PropertyManager.manage_options + SimpleItem.manage_options
 
@@ -49,7 +49,10 @@ class ApacheSSLIdentificationPlugin(PropertyManager, SimpleItem):
         # Make sure this is an SSL request via Apache
         if not request.other['SERVER_URL'].startswith('https://'):
             return None
-        username = request.environ.get('SSL_CLIENT_I_DN_CN')
+        ssl_id_source = self.ssl_id_source.strip()
+        LOG('ApacheSSLIdentification', DEBUG, 'makeAuthenticationString',
+            'Using %s for Id source\n' % ssl_id_source)
+        username = request.environ.get(ssl_id_source)
         if username is None:
             return None
         user = self.acl_users.getUser(username)
