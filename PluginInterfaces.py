@@ -140,6 +140,9 @@ class IRolePlugin(Interface.Base):
         previous is 0, in both cases needing no traversal at all.
         """
 
+    def getUsersWithRoles(self, object=None):
+        """Returns a list of users that might have their roles modified."""
+
 class IGroupPlugin(IRolePlugin):
     # XXX: I'm not sure if there are side effects of subclassinng
     # Interfaces...
@@ -158,15 +161,18 @@ class IGroupPlugin(IRolePlugin):
     def getGroupFromId(self, id):
         """Returns the group object"""
 
-        
+    def getGroupsForUser(self, userid):
+        """Returns all groups userid is a member of"""
+
+    def addGroup(self, id, title):
+        """Creates a new empty group"""
+
+    def getGroup(self, id):
+        """Returns the grop object for the named group"""
+
+
 class IGroupObject(Interface.Base):
 
-    def getMembers(self):
+    def getUsers(self):
         """Returns the names of the members of the group"""
 
-    def manageForm(self):
-        """Returns HTML code for a management form
-
-        This form should be made to be displayed inside a CMF template,
-        called on a RoleManager object.
-        """
