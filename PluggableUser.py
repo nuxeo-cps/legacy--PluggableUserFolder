@@ -1,3 +1,4 @@
+
 # Copyright (c) 2003 Nuxeo SARL <http://nuxeo.com>
 # Copyright (c) 2003 CEA <http://www.cea.fr>
 #
@@ -40,6 +41,8 @@ class PluggableUserMixin:
         """Return the list of roles assigned to a user."""
         LOG('PluggableUser', DEBUG, 'getRoles',
             'User: %s\n' % self.getId())
+        if not hasattr(self, 'acl_users'):
+            return ()
         plugins = self.acl_users._get_plugins(IRolePlugin)
         # plugins = self._sort_plugins(plugins, self.role_order)
         roles = self.roles[:] # Make sure it's a copy, and not the original
