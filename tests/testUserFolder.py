@@ -23,6 +23,8 @@ from Products.PluggableUserFolder.PluginInterfaces import \
     IAuthenticationPlugin, IIdentificationPlugin, IRolePlugin
 
 ZopeLite.installProduct('PluggableUserFolder', 1)
+# These are installed so that there are products that should
+# be filtered out by all_meta_types().
 ZopeLite.installProduct('ZCatalog', 1)
 ZopeLite.installProduct('PageTemplates', 1)
 
