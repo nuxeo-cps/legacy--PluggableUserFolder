@@ -106,8 +106,8 @@ class TestUserFolder(TestBase):
 
     def testGetUsers(self):
         users = self.uf.getUsers()
-        assert users != []
-        assert users[0].getUserName() == _user_name
+        self.assertNotEquals(users, [])
+        self.assertEquals(users[0].getUserName(), _user_name)
 
     def testGetUserNames(self):
         names = self.uf.getUserNames()
@@ -158,6 +158,7 @@ class TestUserFolder(TestBase):
     def testAuthenticate(self):
         user = self.uf.getUser(_user_name)
         assert user.authenticate('secret', self.app.REQUEST)
+
 
 class TestAccess(TestBase):
     '''Test UF is protecting access'''
@@ -328,11 +329,11 @@ class TestCPSAPI(TestBase):
 
     def testPropertySetting(self):
         user = self.uf.getUser('test_user_1_')
-        self.assertRaises(AttributeError, user.setProperty,'','')
+        self.assertRaises(AttributeError, user.setProperty, '', '')
         user.setProperty('roles', [_user_role, 'Manager', 'Owner'])
-        self.assertEquals(user.roles,  [_user_role, 'Manager', 'Owner'])
+        self.assertEquals(user.roles, [_user_role, 'Manager', 'Owner'])
         user.setProperties(roles = [_user_role])
-        self.assertEquals(user.roles,  [_user_role])
+        self.assertEquals(user.roles, [_user_role])
 
 
     def testCPSRoleAPI(self):
