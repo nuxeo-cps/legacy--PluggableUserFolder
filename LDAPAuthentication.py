@@ -39,8 +39,13 @@ from PluginInterfaces import IAuthenticationPlugin
 from PluggableUser import PluggableUserMixin
 
 class PluggableLDAPUser(PluggableUserMixin, LDAPUser):
+
     def _getProperty(self, id, default=None):
         return LDAPUser.getProperty(self, id, default)
+
+    def _setProperty(self, id, value):
+        return LDAPUser.setProperty(self, id, value)
+
 
 class LDAPAuthenticationPlugin(LDAPUserFolder):
     """This plugin stores the user definitions in the ZODB"""

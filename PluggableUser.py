@@ -202,7 +202,7 @@ class PluggableUserMixin:
 
     def _getProperty(self, id, default=None):
         return default
-        
+
     def getProperties(self, ids):
         res = {}
         for prop in ids:
@@ -212,6 +212,13 @@ class PluggableUserMixin:
     def setProperty(self, id, value):
         if id == 'roles':
             self.setRoles(value)
+        elif id == 'groups':
+            self.getUserFolder().setGroupsForUser(self.getId(), value)
+        else:
+            return self._setProperty(id, default)
+
+    def _setProperty(self, id, value):
+        raise AttributeError('User does not have property %s', id)
 
     def setProperties(self, **kw):
         for key, val in kw.items():
