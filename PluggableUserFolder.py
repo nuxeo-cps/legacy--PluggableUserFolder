@@ -27,7 +27,6 @@ from AccessControl.User import BasicUserFolder, UserFolder
 from AccessControl.Role import RoleManager, DEFAULTMAXLISTUSERS
 from OFS.ObjectManager import ObjectManager
 from OFS.SimpleItem import Item
-from ZODB.PersistentMapping import PersistentMapping
 
 from PluginInterfaces import IAuthenticationPlugin
 from Products.PluggableUserFolder.InternalAuthentication import \
@@ -177,6 +176,27 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
                 if plugin.getUser(name):
                     localnames.append(username)
             plugin._doDelUsers(localnames)
+
+    def _createInitialUser(self):
+        """
+        If there are no users or only one user in this user folder,
+        populates from the 'inituser' file in INSTANCE_HOME.
+        We have to do this even when there is already a user
+        just in case the initial user ignored the setup messages.
+        We don't do it for more than one user to avoid
+        abuse of this mechanism.
+        Called only by OFS.Application.initialize().
+        """
+        if len(self.data) <= 1:
+            info = readUserAccessFile('inituser')
+            if info:
+                name, password, domains, remote_user_mode = info
+                self._doDelUsers(self.getUserNames())
+                self._doAddUser(name, password, ('Manager',), domains)
+                try:
+                    os.remove(os.path.join(INSTANCE_HOME, 'inituser'))
+                except:
+                    pass
 
 
 def manage_addPluggableUserFolder(self, REQUEST=None):

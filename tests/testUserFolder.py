@@ -230,6 +230,7 @@ class TestPluginFolder(TestBase):
 
     # TODO: Add tests for adding, changing and deleting users to the
     # (deprecated) UserFolder interfaces
+    # Add test for _createInitialUser()
 
 # TODO: Create testsuites for each and every plugin used.
 
