@@ -1,4 +1,27 @@
 *******************************************
+** PluggableUserFolder V2.4.0 [R1 build 2004/03/15-13:46 by regebro]
+
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+- PluggableUser now implements property handling (needed for CPS3)
+- The LDAPAuthenticationPlugin is now read/write.
+Bug fixes:
+~~~~~~~~~~
+- Compatibility with LDAPUserGroupsFolder was buggy.
+- InternalAuthentication search did not handle '*' searches.
+- Group plugins can now delete groups!
+- Doing a CPSDirectory search on members now work again.
+- Searching in roles now work again.
+- Role oplugins are no longer required to take care of inheritance
+  themselves. This is probably inefficient, but makes for neater code.
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+-
+
+*******************************************
 ** PluggableUserFolder V2.3.1 [R1 build 2004/02/08-07:38 by fermigier]
 
 ZODB Requires:
