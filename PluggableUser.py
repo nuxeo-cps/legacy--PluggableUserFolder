@@ -220,7 +220,7 @@ class PluggableUserMixin:
             return self._setProperty(id, value)
 
     def _setProperty(self, id, value):
-        raise AttributeError('User does not have property %s', id)
+        raise AttributeError('User does not have property %s' % id)
 
     def setProperties(self, **kw):
         for key, val in kw.items():

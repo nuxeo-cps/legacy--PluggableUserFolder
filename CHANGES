@@ -10,6 +10,7 @@ Bug fixes:
   through the ZMI.
 - There was a bug in the error handling of InternalAuthenticationPlugin
   when acquisition of acl_users didn't work.
+- A typo in PluggableUser was fixed.
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -
