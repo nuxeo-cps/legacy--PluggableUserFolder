@@ -35,7 +35,7 @@ from Products.PluggableUserFolder.InternalAuthentication import \
 
 _marker=[]
 
-class PluggableUserFolder(ObjectManager, UserFolder):
+class PluggableUserFolder(ObjectManager, BasicUserFolder):
     meta_type='Pluggable User Folder'
     id       ='acl_users'
     title    ='Pluggable User Folder'
@@ -69,7 +69,6 @@ class PluggableUserFolder(ObjectManager, UserFolder):
     _product_interfaces = (IAuthenticationPlugin,)
 
     def __init__(self):
-        self.data=PersistentMapping() # Just here during development
         # As default, add the "Internal" plugins.
         ob=InternalAuthenticationPlugin()
         self._setObject(ob.id, ob)
@@ -100,6 +99,12 @@ class PluggableUserFolder(ObjectManager, UserFolder):
             result.append(plugin)
 
         return result
+
+    # ----------------------------------
+    # ZMI interfaces
+    # ----------------------------------
+
+    manage_userFolderProperties = DTMLFile('zmi/userFolderProps', globals())
 
     # ----------------------------------
     # Public UserFolder object interface
