@@ -107,7 +107,7 @@ if not _cmf_localroles_patch:
             return CatalogTool.old_listAllowedRolesAndUsers(self, user)
 
         if not hasattr(CatalogTool, 'old_listAllowedRolesAndUsers'):
-            CatalogTool.old_getAllowedRolesAndUsers = CatalogTool._listAllowedRolesAndUsers
+            CatalogTool.old_listAllowedRolesAndUsers = CatalogTool._listAllowedRolesAndUsers
 
         CatalogTool._listAllowedRolesAndUsers = _listAllowedRolesAndUsers
 
