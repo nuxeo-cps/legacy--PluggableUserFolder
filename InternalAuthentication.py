@@ -20,7 +20,7 @@
 __doc__ = '''Internal Authentication Plugin'''
 __version__ = '$Revision$'[11:-2]
 
-#from AccessControl.User import UserFolder
+from types import StringType
 from Globals import DTMLFile, MessageDialog
 from Acquisition import aq_base, aq_parent
 from AccessControl import AuthEncoding, ClassSecurityInfo
@@ -92,6 +92,89 @@ class InternalAuthenticationPlugin(SimpleItem):
         if user:
             user = user.__of__(self.aq_parent)
         return user
+
+    def listUserProperties(self):
+        """Lists properties settable or searchable on the users."""
+        return ('id', 'roles')
+
+    def searchUsers(self, query={}, props=None, options=None, **kw):
+        """Search for users having certain properties.
+
+        See PluggableUserFolder for API description.
+        This Plugin only searches on is and roles."""
+
+        #
+        # Search helpers
+        #
+        def _preprocessQuery(mapping):
+            """Compute is_list_search and query."""
+            is_list_search = {}
+            query = {}
+            for key, value in mapping.items():
+                if type(value) is StringType:
+                    is_list_search[key] = 0
+                    query[key] = value.lower()
+                else:
+                    is_list_search[key] = 1
+                    query[key] = value
+            return is_list_search, query
+
+        def _isEntryMatching(entry, is_list_search, query):
+            """Is the entry matching the query?
+
+            Does an AND search for all key, value of the query.
+            If the entry value corresponding to a key is a list,
+            does an OR search on all the list elements.
+            If the query value is a string, does a substring lowercase search.
+            If the query value is a list, does OR search with exact match.
+            """
+            for key, value in query.items():
+                if not value:
+                    # Ignore empty searches.
+                    continue
+                if not entry.has_key(key):
+                    return 0
+                searched = entry[key]
+                if searched is None:
+                    return 0
+                if type(searched) is StringType:
+                    searched = (searched,)
+                matched = 0
+                for item in searched:
+                    if is_list_search[key]:
+                        matched = item in value
+                    else:
+                        matched = item.lower().find(value) != -1
+                    if matched:
+                        break
+                if not matched:
+                    return 0
+            return 1
+
+        kw.update(query)
+        query = kw
+        do_roles = query.has_key('roles')
+        is_list_search, query = _preprocessQuery(query)
+        res = []
+        for user in self.getUsers():
+            base_user = aq_base(user)
+            id = user.getId()
+            entry = {'id': id}
+            if do_roles:
+                roles = user.getRoles()
+                entry['roles'] = [r for r in roles
+                                if r not in ('Anonymous', 'Authenticated')]
+            if not _isEntryMatching(entry, is_list_search, query):
+                continue
+            if props is None:
+                res.append(id)
+            else:
+                d = {}
+                for key in props:
+                    if entry.has_key(key):
+                        d[key] = entry[key]
+                res.append((id, d))
+        return res
 
     #
     # ZMI methods
@@ -212,7 +295,7 @@ class InternalAuthenticationPlugin(SimpleItem):
         for name in names:
             del self.data[name]
 
-    def _addUser(self,name,password,confirm,roles,domains,REQUEST=None):
+    def _addUser(self,name,password,confirm,roles=[],domains=[],REQUEST=None):
         if not name:
             return MessageDialog(
                    title  ='Illegal value',
@@ -235,9 +318,6 @@ class InternalAuthenticationPlugin(SimpleItem):
                    title  ='Illegal value',
                    message='Password and confirmation do not match',
                    action ='manage_main')
-
-        if not roles: roles = []
-        if not domains: domains = []
 
         if domains and not self.domainSpecValidate(domains):
             return MessageDialog(
