@@ -26,15 +26,11 @@ from Globals import MessageDialog, DTMLFile
 from Acquisition import aq_base
 from OFS.SimpleItem import SimpleItem
 
-try:
-    from Products.LDAPUserGroupsFolder.LDAPUserFolder import LDAPUserFolder
-except:
-    from Products.LDAPUserFolder.LDAPUserFolder import LDAPUserFolder
-
+from LDAPAuthentication import LDAPAuthenticationPlugin, _ldap_user_groups
 from PluginInterfaces import IAuthenticationPlugin
 from PluggableUser import PluggableUserWrapper
 
-class LDAPLoginPlugin(LDAPUserFolder):
+class LDAPLoginPlugin(LDAPAuthenticationPlugin):
     """This plugin stores the user definitions in the ZODB"""
     meta_type = 'LDAP Login'
     title = 'LDAP Login'
@@ -42,11 +38,6 @@ class LDAPLoginPlugin(LDAPUserFolder):
     isAUserFolder = 0
 
     __implements__ = (IAuthenticationPlugin,)
-
-    manage_options = (
-        LDAPUserFolder.manage_options[:6]+
-        SimpleItem.manage_options
-        )
 
     def isReadOnly(self):
         """Returns 1 if you can not add, change or delete users"""
@@ -73,11 +64,7 @@ class LDAPLoginPlugin(LDAPUserFolder):
         else:
             LOG('LDAP Login', DEBUG, 'getUser',
                 'Username: %s\nPassword: %s\n' % (name, password))
-            user = LDAPUserFolder.getUser(self, name, password)
-            if user is not None:
-                user = user.__of__(self)
-                user = user.__of__(PluggableUserWrapper())
-            return user
+            return LDAPAuthenticationPlugin.getUser(self, name, password)
 
 
 addLDAPLoginPlugin = DTMLFile('zmi/addLDAPLoginPlugin', globals())
@@ -88,11 +75,23 @@ def manage_addLDAPLoginPlugin(self, id, title, LDAP_server, login_attr
                             , rdn_attr='cn', local_groups=0, use_ssl=0
                             , encryption='SHA', read_only=0, REQUEST=None):
     """ """
-    ob = LDAPLoginPlugin(title, LDAP_server, login_attr, users_base, users_scope
-                          , roles, groups_base, groups_scope, binduid, bindpwd
-                          , binduid_usage, rdn_attr, local_groups=local_groups
-                          , use_ssl=not not use_ssl, encryption=encryption
-                          , read_only=read_only, REQUEST=None)
+    if _ldap_user_groups:
+        usergroups_base = usergroups_scope = ''
+        ob = LDAPAuthenticationPlugin(title, LDAP_server, login_attr, users_base
+                          , users_scope, roles, groups_base, groups_scope
+                          , usergroups_base, usergroups_scope
+                          , binduid, bindpwd, binduid_usage, rdn_attr
+                          , local_groups=local_groups, local_usergroups=1
+                          , use_ssl=not not use_ssl
+                          , encryption=encryption, read_only=read_only
+                          , REQUEST=None)
+    else:
+        ob = LDAPAuthenticationPlugin(title, LDAP_server, login_attr, users_base
+                          , users_scope, roles, groups_base, groups_scope
+                          , binduid, bindpwd, binduid_usage, rdn_attr
+                          , local_groups=local_groups, use_ssl=not not use_ssl
+                          , encryption=encryption, read_only=read_only
+                          , REQUEST=None)
     ob.id = id
     self = self.this()
     if hasattr(aq_base(self), id):
