@@ -140,7 +140,7 @@ class IRolePlugin(Interface.Base):
         previous is 0, in both cases needing no traversal at all.
         """
 
-    def getUsersWithRoles(self, object=None):
+    def getUsersWithRoles(self, object):
         """Returns a list of users that might have their roles modified."""
 
 class IGroupPlugin(IRolePlugin):
@@ -170,6 +170,8 @@ class IGroupPlugin(IRolePlugin):
     def getGroup(self, id):
         """Returns the grop object for the named group"""
 
+    def getLocalGroups(self, object):
+        """Returns a list of groups that are 'active' on this object"""
 
 class IGroupObject(Interface.Base):
 
