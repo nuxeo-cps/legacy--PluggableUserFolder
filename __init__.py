@@ -27,8 +27,9 @@ import InternalAuthentication
 import BasicIdentification
 import ApacheSSLIdentification
 import CookieIdentification
-# The GroupRoles Plugin does not work with CPS2.2 and is therefore
-# commented out in thei release.
+import CASIdentification
+# The GroupRoles Plugin does not work with CPS and is therefore
+# commented out in this release.
 #import GroupRoles
 import SimpleGroupRoles
 
@@ -82,8 +83,15 @@ def initialize(context):
             (CookieIdentification.manage_addCookieIdentificationPlugin,),
         icon = 'zmi/UserFolder_icon.gif',
         visibility = None)
-# The GroupRoles Plugin does not work with CPS2.2 and is therefore
-# commented out in thei release.
+    context.registerClass(
+        instance_class = CASIdentification.CASIdentificationPlugin,
+        permission = add_user_folders,
+        constructors =
+            (CASIdentification.manage_addCASIdentificationPlugin,),
+        icon = 'zmi/UserFolder_icon.gif',
+        visibility = None)
+# The GroupRoles Plugin does not work with CPS and is therefore
+# commented out in this release.
 #    context.registerClass(
 #        instance_class = GroupRoles.GroupRolesPlugin,
 #        permission = add_user_folders,

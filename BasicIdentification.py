@@ -56,6 +56,9 @@ class BasicIdentificationPlugin(SimpleItem):
         LOG('BasicIdentification', DEBUG, name)
         return name, password
 
+    def _logout(self):
+        pass
+    
 
 def manage_addBasicIdentificationPlugin(self, REQUEST=None):
     """ """

@@ -3,10 +3,13 @@ Requires:
 -
 New features:
 ~~~~~~~~~~~~~
--
+- Added a CASIdentification plugin for the CAS single-sign-on solution
+  (see http://www.yale.edu/tp/cas/)
+- The login page can now be external to the Zope site.
+- IdentificationPlugins now can tell you what parameters 
+  (like came_from) it wants to pass to the login-page.
 Bug fixes:
 ~~~~~~~~~~
--
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
--
+- _logout() is now a required attribute of plugins.

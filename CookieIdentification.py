@@ -145,13 +145,10 @@ class CookieIdentificationPlugin(PropertyManager, SimpleItem):
             'User: %s\n' % name)
         return name, password
 
-    security.declarePublic('logout')
-    def logout(self):
-        '''Log out the user and redirect to the logout page.'''
+    def _logout(self):
         req = self.REQUEST
         resp = req['RESPONSE']
         resp.expireCookie(self.auth_cookie, path='/')
-        # XXX No redirect is done. Check with CookieCrimbler
 
     #
     # Internal methods

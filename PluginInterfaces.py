@@ -109,6 +109,8 @@ class IIdentificationPlugin(Interface.Base):
     def identify(self, auth):
         """Return a username and a password from the authentication string"""
 
+    def _logout(self):
+        """Destroys the identification information (if applicable)"""
 
 class IRolePlugin(Interface.Base):
 

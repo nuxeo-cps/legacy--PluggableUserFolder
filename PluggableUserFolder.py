@@ -24,7 +24,7 @@ __version__ = '$Revision$'[11:-2]
 # so don't remove them even though they are unused.
 from zLOG import LOG, DEBUG, BLATHER, INFO, PROBLEM, WARNING, ERROR
 import os
-from urllib import quote
+from urllib import quote, urlencode
 
 if os.environ.get("ZOPE_PLUGGABLE_LOGGING", None) == "OFF":
     def LOG(*args, **kw):
@@ -776,7 +776,6 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
     #
     def __call__(self, container, req):
         '''The __before_publishing_traverse__ hook.'''
-        #import pdb;pdb.set_trace()
         resp = self.REQUEST['RESPONSE']
         if req.__class__ is not HTTPRequest:
             return
@@ -831,19 +830,34 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         if self.login_page:
             req = self.REQUEST
             resp = req['RESPONSE']
-            iself = getattr(self, 'aq_inner', self)
-            parent = getattr(iself, 'aq_parent', None)
-            page = getattr(parent, self.login_page, None)
-            if page is not None:
-                retry = getattr(resp, '_auth', 0) and '1' or ''
-                came_from = req.get('came_from', None)
-                if came_from is None:
-                    came_from = req['URL']
-                url = '%s?came_from=%s&retry=%s&disable_cookie_login__=1' % (
-                    page.absolute_url(), quote(came_from), retry)
-                return url
+            if self.login_page.startswith('http'):
+                plugins = self._get_plugins(IIdentificationPlugin)
+                plugins = self._sort_plugins(plugins, self.identification_order)
+                params = {}
+                for each in plugins:
+                    if hasattr(each, 'getLoginURLParams'):
+                        params.update(each.getLoginURLParams(req))
+                return '%s?%s' % (self.login_page, urlencode(params))
+            else:
+                iself = getattr(self, 'aq_inner', self)
+                parent = getattr(iself, 'aq_parent', None)
+                page = getattr(parent, self.login_page, None)
+                if page is not None:
+                    came_from = req.get('came_from', None)
+                    if came_from is None:
+                        came_from = req['URL']
+                    retry = getattr(resp, '_auth', 0) and '1' or ''
+                    url = '%s?came_from=%s&retry=%s&disable_cookie_login__=1' % (
+                        page.absolute_url(), quote(came_from), retry)
+                    return url
         return None
-
+    
+    security.declarePublic('logout')
+    def logout(self):
+        plugins = self._get_plugins(IIdentificationPlugin)
+        for each in plugins:
+            each._logout()
+        
     # Installation and removal of traversal hooks.
 
     def manage_beforeDelete(self, item, container):

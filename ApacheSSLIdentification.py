@@ -93,6 +93,9 @@ class ApacheSSLIdentificationPlugin(PropertyManager, SimpleItem):
                 return p.get('label', id)
         return id
 
+    def _logout(self):
+        pass
+
 
 def manage_addApacheSSLIdentificationPlugin(self, REQUEST=None):
     """ """
