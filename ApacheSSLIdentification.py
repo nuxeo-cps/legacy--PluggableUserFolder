@@ -39,6 +39,7 @@ class ApacheSSLIdentificationPlugin(PropertyManager, SimpleItem):
     _properties = ( {'id': 'ssl_id_source',
                      'type': 'string',
                      'label': 'SSL Id Source field',
+                     'mode': 'rw',
                     },
                    )
     ssl_id_source = 'SSL_CLIENT_I_DN_CN'
