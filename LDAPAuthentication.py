@@ -50,8 +50,10 @@ class LDAPAuthenticationPlugin(LDAPUserFolder):
         return 1
 
     def getUser(self, name, password=None):
-        return PluggableUserWrapper(
-                   LDAPUserFolder.getUser(self, name, password))
+        user = LDAPUserFolder.getUser(self, name, password)
+        if user is not None:
+            user = PluggableUserWrapper(user)
+        return user
 
 
 addLDAPAuthenticationPlugin = DTMLFile('zmi/addLDAPAuthenticationPlugin', \
