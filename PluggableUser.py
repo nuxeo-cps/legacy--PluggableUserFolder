@@ -213,7 +213,7 @@ class PluggableUserMixin:
 
     def setProperty(self, id, value):
         if id == 'roles':
-            self.setRoles(value)
+            self.roles = value
         elif id == 'groups':
             self.getUserFolder().setGroupsForUser(self.getId(), value)
         else:
