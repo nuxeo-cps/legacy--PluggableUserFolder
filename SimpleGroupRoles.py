@@ -22,7 +22,7 @@ __version__ = '$Revision$'[11:-2]
 
 from PluggableUserFolder import LOG, DEBUG
 from Globals import DTMLFile, MessageDialog
-from Acquisition import aq_base, aq_inner
+from Acquisition import aq_base, aq_inner, aq_parent
 from AccessControl import ClassSecurityInfo
 from OFS.SimpleItem import SimpleItem
 from OFS.Folder import Folder
@@ -37,7 +37,6 @@ ROLEATTRIBUTENAME = '__ac_local_group_roles__'
 class SimpleGroup(SimpleItem):
 
     meta_type = 'Simple Group'
-    global_roles = []
     manage_options = ({'label':'Group', 'action':'manage_groupForm'},) + \
                      SimpleItem.manage_options
     _properties = (
@@ -54,7 +53,7 @@ class SimpleGroup(SimpleItem):
         self.id = id
         self.title = title
         self.members = PersistentList()
-        self.global_roles = []
+        self.groups = PersistentList()
 
     #
     # API
@@ -63,9 +62,26 @@ class SimpleGroup(SimpleItem):
         return self.title
 
     def getMembers(self):
+        """Returns the members of this group"""
         return tuple(self.members)
 
-    getUsers = getMembers
+    def getUsers(self):
+        """Returns all users that are members of this group or subgroup"""
+        users = list(self.getMembers())
+        groups = []
+        for group in self.getGroups():
+            if group not in groups:
+                plugin = aq_parent(self)
+                groupob = plugin.getGroup(group)
+                for user in groupob.getMembers():
+                    if user not in users:
+                        users.append(user)
+                groups.append(group)
+        return tuple(users)
+
+    def getGroups(self):
+        """Returns all groups that are member of this group"""
+        return tuple(self.groups)
 
     #
     # UI support functions (called from ZMI)
@@ -80,19 +96,22 @@ class SimpleGroup(SimpleItem):
     def manage_editSettings(self, title=None, REQUEST=None):
         """Change the settings of the group"""
         if title is not None:
-            self.title = title
+            self.setTitle(title)
 
         if REQUEST is not None:
             return self.manage_groupForm(manage_tabs_message='Settings changed')
 
-    def manage_addUser(self, userids, REQUEST=None):
+    def setTitle(self, title):
+        self.title = title
+
+    def manage_addUsers(self, userids, REQUEST=None):
         """Add a user to the members of the group"""
         # XXX check that user exists
         self.addUsers(userids)
         if REQUEST is not None:
             return self.manage_groupForm(manage_tabs_message='Users added')
 
-    def manage_deleteUsers(self, selected, REQUEST=None):
+    def manage_deleteUsers(self, selectedusers, REQUEST=None):
         """Delete the users in the "selected" list of userids"""
         self.deleteUsers(selected)
         if REQUEST is not None:
@@ -120,8 +139,29 @@ class SimpleGroup(SimpleItem):
                 index = self.members.index(userid)
                 del self.members[index]
 
-    def setTitle(self, title):
-        self.title = title
+    def manage_addGroups(self, groupids, REQUEST=None):
+        """Add a user to the members of the group"""
+        # XXX check that user exists
+        self.addGroups(groupids)
+        if REQUEST is not None:
+            return self.manage_groupForm(manage_tabs_message='Groups added')
+
+    def manage_deleteGroups(self, selectedgroups, REQUEST=None):
+        """Delete the users in the "selected" list of userids"""
+        self.deleteGroups(selected)
+        if REQUEST is not None:
+            return self.manage_groupForm(manage_tabs_message='Groups deleted')
+
+    def addGroups(self, groupids):
+        for groupid in groupids:
+            if not groupid in self.groups:
+                self.groups.append(groupid)
+
+    def deleteGroups(self, groupids):
+        for groupid in groupids:
+            if groupid in self.groups:
+                index = self.groups.index(groupid)
+                del self.groups[index]
 
 
 class SimpleGroupRolesPlugin(Folder):

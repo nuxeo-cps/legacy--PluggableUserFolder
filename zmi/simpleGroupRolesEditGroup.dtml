@@ -33,7 +33,7 @@
 <dtml-in getMembers prefix="user">
   <tr <dtml-if sequence-odd>bgcolor="#CCCCCC"</dtml-if>>
     <td>
-       <input type="checkbox" name="selected:list" value="&dtml-user_item;">
+       <input type="checkbox" name="selectedusers:list" value="&dtml-user_item;">
     </td>
     <td>
        <dtml-var user_item>
@@ -47,12 +47,13 @@
         value="Delete user" />
   </td>
 </tr>
-</table>
-<p>&nbsp;</p>
 
-<table cellspacing="0" cellpadding="2" border="0">
 <tr>
-  <td class="form-label">New user</td>
+  <td>&nbsp;</td>
+  <td class="form-label">Add user</td>
+</tr>
+<tr>
+  <td>&nbsp;</td>
   <td class="form-element">
     <select multiple name="userids:list">
       <dtml-in "acl_users.getUserNames()" prefix="user">
@@ -67,8 +68,59 @@
 <tr>
   <td>&nbsp;</td>
   <td class="form-element">
-    <input class="form-element" type="submit" name="manage_addUser:method"
+    <input class="form-element" type="submit" name="manage_addUsers:method"
         value="Add User" />
+  </td>
+</tr>
+
+<tr>
+  <td>&nbsp;</td>
+</tr>
+
+<tr>
+  <td>&nbsp;</td>
+  <td class="form-label">groupid</td>
+</tr>
+<dtml-in getGroups prefix="group">
+  <tr <dtml-if sequence-odd>bgcolor="#CCCCCC"</dtml-if>>
+    <td>
+       <input type="checkbox" name="selectedgroups:list" value="&dtml-group_item;">
+    </td>
+    <td>
+       <dtml-var group_item>
+    </td>
+  </tr>
+</dtml-in>
+<tr>
+  <td>&nbsp;</td>
+  <td class="form-element" colspan="5">
+    <input class="form-element" type="submit" name="manage_deleteGroups:method"
+        value="Delete groups" />
+  </td>
+</tr>
+
+<tr>
+  <td>&nbsp;</td>
+  <td class="form-label">Add Groups</td>
+</tr>
+<tr>
+  <td>&nbsp;</td>
+  <td class="form-element">
+    <select multiple name="groupids:list">
+      <dtml-in "acl_users.getGroupIds()" prefix="group">
+        <dtml-if "group_item != getId() and group_item not in getGroups()">
+          <option value="&dtml-group_item;"><dtml-var group_item></option>
+        </dtml-if>
+      </dtml-in>
+    </select>
+  </td>
+</tr>
+
+<tr>
+  <td>&nbsp;</td>
+  <td class="form-element">
+    <input class="form-element" type="submit" name="manage_addGroups:method"
+        value="Add Groups" />
   </td>
 </tr>
 
