@@ -58,7 +58,7 @@ class CookieIdentificationPlugin(PropertyManager, SimpleItem):
     auth_cookie = '__ac'
     name_cookie = '__ac_name'
     pw_cookie = '__ac_password'
-    zeo_compatibility = 0
+    zeo_compatibility = 1
 
     manage_options = PropertyManager.manage_options + SimpleItem.manage_options
 
