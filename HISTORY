@@ -1,4 +1,10 @@
 *******************************************
+** PluggableUserFolder V1.3.1 [R1 build 2003-08/21-10:42 by regebro]
+
+Bug fixes:
+~~~~~~~~~~
+- Works better with CPS2's assumption of group support.
+*******************************************
 ** PluggableUserFolder V1.3.0 [R1 build 2003-07/03-13:55 by regebro]
 
 New features:
