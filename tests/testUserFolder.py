@@ -324,8 +324,11 @@ class TestCPSAPI(TestBase):
 
     def testPropertySetting(self):
         user = self.uf.getUser('test_user_1_')
-        self.assertRaises(NotImplementedError, user.setProperty,'','')
-        self.assertRaises(NotImplementedError, user.setProperties)
+        self.assertRaises(AttributeError, user.setProperty,'','')
+        user.setProperty('roles', [_user_role, 'Manager', 'Owner'])
+        self.assertEquals(user.roles,  [_user_role, 'Manager', 'Owner'])
+        user.setProperties(roles = [_user_role])
+        self.assertEquals(user.roles,  [_user_role])
 
 
     def testCPSRoleAPI(self):
