@@ -11,7 +11,6 @@ if __name__ == '__main__':
 
 from testUserFolder import TestBase
 from Testing.ZopeTestCase import _user_name
-from Products.PluggableUserFolder.PluggableUserFolder import _no_password_check
 from Products.PluggableUserFolder.CookieIdentification import \
     CookieIdentificationPlugin, manage_addCookieIdentificationPlugin
 
@@ -25,7 +24,6 @@ class TestPlugin(TestBase):
         self.app.REQUEST[self.plugin.pw_cookie] = 'secret'
 
     def testMakeAuthString(self):
-        request = self.app
         authstr = self.plugin.makeAuthenticationString(self.app.REQUEST, None)
         self.failUnless(authstr)
         self.failUnless(self.plugin.canIdentify(authstr))

@@ -7,8 +7,6 @@ if __name__ == '__main__':
 #os.environ['STUPID_LOG_SEVERITY'] = '-200'  # DEBUG
 
 from testUserFolder import TestBase
-from Testing.ZopeTestCase import _user_name
-from Products.PluggableUserFolder.PluggableUserFolder import _no_password_check
 
 class TestPlugin(TestBase):
 
