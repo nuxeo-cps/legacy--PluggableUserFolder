@@ -29,7 +29,9 @@ from zLOG import LOG, INFO
 from AccessControl.PermissionRole import rolesForPermissionOn
 
 try:
-    from Products.CMFCore.CatalogTool import CatalogTool
+    from Products.CMFCore import utils
+    from Products.CMFCore.CatalogTool import IndexableObjectWrapper,\
+         CatalogTool
 
     LOG('PluggableUserFolder', INFO, 'Patching CMF')
 
@@ -39,6 +41,7 @@ try:
         When called with withgroups=1, the keys are
         of the form user:foo and group:bar."""
         # Modified from AccessControl.User.getRolesInContext().
+        LOG('PluggableUserFolder', DEBUG, 'Patched mergedLocalRoles()')
         merged = {}
         object = getattr(object, 'aq_inner', object)
         while 1:
@@ -73,6 +76,7 @@ try:
                 continue
             break
         return merged
+    utils.mergedLocalRoles = mergedLocalRoles
 
 
     def allowedRolesAndUsers(self):
@@ -80,6 +84,7 @@ try:
         Return a list of roles, users and groups with View permission.
         Used by PortalCatalog to filter out items you're not allowed to see.
         """
+        LOG('PluggableUserFolder', DEBUG, 'Patched allowedRolesAndUsers()')
         ob = self._IndexableObjectWrapper__ob # Eeek, manual name mangling
         allowed = {}
         for r in rolesForPermissionOn('View', ob):
@@ -92,10 +97,11 @@ try:
         if allowed.has_key('Owner'):
             del allowed['Owner']
         return list(allowed.keys())
-    #IndexableObjectWrapper.allowedRolesAndUsers = allowedRolesAndUsers
+    IndexableObjectWrapper.allowedRolesAndUsers = allowedRolesAndUsers
 
 
     def _listAllowedRolesAndUsers(self, user):
+        LOG('PluggableUserFolder', DEBUG, 'Patched allowedRolesAndUsers()')
         result = list(user.getRoles())
         result.append('Anonymous')
         result.append('user:%s' % user.getUserName())
