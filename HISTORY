@@ -1,4 +1,20 @@
 *******************************************
+** PluggableUserFolder V2.5.1 [R1 build 2005/04/13-09:13 by ben]
+
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+-
+Bug fixes:
+~~~~~~~~~~
+- Small XHTML validation fixes.
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+-
+
+*******************************************
 ** PluggableUserFolder V2.5.0 [R1 build 2004/08/27-14:42 by regebro]
 
 Requires:
