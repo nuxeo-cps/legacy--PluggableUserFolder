@@ -480,13 +480,14 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
         # deal with role management plugins, to get a better list
         plugins = self._get_plugins(IRolePlugin)
 
+        result = {}
         if not withgroups:
             # This is probably not CPS. We will simply return a correct and
             # complete list of all users and their roles in this place.
             for plugin in plugins:
-                for user in plugin.getUsersWithRoles():
+                for user in plugin.getUsersWithRoles(object):
                     if not merged.has_key(user):
-                        merged[user] = ()
+                        merged[user] = []
 
             for plugin in plugins:
                 for user in merged.keys():
@@ -500,7 +501,6 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             # are members of groups, but that is no problem, just overhead.
             # Also this adds the 'user:' prefix to users that CPS
             # wants when withgroups is given.
-            result = {}
             for plugin in plugins:
                 for user in merged.keys():
                     result['user:' + user] = plugin.modifyLocalRoles(
@@ -509,9 +509,13 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             plugins = self._get_plugins(IGroupPlugin)
             for plugin in plugins:
                 for group in plugin.getLocalGroups(object):
-                    result['group:' + group] = \
-                        plugin.getGroupRolesOnObject(group, object)
-
+                    group_roles = plugin.getGroupRolesOnObject(group, object)
+                    for role in plugin.getAcquiredGroupRoles(group, object):
+                        for acquired_role in role['roles']:
+                            if acquired_role in group_roles:
+                                continue
+                            group_roles.append(acquired_role)
+                    result['group:' + group] = group_roles
         return result
 
     def mergedLocalRolesWithPath(self, object, withgroups=0):
@@ -582,8 +586,9 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             for plugin in plugins:
                 for user in merged.keys():
                     result[user] = []
+                    user_append = result[user].append
                     for dict in merged[user]:
-                        result[user].append(
+                        user_append(
                             {'url': dict['url'],
                              'roles': plugin.modifyLocalRoles(
                                         user, object, dict['roles'])})
@@ -591,12 +596,23 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             plugins = self._get_plugins(IGroupPlugin)
             for plugin in plugins:
                 for group in plugin.getLocalGroups(object):
-                    result['group:'+group] = []
-                    for dict in merged['group:'+group]:
-                        result['group:'+group].append(
-                            {'url': dict['url'],
-                             'roles': plugin.getGroupRolesOnObject(group, object)})
+                    group_name = 'group:' + group
+                    result[group_name] = []
+                    append_groups = result[group_name].append
+                    for dict in merged[group_name]:
+                        group_dict = {'url': dict['url'],
+                             'roles': plugin.getGroupRolesOnObject(group, object)}
+                        if group_dict in result[group_name]:
+                            continue
+                        append_groups(group_dict)
 
+                    for role in plugin.getAcquiredGroupRoles(group, object):
+                        obj_url = utool.getRelativeUrl(role['obj'])
+                        for acquired_role in role['roles']:
+                            if acquired_role in result[group_name]:
+                                continue
+                            append_groups(
+                                {'roles': [acquired_role], 'url': obj_url})
         return result
 
     def _allowedRolesAndUsers(self, ob):
@@ -750,7 +766,7 @@ class PluggableUserFolder(ObjectManager, BasicUserFolder):
             if plugin.canIdentify(auth):
                 return plugin.identify(auth)
 
-        LOG('PluggableUserFolder', ERROR, 'identify',
+        LOG('PluggableUserFolder', DEBUG, 'identify',
             'No plugins able to identify user\n')
         return None, None
 

@@ -91,6 +91,12 @@ class PluggableUserMixin:
             for plugin in plugins:
                 user_roles = plugin.modifyLocalRoles(userid,
                                 inner_object, user_roles)
+
+                for groupid in plugin.getGroupsOnObject(inner_object):
+                    user_roles.extend(plugin.getGroupRolesOnObject(groupid,
+                                                          inner_object))
+
+
             for r in user_roles:
                 local[r] = 1 #Using mappings is a neat way of doing unions.
             inner = getattr(inner_object, 'aq_inner', inner_object)
