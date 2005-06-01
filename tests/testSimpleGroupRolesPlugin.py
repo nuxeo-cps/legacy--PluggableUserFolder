@@ -6,32 +6,17 @@ import os, sys
 if __name__ == '__main__':
     execfile(os.path.join(sys.path[0], 'framework.py'))
 
+from Testing import ZopeTestCase
+
+# Needs CPSUserFolder to get monkey-patching of UserFolder for groups
+ZopeTestCase.installProduct('CPSUserFolder', quiet=1)
+
 #os.environ['STUPID_LOG_FILE'] = os.path.join(os.getcwd(), 'zLOG.log')
 #os.environ['STUPID_LOG_SEVERITY'] = '-200'  # DEBUG
 
 from OFS.Folder import Folder
 
-from Testing import ZopeTestCase
 from testUserFolder import TestBase
-from Interface.Verify import verifyClass
-
-from Testing.ZopeTestCase import _user_name, _folder_name
-
-from Products.PluggableUserFolder.PluginInterfaces import \
-    IGroupPlugin
-from Products.PluggableUserFolder.SimpleGroupRoles import \
-    SimpleGroupRolesPlugin, manage_addSimpleGroupRolesPlugin
-
-from Products.PluggableUserFolder.PluggableUserFolder import \
-    manage_addPluggableUserFolder, PluggableUserFolder
-from Products.PluggableUserFolder.InternalAuthentication import \
-    InternalAuthenticationPlugin
-from Products.PluggableUserFolder.PluginInterfaces import \
-    IAuthenticationPlugin, IIdentificationPlugin, IRolePlugin
-from Products.PluggableUserFolder.BasicIdentification import \
-    manage_addBasicIdentificationPlugin
-from Products.PluggableUserFolder.SimpleGroupRoles import \
-    manage_addSimpleGroupRolesPlugin
 
 def sorted(l):
     l = list(l)
@@ -43,27 +28,17 @@ class TestBase(ZopeTestCase.ZopeTestCase):
     _setup_fixture = 0
 
     def afterSetUp(self):
+        from Products.PluggableUserFolder.SimpleGroupRoles import \
+             manage_addSimpleGroupRolesPlugin
+        from Products.PluggableUserFolder.PluggableUserFolder import \
+             manage_addPluggableUserFolder
+
         self._setupFolder()
         manage_addPluggableUserFolder(self.folder)
         self.uf = self.folder.acl_users
         manage_addSimpleGroupRolesPlugin(self.uf)
         self.uf.userFolderAddUser('someuser', 'secret',
-            ['SomeRole'], ['somegroup'])
-
-    def beforeClose(self, call_close_hook=1):
-        '''Clears out the fixture.'''
-        self._logout()
-        try: del self.uf
-        except AttributeError: pass
-        try: del self.folder.acl_users
-        except AttributeError: pass
-        try: self.app._delObject(_folder_name)
-        except (AttributeError, RuntimeError): pass
-        try: del self.folder
-        except AttributeError: pass
-        try: del self._user
-        except AttributeError: pass
-
+                                  ['SomeRole'], ['somegroup'])
 
 class TestUserFolder(TestBase):
     '''Test UF is working'''
@@ -95,17 +70,18 @@ class TestUserFolder(TestBase):
         fold.manage_setLocalGroupRoles('somegroup', ['Chief'])
         self.assertEquals(sorted(user.getRolesInContext(root)), base)
         self.assertEquals(sorted(user.getRolesInContext(fold)),
-                          ['Authenticated', 'Chief', 'Daddy',
-                           'SomeRole'])
+                          ['Authenticated', 'Chief', 'Daddy', 'SomeRole'])
         self.assertEquals(sorted(user.getRolesInContext(ob)),
-                          ['Authenticated', 'Chief', 'Daddy',
-                           'SomeRole'])
+                          ['Authenticated', 'Chief', 'Daddy', 'SomeRole'])
 
 class TestPlugin(TestBase):
 
     def testInterface(self):
-        self.assert_(verifyClass(IGroupPlugin,
-            SimpleGroupRolesPlugin))
+        from Interface.Verify import verifyClass
+        from Products.PluggableUserFolder.PluginInterfaces import IGroupPlugin
+        from Products.PluggableUserFolder.SimpleGroupRoles import \
+             SimpleGroupRolesPlugin
+        self.assert_(verifyClass(IGroupPlugin, SimpleGroupRolesPlugin))
 
 if __name__ == '__main__':
     framework(descriptions=0, verbosity=1)
