@@ -1,4 +1,31 @@
 *******************************************
+** PluggableUserFolder V2.6.0 [R1 build 2005/06/02-09:37 by fguillaume]
+** SVN URL: https://svn.nuxeo.org/pub/PluggableUserFolder/trunk Revision: 22058
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+-
+Bug fixes:
+~~~~~~~~~~
+- local roles were not merged from the parent folders
+- mergedLocalRoles() according to PluginInterface getUsersWithRoles() takes
+  an object as argument.
+- mergedLocalRoles(): cannot expand a tuple, so we use an empty list instead.
+- mergedLocalRoles(): the 'result' dict was not defined before assignment.
+- moved the 'No plugins able to identify user' log message from ERROR
+  to DEBUG level.
+- getRolesInContext() did not take group roles ('roles:Authenticated')
+  into account
+- mergedLocalRole(): optimization in dictionary access and fix:
+  group:roles where counted several times.
+- mergedLocalRolesWithPath(): group:roles where counted several times.
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+-
+
+*******************************************
 ** PluggableUserFolder V2.5.1 [R1 build 2005/04/13-09:13 by ben]
 
 Requires:
