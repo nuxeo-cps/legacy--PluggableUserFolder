@@ -51,6 +51,8 @@ class SimpleGroup(SimpleItem):
     )
     manage_groupForm = DTMLFile('zmi/simpleGroupRolesEditGroup', globals())
     manage_main = manage_groupForm
+    manage_main._setName('manage_main')
+
     groups = None
 
     def __init__(self, id, title):
