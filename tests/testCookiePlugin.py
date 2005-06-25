@@ -15,7 +15,7 @@ from Products.PluggableUserFolder.PluginInterfaces import \
     IIdentificationPlugin
 from Products.PluggableUserFolder.CookieIdentification import \
     CookieIdentificationPlugin
-from Testing.ZopeTestCase import _user_name
+from Testing.ZopeTestCase import user_name as _user_name
 from Products.PluggableUserFolder.CookieIdentification import \
      manage_addCookieIdentificationPlugin
 

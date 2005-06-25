@@ -11,8 +11,11 @@ if __name__ == '__main__':
 
 from Interface.Verify import verifyClass
 from Testing import ZopeTestCase
-from Testing.ZopeTestCase import _user_name, _user_role, _folder_name, \
-    _standard_permissions, ZopeLite
+from Testing.ZopeTestCase import ZopeLite
+from Testing.ZopeTestCase import user_name as _user_name
+from Testing.ZopeTestCase import user_role as _user_role
+from Testing.ZopeTestCase import folder_name as _folder_name
+from Testing.ZopeTestCase import standard_permissions as _standard_permissions
 from AccessControl import Unauthorized
 from OFS.DTMLMethod import DTMLMethod
 from OFS.Folder import Folder
@@ -59,12 +62,12 @@ class TestBase(ZopeTestCase.ZopeTestCase):
         self.uf._setObject(ob.id, ob)
         self.uf._addUser(_user_name, 'secret', 'secret', (_user_role,), ())
         self._user = self.uf.getUserById(_user_name).__of__(self.uf)
-        self._setPermissions(_standard_permissions)
+        self.setPermissions(_standard_permissions)
         manage_addSimpleGroupRolesPlugin(self.uf)
 
     def beforeClose(self, call_close_hook=1):
         '''Clears out the fixture.'''
-        self._logout()
+        self.logout()
         try: del self.uf
         except AttributeError: pass
         try: del self.folder.acl_users
@@ -276,7 +279,8 @@ class TestValidate(TestBase):
         auth = self._basicAuth(_user_name)
         roles = self._call__roles__(self.folder[_pm])
         user = self.uf.validate(request, auth, roles)
-        assert user is not None
+        # AT: this test is broken, dont know why
+        self.assert_(user is not None)
         self.assertEquals(user.getUserName(), _user_name)
 
     def testNotAuthorize4(self):

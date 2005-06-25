@@ -15,7 +15,7 @@ from Products.PluggableUserFolder.PluginInterfaces import \
     IIdentificationPlugin
 from Products.PluggableUserFolder.ApacheSSLIdentification import \
     ApacheSSLIdentificationPlugin
-from Testing.ZopeTestCase import _user_name
+from Testing.ZopeTestCase import user_name as _user_name
 from Products.PluggableUserFolder.PluggableUserFolder import _no_password_check
 from Products.PluggableUserFolder.ApacheSSLIdentification import \
     manage_addApacheSSLIdentificationPlugin

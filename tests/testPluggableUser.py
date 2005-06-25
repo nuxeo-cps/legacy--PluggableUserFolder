@@ -10,7 +10,7 @@ if __name__ == '__main__':
 #os.environ['STUPID_LOG_SEVERITY'] = '-200'  # DEBUG
 
 from Interface.Verify import verifyClass
-from Testing.ZopeTestCase import _user_name, ZopeLite
+from Testing.ZopeTestCase import user_name as _user_name, ZopeLite
 from testUserFolder import TestBase
 from Products.PluggableUserFolder.PluggableUser import \
     PluggableUser
