@@ -19,7 +19,7 @@
 
 __doc__ = '''PluggableUserFolder init'''
 __version__ = '$Revision$'[11:-2]
-from zLOG import LOG, DEBUG
+from zLOG import LOG, TRACE
 import CMFPatch
 
 import PluggableUserFolder
@@ -130,8 +130,8 @@ def registerRolePlugin(plugin):
     for method in plugin.local_manage_methods:
         uid = 'manage_' + plugin.plugin_id + method['id']
         action = getattr(plugin, method['action'])
-        LOG('PluggableFolder', DEBUG, 'Add method on RoleManager',
-            'Name: %s \nMethod: <%s>.%s\n' % (
+        LOG('PluggableFolder', TRACE, 'Added method RoleManager.%s, '
+            'calling <%s>.%s' % (
                 uid, plugin.meta_type, method['action']))
         setattr(RoleManager, uid, action)
 
