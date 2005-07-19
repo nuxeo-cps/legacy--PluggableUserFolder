@@ -65,7 +65,7 @@ class TestBase(ZopeTestCase.ZopeTestCase):
         self.setPermissions(_standard_permissions)
         manage_addSimpleGroupRolesPlugin(self.uf)
 
-    def beforeClose(self, call_close_hook=1):
+    def beforeTearDown(self):
         '''Clears out the fixture.'''
         self.logout()
         try: del self.uf
