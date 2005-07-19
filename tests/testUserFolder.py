@@ -279,7 +279,7 @@ class TestValidate(TestBase):
         auth = self._basicAuth(_user_name)
         roles = self._call__roles__(self.folder[_pm])
         user = self.uf.validate(request, auth, roles)
-        # AT: this test is broken, dont know why
+        # AT: this test is broken in Zope 2.8.0, dont know why
         self.assert_(user is not None)
         self.assertEquals(user.getUserName(), _user_name)
 
