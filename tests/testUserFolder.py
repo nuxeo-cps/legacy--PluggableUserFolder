@@ -70,7 +70,7 @@ class TestBase(ZopeTestCase.ZopeTestCase):
         self.logout()
         try: del self.uf
         except AttributeError: pass
-        try: del self.folder.acl_users
+        try: self.folder._delObject('acl_users')
         except AttributeError: pass
         try: self.app._delObject(_folder_name)
         except (AttributeError, RuntimeError): pass
