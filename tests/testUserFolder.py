@@ -17,6 +17,7 @@ from Testing.ZopeTestCase import user_role as _user_role
 from Testing.ZopeTestCase import folder_name as _folder_name
 from Testing.ZopeTestCase import standard_permissions as _standard_permissions
 from AccessControl import Unauthorized
+from AccessControl.PermissionRole import rolesForPermissionOn
 from OFS.DTMLMethod import DTMLMethod
 from OFS.Folder import Folder
 
@@ -96,13 +97,19 @@ class TestBase(ZopeTestCase.ZopeTestCase):
         return 'Basic %s' % base64.encodestring('%s:%s' %(name, 'secret'))
 
     def _call__roles__(self, object):
-        # From BaseRequest.traverse()
-        roles = ()
         object = getattr(object, 'aq_base', object)
-        if hasattr(object, '__call__') \
-          and hasattr(object.__call__, '__roles__'):
-            roles = object.__call__.__roles__
-        return roles
+        acp = getattr(object, '__ac_permissions__', None)
+        if acp is not None:
+            if callable(acp):
+                acp = acp()
+            permission = None
+            for key, value in acp:
+                if '__call__' in value:
+                    permission = key
+                    break
+            if permission is None:
+                return ()
+            return rolesForPermissionOn(permission, object)
 
 
 class TestUserFolder(TestBase):
@@ -258,14 +265,11 @@ class TestValidate(TestBase):
         auth = ''
         assert self.uf.validate(request, auth, [_user_role]) is None
 
-    # This fails with all user folders.
-    # I'm not convinced Validate SHOULD fail without roles
-    # If it should, then BasicUserFolder has it wrong.
-    # def testNotAuthorize2(self):
-    #     # Validate should fail without roles
-    #     request = self.app.REQUEST
-    #     auth = self._basicAuth(_user_name)
-    #     self.assertEqual(self.uf.validate(request, auth),None)
+    def testNotAuthorize2(self):
+        # Validate should fail without roles
+        request = self.app.REQUEST
+        auth = self._basicAuth(_user_name)
+        self.assertEqual(self.uf.validate(request, auth, ()),None)
 
     def testNotAuthorize3(self):
         # Validate should fail with wrong roles
@@ -279,8 +283,7 @@ class TestValidate(TestBase):
         auth = self._basicAuth(_user_name)
         roles = self._call__roles__(self.folder[_pm])
         user = self.uf.validate(request, auth, roles)
-        # AT: this test is broken in Zope 2.8.0, dont know why
-        self.assert_(user is not None)
+        self.assertNotEquals(user, None)
         self.assertEquals(user.getUserName(), _user_name)
 
     def testNotAuthorize4(self):
