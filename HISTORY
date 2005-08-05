@@ -1,4 +1,21 @@
 *******************************************
+** PluggableUserFolder V2.7.0 [R1 build 2005/08/05-15:39 by fguillaume]
+** SVN URL: https://svn.nuxeo.org/pub/PluggableUserFolder/trunk Revision: 25565
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+-
+Bug fixes:
+~~~~~~~~~~
+-
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+- Avoid warning about manage_main's name.
+- Made tests pass with ZopeTestCase shipped with Zope 2.8.
+
+*******************************************
 ** PluggableUserFolder V2.6.0 [R1 build 2005/06/02-09:37 by fguillaume]
 ** SVN URL: https://svn.nuxeo.org/pub/PluggableUserFolder/trunk Revision: 22058
 Requires:

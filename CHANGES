@@ -9,5 +9,4 @@ Bug fixes:
 -
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
-- Avoid warning about manage_main's name.
-- Made tests pass with ZopeTestCase shipped with Zope 2.8.
+-
