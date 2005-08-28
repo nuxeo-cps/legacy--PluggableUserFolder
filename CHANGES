@@ -6,7 +6,7 @@ New features:
 -
 Bug fixes:
 ~~~~~~~~~~
--
+- SimpleGroupRole::getGroup was not acquisition-safe
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -

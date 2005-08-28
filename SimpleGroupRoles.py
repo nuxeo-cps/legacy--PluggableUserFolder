@@ -363,7 +363,7 @@ class SimpleGroupRolesPlugin(Folder):
         return self.objectValues('Simple Group')
 
     def getGroup(self, id):
-        return getattr(self, id, None)
+        return getattr(aq_base(self), id, None)
 
     def getLocalRolesForUser(self, user, object):
         roles = []
