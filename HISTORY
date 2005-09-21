@@ -1,4 +1,20 @@
 *******************************************
+** PluggableUserFolder V2.7.1 [R1 build 2005/09/21-15:35 by fguillaume]
+** SVN URL: https://svn.nuxeo.org/pub/PluggableUserFolder/trunk Revision: 27306
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+-
+Bug fixes:
+~~~~~~~~~~
+- SimpleGroupRole::getGroup was not acquisition-safe
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+-
+
+*******************************************
 ** PluggableUserFolder V2.7.0 [R1 build 2005/08/05-15:39 by fguillaume]
 ** SVN URL: https://svn.nuxeo.org/pub/PluggableUserFolder/trunk Revision: 25565
 Requires:
