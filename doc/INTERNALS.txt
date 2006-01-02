@@ -1,6 +1,6 @@
-==================================================================
-PluggableUserFolder: A Zope UserFolder with authentication plugins
-==================================================================
+============================================================================
+PluggableUserFolder Internals: A Zope UserFolder with Authentication Plugins
+============================================================================
 
 :Revision: $Id$
 
