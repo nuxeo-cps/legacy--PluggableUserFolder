@@ -1,200 +1,230 @@
+==================================================================
 PluggableUserFolder: A Zope UserFolder with authentication plugins
+==================================================================
 
-  Zopes AccessControl consists of several separate steps.
+:Revision: $Id$
 
-   * Identification: The way the client tells the server who the
-     user is. When it comes to web, this is typically methods like
-     Basic HTTP Authentication, Cookies or SSL Certificates.
-
-   * Authentication: Making sure the user is who he/she is. This typically
-     involves looking up the user in a user database and validating the users
-     password.
-
-   * Authorization: Making sure the authenticated user is authorized to do
-     what the user is trying to do.
-
-  In Zope these three steps are together known as Validation.
-
-  Zope includes only supports one way of Authenticating users, namely
-  mathching them against an internal user database. Being able to use
-  external user databases is one of the most common requirements, and
-  this has been accomodated by several different third-party user folders,
-  who instead of storing the user data in the ZODB, make external calls
-  to external user directories such as LDAP servers, Microsoft NT servers,
-  or lookups in an SQL database. This works well, until you want to have
-  several different sources of users. It also has the drawback that adding
-  new features and extentions like Groups, or new high-level interfaces,
-  only works with the default user folder, and not to the external user
-  folders.
-
-  The PluggableUserFolder is an attempt to fix these problems, by having
-  a user folder that uses plugins for the different steps. This makes it
-  possible to have several plugins to use several sources of users
-  (typically both an LDAP source and an ZODB source). It also simplifies
-  the implementation of new sources by letting you only implement the
-  basic methods to get data from a data source, instead of implementing
-  a complete user folder. Any features added to the user folder can then
-  also directly be enjoyed by  anybody using an external data source.
+.. sectnum::    :depth: 4
+.. contents::   :depth: 4
 
 
-  Identification
+Introduction -- Zope AccessControl
+===================================
 
-    Zope out of the box also supports only Basic HTTP Authentication.
-    CMF adds identification through Cookies with the CookieCrumbler
-    product. It's using a rather ugly, but well-working method of
-    faking a Basic HTTP Authentication header in the REQUEST object.
-    It's possible to add new Identification methods in a similar way,
-    if needed. However, it gets complicated to support more than one
-    additional identification process on top of Basic HTTP Authentication.
+Zope AccessControl consists of several separate steps.
 
-    PluggableUserFolder solves this by allowing the use of plugins
-    that take the HTTP request and identifies the user from this.
-    Three plugins are currently included, one plugin that handles
-    the standard Basic HTTP Authentication method (please note that
-    despite it's name it's a method for identification, not
-    Authentication), one for Cookie Identification, to allow for a
-    predictable way of logging out, and one for identification through
-    SSL Certificates (requires Apache SSL).
+- Identification: The way the client tells the server who the user
+  is. When it comes to web, this is typically methods like Basic
+  HTTP Authentication, Cookies or SSL Certificates.
 
-    All these plugins, and also any other identification plugins, can
-    be installed at one time. They will be called by the user folder
-    in an order defined by the manager, and the first that is able to
-    identifying the user will be allowed to do so.
+- Authentication: Making sure the user is who he/she is. This
+  typically involves looking up the user in a user database and
+  validating the users password.
 
-    Identification is done in three separate steps. This split is
-    partly done to accomodate the current Zope user folder code base.
-    Two steps would have been possible, but that would have required
-    duplicating a lot of code from the Zope User Folder, and hence
-    having two separate codebases to keep in sync.
+- Authorization: Making sure the authenticated user is authorized
+  to do what the user is trying to do.
 
-    Step 1 is to make a string from the HTTP request that contains
-    the method of identification, the username and the password (if
-    there is one) into one string, in the form of
-       <Method><space><Ident>
-    where Method is the name of method of identification used,
-    and Ident is a base64 encoded string used by the plugin to
-    identify the user. Typically this would the login and password
-    separated by a colon.
+In Zope these three steps are together known as Validation.
 
-    Examples:
-      basic bGVubmFydDppc2dyZWF0
-      ApacheSSL R2luZ2VyIEJyZWFkbWFuOg==
+Zope includes only supports one way of Authenticating users,
+namely matching them against an internal user database. Being
+able to use external user databases is one of the most common
+requirements, and this has been accommodated by several different
+third-party user folders, who instead of storing the user data in
+the ZODB, make external calls to external user directories such as
+LDAP servers, Microsoft NT servers, or lookups in an SQL database.
+This works well, until you want to have several different sources
+of users. It also has the drawback that adding new features and
+extensions like Groups, or new high-level interfaces, only works
+with the default user folder, and not to the external user
+folders.
 
-    This string is (illogically) in Zope called 'auth' by most methods.
-    I have kept this name, and calls it the Authentication string
-    although it strictly is an identification string.
+The PluggableUserFolder is an attempt to fix these problems, by
+having a user folder that uses plugins for the different steps.
+This makes it possible to have several plugins to use several
+sources of users (typically both an LDAP source and an ZODB
+source). It also simplifies the implementation of new sources by
+letting you only implement the basic methods to get data from a
+data source, instead of implementing a complete user folder. Any
+features added to the user folder can then also directly be
+enjoyed by anybody using an external data source.
 
-    Step 2 is asking all the plugins if they can use this string
-    to identify the user. This is necessary, since the creation of
-    the authentication string is done in another part of the code
-    from it's actual use.
 
-    Step 3 is letting the plugin identify the user from the
-    authentication string. It returns a name and a password, later
-    used to authenticate the user. There is a special password
-    marker called '_no_password_check' that can be returned if the
-    identification method do not include a password. This is for
-    example true for SSL logins, where the successful decryption of
-    a certificate is seen as proof of authentication instead of a
-    password.
+Identification
+==============
 
-  Authentication
+Zope out of the box also supports only Basic HTTP Authentication.
+CMF adds identification through Cookies with the CookieCrumbler
+product. It's using a rather ugly, but well-working method of
+faking a Basic HTTP Authentication header in the REQUEST object.
+It's possible to add new Identification methods in a similar way,
+if needed. However, it gets complicated to support more than one
+additional identification process on top of Basic HTTP
+Authentication.
 
-    Authentication is the process of checking that the user really is
-    who he or she claims he is. This is normally done by checking a
-    password. In Zope it is the user object that Authenticates.
+PluggableUserFolder solves this by allowing the use of plugins
+that take the HTTP request and identifies the user from this.
+Three plugins are currently included, one plugin that handles the
+standard Basic HTTP Authentication method (please note that
+despite it's name it's a method for identification, not
+Authentication), one for Cookie Identification, to allow for a
+predictable way of logging out, and one for identification through
+SSL Certificates (requires Apache SSL).
 
-    The Authentication is made up by two substeps. The first one is
-    the fetching of a user object from a directory of users. At the
-    moment this directory of users is the Authentication plugin
-    (although a case can be made for this to be separated, se Future
-    Development below).
-    The second step is the actual authentication, which typically
-    is the matching of the password supplied to the password stored
-    in the user directory. This is in Zope done by the user object.
-    However, the authentication is not always done by a password check.
-    It is somethines done by the identification process, as in the
-    Apache SSL case, mentioned above. In other cases, it's done as
-    a part of the process of fetching the user, such as LDAP, where
-    you send the password to the LDAP server when you fetch the data,
-    and you let the LDAP server validate the password.
+All these plugins, and also any other identification plugins, can
+be installed at one time. They will be called by the user folder
+in an order defined by the manager, and the first that is able to
+identifying the user will be allowed to do so.
 
-    This means two things for PluggableUserFolder. First, you need
-    to store a reference to the user folder in the user object, so
-    that the user object can call the user folder for the
-    authentication, so it in turn can call the plugins. Secondly, it
-    means that the getUser method must take a password as an optional
-    parameter, and that the authentciation method must handle
-    the '_no_password_check' marker mentioned above.
+Identification is done in three separate steps. This split is
+partly done to accommodate the current Zope user folder code base.
+Two steps would have been possible, but that would have required
+duplicating a lot of code from the Zope User Folder, and hence
+having two separate code bases to keep in sync.
 
-  Authorization
+Step 1 is to make a string from the HTTP request that contains
+the method of identification, the username and the password (if
+there is one) into one string, in the form of::
 
-    This is the last and most complicated part of the validation.
-    The Zope security policy is based on users having roles, and
-    roles having a mapping to specific permissions. If a user has
-    the permission to do a specific action is checked by looking up
-    which roles have the permission, and then calling the users
-    "allowed" method to check if the user has any of the roles
-    in queston.
+   <Method><space><Ident>
 
-    The  PluggableUserFolder extends the current role assignment
-    mechanism with role modification plugins. These plugins are
-    called in the "allowed" method, and passed the users list of
-    currently assigned roles, and return a modified list. Any type
-    of modification could be allowed, but the most commonly wanted
-    is groups support. Two plugins for group support is included,
-    the SimpleGroups, which is just a simple support for groups that
-    can be assigned local roles, just as users, and a more experimental
-    groups support that adds an ortogonality to the access control
-    in Zope (see separate documentation).
+where Method is the name of method of identification used, and
+Ident is a base64 encoded string used by the plugin to identify
+the user. Typically this would the login and password separated by
+a colon.
 
-    Another type of role modification plugin can be the blacklist,
-    where you add the functionality of assigning people less roles
-    in a subtree than they had above, something that is not otherwise
-    available in Zope.
+Examples::
 
-    Plugins that manage local roles inone way or another need to have
-    local management screens. This is supported by dynamically patching
-    in management methods on the RoleManager object. This means that
-    all objects that subclass RoleManager will get these management
-    methods and screens. The main management screen is also replaced
-    with one that will list all available management screens. The list
-    of management methods is stored in the local_manage_methods property
-    of the plugin. It's a list of dictionaries, in the tradition of
-    _properties and manage_options.
+  basic bGVubmFydDppc2dyZWF0
+  ApacheSSL R2luZ2VyIEJyZWFkbWFuOg==
+
+This string is (illogically) in Zope called 'auth' by most
+methods. I have kept this name, and calls it the Authentication
+string although it strictly is an identification string.
+
+Step 2 is asking all the plugins if they can use this string to
+identify the user. This is necessary, since the creation of the
+authentication string is done in another part of the code from
+it's actual use.
+
+Step 3 is letting the plugin identify the user from the
+authentication string. It returns a name and a password, later
+used to authenticate the user. There is a special password marker
+called '_no_password_check' that can be returned if the
+identification method do not include a password. This is for
+example true for SSL logins, where the successful decryption of a
+certificate is seen as proof of authentication instead of a
+password.
+
+
+Authentication
+==============
+
+Authentication is the process of checking that the user really is
+who he or she claims he is. This is normally done by checking a
+password. In Zope it is the user object that Authenticates.
+
+The Authentication is made up by two sub-steps. The first one is
+the fetching of a user object from a directory of users. At the
+moment this directory of users is the Authentication plugin
+(although a case can be made for this to be separated, see Future
+Development below).
+
+The second step is the actual authentication, which typically is
+the matching of the password supplied to the password stored in
+the user directory. This is in Zope done by the user object.
+However, the authentication is not always done by a password
+check. It is sometimes done by the identification process, as in
+the Apache SSL case, mentioned above. In other cases, it's done as
+a part of the process of fetching the user, such as LDAP, where
+you send the password to the LDAP server when you fetch the data,
+and you let the LDAP server validate the password.
+
+This means two things for PluggableUserFolder. First, you need to
+store a reference to the user folder in the user object, so that
+the user object can call the user folder for the authentication,
+so it in turn can call the plugins. Secondly, it means that the
+getUser method must take a password as an optional parameter, and
+that the authentication method must handle the
+'_no_password_check' marker mentioned above.
+
+
+Authorization
+=============
+
+This is the last and most complicated part of the validation. The
+Zope security policy is based on users having roles, and roles
+having a mapping to specific permissions. If a user has the
+permission to do a specific action is checked by looking up which
+roles have the permission, and then calling the users "allowed"
+method to check if the user has any of the roles in question.
+
+The PluggableUserFolder extends the current role assignment
+mechanism with role modification plugins. These plugins are called
+in the "allowed" method, and passed the users list of currently
+assigned roles, and return a modified list. Any type of
+modification could be allowed, but the most commonly wanted is
+groups support. Two plugins for group support is included, the
+SimpleGroups, which is just a simple support for groups that can
+be assigned local roles, just as users, and a more experimental
+groups support that adds an orthogonality to the access control in
+Zope (see separate documentation).
+
+Another type of role modification plugin can be the blacklist,
+where you add the functionality of assigning people less roles in
+a subtree than they had above, something that is not otherwise
+available in Zope.
+
+Plugins that manage local roles in one way or another need to have
+local management screens. This is supported by dynamically
+patching in management methods on the RoleManager object. This
+means that all objects that subclass RoleManager will get these
+management methods and screens. The main management screen is also
+replaced with one that will list all available management screens.
+The list of management methods is stored in the
+local_manage_methods property of the plugin. It's a list of
+dictionaries, in the tradition of _properties and manage_options.
     
 
-  Future development
+Future development
+==================
 
-    Splitting the directory and authentication
+Splitting the directory and authentication
+------------------------------------------
 
-      There are several problems with letting the user directory do
-      the authentication. One of them is the problem of where to store
-      data. For example, you might want to store extra data concerning
-      a user that is not stored in the LDAP directory. Changing the
-      schema for the LDAP server can be complicated, and the data may
-      also be very specific to the site. A transparent way of having
-      several separate directories could be one solution. But as long
-      as the directories also to the authentication, that could be
-      problematic.
+There are several problems with letting the user directory do the
+authentication. One of them is the problem of where to store data.
+For example, you might want to store extra data concerning a user
+that is not stored in the LDAP directory. Changing the schema for
+the LDAP server can be complicated, and the data may also be very
+specific to the site. A transparent way of having several separate
+directories could be one solution. But as long as the directories
+also to the authentication, that could be problematic.
 
-      Another reason for splitting these is that you may want to get the
-      list of users either locally, or from a third-party database, but
-      you want the password check to be done by the LDAP server.
-      This could for example be the case where you only want some users
-      to be able to access the server, but you have no way of adding a
-      flag on the LDAP server to set the access rights there.
+Another reason for splitting these is that you may want to get the
+list of users either locally, or from a third-party database, but
+you want the password check to be done by the LDAP server. This
+could for example be the case where you only want some users to be
+able to access the server, but you have no way of adding a flag on
+the LDAP server to set the access rights there.
 
-      Or you may have an old list of users already in the ZODB, but you
-      want to use the passwords in the LDAP for the users that are
-      in the LDAP directory, and you want to use the passwords in the
-      ZODB for the rest. (Although putting the LDAP Authentication plugin
-      first in the sort order should solve that for most cases).
+Or you may have an old list of users already in the ZODB, but you
+want to use the passwords in the LDAP for the users that are in
+the LDAP directory, and you want to use the passwords in the ZODB
+for the rest. (Although putting the LDAP Authentication plugin
+first in the sort order should solve that for most cases).
 
-      In any case, this directory support should probably be merged with
-      the support for user meta data in CMF. Either that support should
-      be moved into the Pluggable User Folder, or the Pluggable User
-      Folder should ask the CMF meta directories for user objects, but
-      still authenticate them through it's own plugins.
+In any case, this directory support should probably be merged with
+the support for user meta data in CMF. Either that support should
+be moved into the Pluggable User Folder, or the Pluggable User
+Folder should ask the CMF meta directories for user objects, but
+still authenticate them through it's own plugins.
 
+
+.. Emacs
+.. Local Variables:
+.. mode: rst
+.. End:
+.. Vim
+.. vim: set filetype=rst:
 
