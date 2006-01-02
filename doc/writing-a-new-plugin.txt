@@ -9,12 +9,12 @@ Writing a new Plugin
 
 ::
 
-From: <rmccain@3dex.com>
->> I have installed PluggableUserFolder for my Zope installation, but have no
->> idea how to make it read from a sql database. The Readme says that it is
->> possible but I cannot find any documentation or comments or posts or
->> anything anywhere about how to do it. Jeeezz. Somebody please
->> HEEELLPPPP!!!!!!!
+  From: <rmccain@3dex.com>
+  >> I have installed PluggableUserFolder for my Zope installation, but have no
+  >> idea how to make it read from a sql database. The Readme says that it is
+  >> possible but I cannot find any documentation or comments or posts or
+  >> anything anywhere about how to do it. Jeeezz. Somebody please
+  >> HEEELLPPPP!!!!!!!
 
 Yeah, as you noticed, there is no documentation on how to write
 plugins yet. Sorry about that.
